@@ -1,0 +1,28 @@
+.toggle-button {
+    display: inline-flex;
+    padding:7px;
+    overflow: hidden;
+    background-color: #FFFFFF;
+  }
+  
+  .option {
+    flex: 1;
+    
+    
+    border: none;
+    background-color: #FFFFFF;
+    color: #620B84;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .option.selected {
+    background-color: #620B84;
+    color: #FFFFFF;
+    margin:0px;
+    padding:7px;
+    width:100%;
+ 
+  }
+  

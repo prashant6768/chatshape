@@ -18,7 +18,7 @@ stripe.api_key=os.getenv('STRIPE_SECRET_KEY_2')
 
 stripepay = Blueprint("stripepay",__name__)
 
-# stripepay.secret_key= 'udrg4tciytv7e57tyjwiety5eowywtwne7v5b7ctywe758yxt7eynco8wt7tyncwel'
+
 
 YOUR_DOMAIN = os.getenv("YOUR_DOMAIN")
 

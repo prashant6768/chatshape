@@ -38,7 +38,7 @@ useEffect(()=>{
      <BrowserRouter>
            <Routes>
            <Route path='/' element={<Home/>}  />
-           <Route path='/pricing' element={<PricingPage/>}/>
+           <Route path='/pricing' element={<PrivateRoute><PricingPage/></PrivateRoute>}/>
            <Route path='/account' element={<PrivateRoute><AccountPage/></PrivateRoute>}/>
            <Route path='/chatpage/:id' element={<ChatPage/>}/>
            <Route path='/create' element={<PrivateRoute><CreateBot/></PrivateRoute>}/>

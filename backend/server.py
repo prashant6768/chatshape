@@ -1,9 +1,10 @@
 import time
-from flask import Blueprint
+from flask import Blueprint, abort
 import ast
 import tiktoken
 from bson import ObjectId
 from auth import auth
+from stripepay import stripepay
 from flask import Flask, jsonify, request
 import json
 import asyncio
@@ -17,9 +18,11 @@ from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import SeleniumURLLoader
 import openai
 from pymongo import MongoClient
+from urllib.parse import quote_plus
 
 load_dotenv(find_dotenv())
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+MONGO = os.getenv("MONGO")
 
 from flask_bcrypt import Bcrypt
 from langchain.text_splitter import CharacterTextSplitter
@@ -52,16 +55,25 @@ from langchain.schema import (
 )
 from langchain.memory import ConversationBufferMemory
 
+from datetime import date
+from datetime import date
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+
 app = Flask(__name__)
 CORS(app) 
 
 app.register_blueprint(auth, url_prefix="/auth")
+app.register_blueprint(stripepay,url_prefix="/stripepay")
+
+client = MongoClient(MONGO)
+db = client['chatbot']
 
 Gsummary = None
 
 def start_ai(query,userData):
-    client = MongoClient('mongodb://localhost:27017/')
-    db = client['chatbot']
+   
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(userData)
     dataDb = users_collection.find_one({'_id':objId})
@@ -103,6 +115,8 @@ def user_msg():
 
 urll = None
 
+#create bot api start
+
 @app.route('/api/sendLinkData',methods=['POST'])
 def get_link_data():
     # print("INSide get the link data")
@@ -111,6 +125,14 @@ def get_link_data():
     userData = request.get_json()['decoded']['username']
     botName =  request.get_json()['botName']
     exclude = request.get_json()['exclude']
+    sub = db['user_subscription']
+    
+    datasub = sub.find_one({'username':userData}) 
+    # print(datasub,"555555555555555555555555555555",datetime.strptime(datasub['expiration'], "%Y-%m-%d"),"WWW",datetime.now().date())
+    if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date():
+        return "SubE"
+    if datasub['plan-Info']['NoOfBots'] < 1:
+       return "BotF" 
     # print("the link i recieved ",urll)
     # print("username is ==", userData)
     get_data(urll,userData,botName,exclude)
@@ -129,8 +151,9 @@ def get_data(urls,userData,botName,exclude):
     data = loader.load()
     # print(data)
 
-    client = MongoClient('mongodb://localhost:27017/')
-    db = client['chatbot']
+    # client = MongoClient('mongodb://localhost:27017/')
+    # client = MongoClient(MONGO)
+    # db = client['chatbot']
     users_collection = db['users_website_crawl_data']
     user_data = {
         'crawldata': str(data),
@@ -148,8 +171,7 @@ def get_data(urls,userData,botName,exclude):
 
 @app.route('/api/updatebot/<id>',methods=['GET'])
 def getupdatebot(id):
-    client = MongoClient('mongodb://localhost:27017/')
-    db = client['chatbot']
+
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(id)
     dataDb = users_collection.find_one({'_id':objId})
@@ -164,8 +186,7 @@ def getupdatebot(id):
     
 @app.route('/api/updatebot/<id>',methods=['PUT'])
 def updatebot(id):
-    client = MongoClient('mongodb://localhost:27017/')
-    db = client['chatbot']
+
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(id)
     # dataDb = users_collection.find_one({'_id':objId})
@@ -182,8 +203,7 @@ def get_mybots():
     data =  request.get_json()['decoded']['username']
     # print("my bots ",data)
 
-    client = MongoClient('mongodb://localhost:27017/')
-    db = client['chatbot']
+
     users_collection = db['users_website_crawl_data']
 
     dataDb =[] 
@@ -226,7 +246,18 @@ def scrape_links_and_buttons(url):
     driver.quit()
     return unique_links
 
+@app.route('/api/subdata',methods=['POST'])
+def subdata():
+    data =  request.get_json()['decoded']['username']
+    users_collection = db['user_subscription']
+
+    datasub = users_collection.find_one({'username':data}) 
+    print(datasub," MMMMMMMM")
+
+    # print("dataDb =",dataDb)
+    return [datasub['plan-Info'],datasub['username'],datasub['created'],datasub['expiration']]
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+    #   app.run(host=socket.gethostname(), port=8080)  # Change the port to 8080 or 8888 . remove this if connection refused for email otp verification not work

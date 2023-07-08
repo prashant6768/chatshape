@@ -26,3 +26,27 @@
  
   }
   
+
+  @media screen and (min-width: 1621px) {
+    /* CSS rules to apply when the screen width is above 500 pixels */
+    .sectionwidth {
+      margin-left:15%;
+      margin-right: 15%;
+    }
+  }
+  @media screen and (max-width: 1620px ) and (min-width:1501px) {
+    /* CSS rules to apply when the screen width is above 500 pixels */
+    .sectionwidth {
+      margin-left:10%;
+      margin-right: 10%;
+    }
+  }
+  
+  /* Styles for screens below 500 pixels */
+  @media screen and (max-width: 1500px) {
+    /* CSS rules to apply when the screen width is 500 pixels or below */
+    .sectionwidth {
+      margin-left:10px;
+      margin-right: 30px
+    }
+  }

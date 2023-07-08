@@ -4,33 +4,57 @@ import NavbarC from '../component/NavbarC';
 import Footer from '../component/Footer';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {ThreeDots} from 'react-loader-spinner';
+
+import env from 'react-dotenv'
 
 
 const Signup = () => {
 
+  const BACKEND = 'http://localhost:5000/'
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const[loading, setLoading] = useState(false);
+    const[loading2, setLoading2] = useState(false);
+    const[otp,setOtp]=useState('')
+    const[show,setShow]=useState(false)
   
     const handleSubmit =async (e) => {
       e.preventDefault();
-      
-      await axios.post('http://127.0.0.1:5000/auth/signup',{username,password},{
+      setShow(true)
+      setLoading(true); 
+      await axios.post(`${BACKEND}/auth/signup`,{username,password},{
+        // await axios.post('http://18.218.218.167:8000/auth/signup',{username,password},{
           'Content-type':'application/json', 
           'Accept':'application/json',
           'Access-Control-Allow-Origin':'*'
-    }).then((res)=>{console.log("signup = ",res); if(res.data === "NO"){toast.error("User Already Exists")} else{toast.success("Profile created Successfully")}})
+    }).then(res => { console.log(res); setLoading(false)})
+    // .then((res)=>{console.log("signup = ",res); if(res.data === "NO"){toast.error("User Already Exists");setLoading(false);} else{toast.success("Profile created Successfully");setLoading(false);}})
       // .then(data => {document.cookie =`accessToken = ${data.data.accessToken}` })
-      .catch(err => {console.log("signup form err = ",err); toast.error("Something went wrong")})
+      .catch(err => {console.log("signup form err = ",err); toast.error("Something went wrong");setLoading(false);})
   
-      console.log('Submitted:', username, password);
+      console.log('Submitted:', BACKEND);
     };
+
+    const handleOtp=async(e)=>{
+       e.preventDefault()
+       setLoading2(true)
+       await axios.post(`${BACKEND}/auth/getOTP`,{otp},{
+        'Content-type':'application/json', 
+        'Accept':'application/json',
+        'Access-Control-Allow-Origin':'*'
+  }).then((res)=>{console.log("signup = ",res); if(res.data === "NO"){toast.error("User Already Exists");setLoading2(false);}else if(res.data == "Verification Failed"){toast.error("Verification Failed");setLoading2(false);} else{toast.success("Profile created Successfully");setLoading2(false);}}).catch(err => {console.log(err);setLoading2(false);{toast.error("Some Error Occured")}})
+    }
+
 
     const gradientC = true
 
   return (
     <div style={{width:'100vw'}}>
     <NavbarC gradientC={gradientC}/>
-    <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'100px', backgroundColor: '#242439', height: '100vh'}} >
+    <div  style={{paddingTop:'100px', backgroundColor: '#242439', height: '100vh'}}>
+    <div className='d-flex justify-content-center col-12'  >
     <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px',height:'300px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
     <div className="row">
       <h3>Signup</h3>
@@ -78,8 +102,60 @@ const Signup = () => {
         </button>
       </div>
     </div>
+    <div className='form-group d-flex justify-content-center mt-4'>
+       {loading ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
  
   </form>
+  </div>
+  { show ?
+  <div className='d-flex justify-content-center col-12' style={{paddingTop:'10px',paddingBottom:'100px', backgroundColor: '#242439', height: '100vh'}} >
+  <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px',height:'160px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
+<div className="row">
+  <div className="col-sm-12">
+    <label htmlFor="email" className="mb-1">
+     Check for OTP in your email <span className="text-danger">*</span>
+    </label>
+    <div className="input-group mb-3">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="OTP"
+        id="emailFreelancer"
+        required
+        aria-label="otp"
+        value={otp}
+        onChange={(e)=>setOtp(e.target.value)}
+      />
+    </div>
+  </div>
+  <div className="col-12">
+    <button
+      type="submit"
+      className="btn btn-primary mt-3 d-block w-100"
+       onClick={(e) => handleOtp(e)}
+    >
+      Submit
+    </button>
+  </div>
+</div>
+<div className='form-group d-flex justify-content-center mt-4'>
+   {loading2 ? (
+      <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+     
+    ) : (
+      ''
+    )}
+    </div>
+
+</form>
+  </div> : ''
+  }
   </div>
   <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />
   <Footer/>
@@ -88,3 +164,5 @@ const Signup = () => {
 }
 
 export default Signup
+
+

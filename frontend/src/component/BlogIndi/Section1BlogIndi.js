@@ -75,15 +75,15 @@ console.log(x)
   return (
     <div className='pb-5 mx-0 d-flex row justify-content-center ' style={{ backgroundColor: '#242439', height: '100%',width:'100vw' }}>
          <div id={x.id} className=' row px-0 row d-flex  col-11  mx-xxl-5 mx-2 my-5  d-flex  justify-content-center ' style={{ height: '450px', borderRadius:'10%' }}>
-          <div className='col-8 px-0 py-3 hovercolor' style={{ borderTopLeftRadius:'15px', borderBottomLeftRadius:'15px'}}>
+          <div className='col-sm-8 px-0 py-3 hovercolor brt' style={{}}>
             <h1 style={{color:'white', backgroundColor:'#CE98E8'}} className=' py-2 mx-3 mb-0 mt-4 px-1 fw-bold  text-uppercase '>{x.imageHeading}</h1>
             <h3 style={{color:'black', backgroundColor:'#F6BDFF'}} className=' py-2 mx-3  px-1   text-uppercase '>{x.imageSubheading}</h3>
             <p className=' pt-2 pb-0 mb-0 mx-3  px-1 ' style={{color:'black'}}>{x.company}</p>
           </div>
-          <div className='col-4 px-0' style={{ }}>
+          <div className='col-sm-4 px-0' style={{ }}>
             <img
-              style={{ width: '100%', height: '100%', borderTopRightRadius:'15px', borderBottomRightRadius:'15px',boxShadow:'-2px 0px 5px grey' }}
-              className='px-0'
+              style={{ width: '100%', height: '100%'}}
+              className='px-0 bri'
               alt='loading...'
               src={x.imageSource}
             />

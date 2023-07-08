@@ -12,6 +12,8 @@ import Signup from './page/Signup';
 import BlogPage from './page/BlogPage';
 import PrivateRoute from './component/PrivateRoute';
 import BlogIndiPage from './page/BlogIndiPage';
+import SuccessPage from './page/SuccessPage';
+import CancelPage from './page/CancelPage';
 // import jwt from 'jsonwebtoken'
 import * as jose from 'jose'
 
@@ -19,6 +21,7 @@ import * as jose from 'jose'
 import { decodeToken, getAccessToken } from './component/Auth'
 import ManageBotPage from './page/ManageBotPage';
 import TermsOfService from './page/TermsOfService';
+import PrivacyPolicy from './page/PrivacyPolicy';
 
 
 
@@ -44,8 +47,12 @@ useEffect(()=>{
            <Route path='/blog' element={<BlogPage/>}/> 
            <Route path='/blog/:id' element={<BlogIndiPage/>}/> 
            <Route path='/terms' element={<TermsOfService/>}/> 
+           <Route path='/privacy' element={<PrivacyPolicy/>}/> 
            <Route path ='/login' element={<Login/>}/>
            <Route path ='/signup' element={<Signup/>}/>
+           <Route path ='/SuccessPage' element={<PrivateRoute><SuccessPage/></PrivateRoute>}/>
+           <Route path ='/CancelPage' element={<PrivateRoute><CancelPage/></PrivateRoute>}/>
+
           
         </Routes>
         </BrowserRouter>

@@ -5,24 +5,29 @@ import Footer from '../component/Footer'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie'
-
+import {ThreeDots} from 'react-loader-spinner';
+import * as jose from 'jose';
+import env from 'react-dotenv'
 
 const Login = () => {
 
+  const BACKEND = 'http://localhost:5000/'
     const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const[loading, setLoading] = useState(false);
 
   const handleSubmit =async (e) => {
     e.preventDefault();
     
-    await axios.post('http://127.0.0.1:5000/auth/login',{username,password},{
+    setLoading(true); 
+    await axios.post(`${BACKEND}/auth/login`,{username,password},{
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
   })
-    .then(data => { if(data.data === 'NO'){toast.error("Wrong Credentials")}else{Cookies.set('accessToken', `${data.data}`); toast.success("Login Successful")} })
+    .then(data => { if(data.data === 'NO'){toast.error("Wrong Credentials");setLoading(false);}else{Cookies.set('accessToken', `${data.data}`); toast.success("Login Successful");setLoading(false);} })
     // .then(data => console.log(data.data))
-    .catch(err => {console.log("login form err = ",err); toast.error("Something went wrong")})
+    .catch(err => {console.log("login form err = ",err); toast.error("Something went wrong");setLoading(false);})
 
     console.log('Submitted:', username, password);
   };
@@ -32,6 +37,7 @@ const Login = () => {
     // document.cookie = "accessToken; expires=Thu, 01 Jan 1970 00:00:00 UTC; ";
     Cookies.remove('accessToken')
      toast.success("Logout Successful")
+     window.location.reload(true)
   }
 
   return (
@@ -39,7 +45,8 @@ const Login = () => {
   <div style={{minWidth:'100vw'}}>
   <NavbarC gradientC={gradientC}/>
   <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'100px', backgroundColor: '#242439', height: '100vh'}} >
-  <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px',height:'350px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
+ 
+  <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px', height:'350px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
   <div className="row">
     <h3>Login</h3>
     <div className="col-sm-12">
@@ -89,10 +96,20 @@ const Login = () => {
     <button type="button" onClick={()=> logout()} class="btn btn-outline-danger  mt-3 d-block w-100">Logout</button>
     </div>
   </div>
+  <div className='form-group d-flex justify-content-center mt-4'>
+       {loading ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
 </form>
 
-</div>
+
+
 <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />
+</div>
 <Footer/>
 </div>
   )

@@ -4,6 +4,8 @@ import '../css/chatCss.css'
 import axios  from 'axios'
 import {ThreeDots} from 'react-loader-spinner';
 
+import env from 'react-dotenv'
+
 
 function TypingEffect({ text }) {
   const delay = 20;
@@ -31,6 +33,7 @@ const ChatUI = (botID) => {
   const [inputValue, setInputValue] = useState('');
   const [chatbotMsg,setChatbotMsg]= useState('Ask what you want')
   const[loading, setLoading] = useState(false);
+  const BACKEND = 'http://localhost:5000/'
 
   const handleInputChange = async(e) => {
     await setInputValue(e.target.value);
@@ -50,7 +53,7 @@ const ChatUI = (botID) => {
 
      setMessages((prevMessages) => [...prevMessages, newMessage]);
      setLoading(true); 
-    axios.post("http://127.0.0.1:5000/api/msg",{inputValue,botID},{
+    axios.post(`${BACKEND}/api/msg`,{inputValue,botID},{
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'

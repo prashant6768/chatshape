@@ -15,23 +15,52 @@ import jwt
 from pymongo.errors import OperationFailure
 # from jose import jwt
 
+from flask_mail import Mail, Message
+import random
+import smtplib, ssl
+
+from datetime import date
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+from flask import session
 
 
 
-client = MongoClient('mongodb://localhost:27017/')
-db = client['chatbot']
+
+# client = MongoClient('mongodb://localhost:27017/')
+
 
 
 
 load_dotenv(find_dotenv())
 SECRET_KEY = os.getenv("SECRET_KEY")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+MONGO = os.getenv("MONGO")
+
+client = MongoClient(MONGO)
+db = client['chatbot']
+
 
 auth = Blueprint("auth",__name__)
+app = Flask(__name__)
 # auth.config['SECRET_KEY'] = SECRET_KEY
 bcrypt = Bcrypt()
 
 CORS(auth) 
+# auth.secret_key = os.getenv("SESSION")
+
+
+default_sub = {
+    'amount':0,
+    'plan':'Free',
+    'NoOfMsg':20,
+    'NoOfBots':2,
+    'NoOfCharacters':20000,
+}
+
+
+
 
 
 def create_jwt_token(username):
@@ -53,37 +82,97 @@ def verify_jwt_token(token):
     except jwt.InvalidTokenError:
         return None
 
+user_data=None
+otpSer= None
 
 @auth.route('/signup', methods=[ 'POST'])
 def signup():
     if request.method == 'POST':
-
+       
+        otp_store = {}
+        
         username = request.get_json()['username']
-        password = request.get_json()['password']
+        passwordUser = request.get_json()['password']
+        otp = random.randint(100000, 999999)
+        otp_store[username] = otp
+        global otpSer
+        otpSer = otp
+        # session['otpSer_s'] = otp
+        smtp_server = "smtp.gmail.com"
+        port = 587  # For starttls
+        sender_email = "thedummydog@gmail.com"
+        password = "rhaoddbejzghhfuv"
+        message = "Your OTP for Zemo signup is "+str(otp)
 
+        # Create a secure SSL context
+        context = ssl.create_default_context()
+
+        # Try to log in to server and send email
+        try:
+            server = smtplib.SMTP(smtp_server,port)
+            server.ehlo() # Can be omitted
+            server.starttls(context=context) # Secure the connection
+            server.ehlo() # Can be omitted
+            server.login(sender_email, password)
+            server.sendmail(sender_email, username, message)
+            # TODO: Send email here
+        except Exception as e:
+            # Print any error messages to stdout
+            print(e)
+        finally:
+            server.quit() 
+      
+        print("2")
+        global user_data
+        user_data = {
+            'username': username,
+            'password': bcrypt.generate_password_hash(passwordUser)
+                     }
+     
+    return "ok"
+     
+        
+@auth.route('/getOTP',methods=['POST'])
+def getOTP():
+    user_otp = int(request.get_json()['otp'])
+    print(user_otp,"user",type(user_otp))
+    print(otpSer,"server",type(otpSer))
+    print(user_data)
+   
+
+    if user_otp == otpSer:
         users_collection = db['users']
+        users_subscription = db['user_subscription']
+        
+        created = datetime.now().date().strftime("%Y-%m-%d")
+        expire = datetime.now().date()+relativedelta(years=1)
+        expired = expire.strftime("%Y-%m-%d")
+
+        print("#######N",created,"u",expired)
+        
+        user_sub_data={
+            'plan-Info':default_sub,
+            'username':user_data['username'],
+            'created':created,
+            'expiration':expired ,
+        }
+        
         try:
             users_collection.create_index("username", unique=True)
-            user_data = {
-            'username': username,
-            'password': bcrypt.generate_password_hash(password)
-                     }
+            users_subscription.create_index("username", unique=True)
+                    
             users_collection.insert_one(user_data) 
+            users_subscription.insert_one(user_sub_data)
             return "OK"       
         except OperationFailure as e:
             return "NO"
-    return "ok"
-        # user_data = {
-        #     'username': username,
-        #     'password': bcrypt.generate_password_hash(password)
-        # }
-        # users_collection.insert_one(user_data)
-    
-        
+    else:
+        return "Verification Failed"
+   
 
     
 
-@auth.route('/login', methods=['GET', 'POST'])
+@auth.route('/login', methods=[ 'POST'])
 def login():
     if request.method == 'POST':
 

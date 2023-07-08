@@ -37,6 +37,7 @@ load_dotenv(find_dotenv())
 SECRET_KEY = os.getenv("SECRET_KEY")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 MONGO = os.getenv("MONGO")
+emailpass = os.getenv("EMAILPASS")
 
 client = MongoClient(MONGO)
 db = client['chatbot']
@@ -101,7 +102,7 @@ def signup():
         smtp_server = "smtp.gmail.com"
         port = 587  # For starttls
         sender_email = "thedummydog@gmail.com"
-        password = "rhaoddbejzghhfuv"
+        password = emailpass
         message = "Your OTP for Zemo signup is "+str(otp)
 
         # Create a secure SSL context

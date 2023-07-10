@@ -34,7 +34,7 @@ useEffect(()=>{
 const handleSubmit=(e)=>{
     e.preventDefault()
     setLoading(true);
-    axios.put(`${BACKEND}/updatebot/${id.id}`,{botname,prompt},{
+    axios.put(`${BACKEND}/api/updatebot/${id.id}`,{botname,prompt},{
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'

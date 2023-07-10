@@ -25,13 +25,9 @@ from dateutil.relativedelta import relativedelta
 
 from flask import session
 
-
-
+import time    
 
 # client = MongoClient('mongodb://localhost:27017/')
-
-
-
 
 load_dotenv(find_dotenv())
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -42,7 +38,6 @@ EMAILPASS = os.getenv("EMAILPASS")
 client = MongoClient(MONGO)
 db = client['chatbot']
 
-
 auth = Blueprint("auth",__name__)
 app = Flask(__name__)
 # auth.config['SECRET_KEY'] = SECRET_KEY
@@ -50,7 +45,6 @@ bcrypt = Bcrypt()
 
 CORS(auth) 
 # auth.secret_key = os.getenv("SESSION")
-
 
 default_sub = {
     'amount':0,
@@ -60,14 +54,9 @@ default_sub = {
     'NoOfCharacters':20000,
 }
 
-
-
-
-
 def create_jwt_token(username):
     payload = {
-        'username': username,
-        
+        'username': username,       
     }
     # print("AAAAAAAAAAAAAA ====== ",JWT_SECRET_KEY)
     token = jwt.encode(payload = payload,key= JWT_SECRET_KEY)
@@ -86,6 +75,7 @@ def verify_jwt_token(token):
 user_data=None
 otpSer= None
 
+
 @auth.route('/signup', methods=[ 'POST'])
 def signup():
     if request.method == 'POST':
@@ -94,6 +84,8 @@ def signup():
         
         username = request.get_json()['username']
         passwordUser = request.get_json()['password']
+        nameUser = request.get_json()['name']
+        phone = request.get_json()['phone']
         otp = random.randint(100000, 999999)
         otp_store[username] = otp
         global otpSer
@@ -127,11 +119,13 @@ def signup():
         global user_data
         user_data = {
             'username': username,
-            'password': bcrypt.generate_password_hash(passwordUser)
+            'password': bcrypt.generate_password_hash(passwordUser),
+            'phone': phone,
+            'name':nameUser
                      }
+
      
     return "ok"
-     
         
 @auth.route('/getOTP',methods=['POST'])
 def getOTP():
@@ -167,6 +161,7 @@ def getOTP():
             return "OK"       
         except OperationFailure as e:
             return "NO"
+            # if you get user already exists erro it might be due to user existing in subscription schema
     else:
         return "Verification Failed"
    
@@ -181,7 +176,20 @@ def login():
         password = request.get_json()['password']
 
         users_collection = db['users']
-        user_data = users_collection.find_one({'username': username})
+
+        # ooooooooooooooooooooooooooooooo Find function alternative 00000000000000000000000000000000000000000000
+        # obj = [{'k1':"apple",'k2':"red"}, {'k1':"banana",'k2':"yellow"}]
+        # for x in obj:
+        #   if x.get('k2') == 'red':
+        #      print(x.get('k2'),x.get('k1'))
+        #      print("{k2:",x.get('k2'),",k1:",x.get('k1'),"}") 
+        
+        user_data_i = users_collection.find_one({'username': username})
+        print("KKKKKKKKKKk",user_data_i.get('username'))
+        user_data = {
+            'username':user_data_i.get('username'),
+            'password':user_data_i.get('password'),
+        }
 
         if user_data and bcrypt.check_password_hash(user_data['password'], password):
             token = create_jwt_token(username)

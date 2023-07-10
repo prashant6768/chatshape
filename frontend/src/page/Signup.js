@@ -15,6 +15,8 @@ const Signup = () => {
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const[name,setName]=useState('')
+    const[phone,setPhone]=useState('')
     const[loading, setLoading] = useState(false);
     const[loading2, setLoading2] = useState(false);
     const[otp,setOtp]=useState('')
@@ -24,7 +26,7 @@ const Signup = () => {
       e.preventDefault();
       setShow(true)
       setLoading(true); 
-      await axios.post(`${BACKEND}/auth/signup`,{username,password},{
+      await axios.post(`${BACKEND}/auth/signup`,{username,password,name,phone},{
         // await axios.post('http://18.218.218.167:8000/auth/signup',{username,password},{
           'Content-type':'application/json', 
           'Accept':'application/json',
@@ -55,12 +57,12 @@ const Signup = () => {
     <NavbarC gradientC={gradientC}/>
     <div  style={{paddingTop:'100px', backgroundColor: '#242439', height: '100vh'}}>
     <div className='d-flex justify-content-center col-12'  >
-    <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px',height:'300px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
+    <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px',height:'380px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
     <div className="row">
       <h3>Signup</h3>
       <div className="col-sm-12">
         <label htmlFor="email" className="mb-1">
-          Email <span className="text-danger">*</span>
+          Email 
         </label>
         <div className="input-group mb-3">
           <input
@@ -72,6 +74,40 @@ const Signup = () => {
             aria-label="email"
             value={username}
             onChange={(e)=>setUsername(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="col-sm-12">
+        <label htmlFor="text" className="mb-1">
+          Name
+        </label>
+        <div className="input-group mb-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Name"
+            id="nameFreelancer"
+            required
+            aria-label="Name"
+            value={name}
+            onChange={(e)=>setName(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="col-sm-12">
+        <label htmlFor="text" className="mb-1">
+          Phone Number
+        </label>
+        <div className="input-group mb-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Phone Number"
+            id="phoneFreelancer"
+            required
+            aria-label="number"
+            value={phone.replace(/[^0-9+]/g, '')}
+            onChange={(e)=>setPhone(e.target.value)}
           />
         </div>
       </div>
@@ -114,7 +150,7 @@ const Signup = () => {
   </form>
   </div>
   { show ?
-  <div className='d-flex justify-content-center col-12' style={{paddingTop:'10px',paddingBottom:'100px', backgroundColor: '#242439', height: '100vh'}} >
+  <div className='d-flex justify-content-center col-12' style={{paddingTop:'60px',paddingBottom:'100px', backgroundColor: '#242439', height: '100vh'}} >
   <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px',height:'160px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
 <div className="row">
   <div className="col-sm-12">

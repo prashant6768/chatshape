@@ -76,7 +76,15 @@ def start_ai(query,userData):
    
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(userData)
-    dataDb = users_collection.find_one({'_id':objId})
+    dataDb_i = users_collection.find_one({'_id':objId})
+
+    dataDb = {
+        'crawldata':dataDb_i.get('crawldata'),
+        'email':dataDb_i.get('email'),
+        'botname':dataDb_i.get('botname'),
+        'url':dataDb_i.get('url'),
+        'prompt':dataDb_i.get('prompt')
+    }
     
     data = dataDb['crawldata']
     prompt = str(dataDb['prompt'])
@@ -108,7 +116,6 @@ def user_msg():
     data = request.get_json()['inputValue']
     userData = request.get_json()['botID']['botID']
     # print("user msg ////////////////////////",userData)
-    # remove return new addition
     start_ai(data,userData)
     # print("X ==",Gsummary)
     return Gsummary
@@ -127,7 +134,13 @@ def get_link_data():
     exclude = request.get_json()['exclude']
     sub = db['user_subscription']
     
-    datasub = sub.find_one({'username':userData}) 
+    datasub_i = sub.find_one({'username':userData})
+    
+    datasub={
+      'expiration':datasub_i.get('expiration'),
+      'plan-Info':{'NoOfBots':datasub_i.get('plan-Info').get('NoOfBots')}
+    }
+
     # print(datasub,"555555555555555555555555555555",datetime.strptime(datasub['expiration'], "%Y-%m-%d"),"WWW",datetime.now().date())
     if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date():
         return "SubE"
@@ -155,6 +168,7 @@ def get_data(urls,userData,botName,exclude):
     # client = MongoClient(MONGO)
     # db = client['chatbot']
     users_collection = db['users_website_crawl_data']
+    user_sub = db['user_subscription']
     user_data = {
         'crawldata': str(data),
         'email': userData,
@@ -164,7 +178,9 @@ def get_data(urls,userData,botName,exclude):
     } 
     try:
        users_collection.insert_one(user_data)
-    #    print("Data stored successfully!")
+        #  print(user_sub.find_one({"username":userData}),"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+       user_sub.update_one({"username": userData}, {"$inc": {"plan-Info.NoOfBots":-1}},)
+       print("Data stored successfully!")
     except Exception as e:
        print("Error storing data:============", str(e),"===========================")
     # print("dat stored hopefully = ")
@@ -174,7 +190,13 @@ def getupdatebot(id):
 
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(id)
-    dataDb = users_collection.find_one({'_id':objId})
+    dataDb_i = users_collection.find_one({'_id':objId})
+    # print(dataDb_i)
+    dataDb = {
+        'email':dataDb_i.get('email'),
+        'botname':dataDb_i.get('botname'),
+        'prompt':dataDb_i.get('prompt'),
+    }
     data={
         'email':dataDb['email'],
         'botname':dataDb['botname'],
@@ -186,17 +208,21 @@ def getupdatebot(id):
     
 @app.route('/api/updatebot/<id>',methods=['PUT'])
 def updatebot(id):
-
+    print("KKKKKKKKKK")
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(id)
     # dataDb = users_collection.find_one({'_id':objId})
     data =  request.get_json()
+    print(data,"YYY")
     try:
          result = users_collection.update_one({'_id': ObjectId(id)}, {'$set': data})
+         print(result)
+         return "Update Successful"
     except Exception as e:
+        print(e)
         return "Couldn't Update"     
-    # print(data)
-    return "Update Successful"    
+    print(data)
+    return "Coudn't Update"    
 
 @app.route('/api/mybots',methods=['GET','POST'])
 def get_mybots():
@@ -251,7 +277,20 @@ def subdata():
     data =  request.get_json()['decoded']['username']
     users_collection = db['user_subscription']
 
-    datasub = users_collection.find_one({'username':data}) 
+    datasub_i = users_collection.find_one({'username':data}) 
+    print("BBBBBBBBBBBBBBBbb",datasub_i.get('plan-Info.plan'))
+    datasub={
+        'username':datasub_i.get('username'),
+        'created':datasub_i.get('created'),
+        'expiration':datasub_i.get('expiration'),
+        'plan-Info':{
+            'amount':datasub_i.get('plan-Info').get('amount'),
+            'plan':datasub_i.get('plan-Info').get('plan'),
+            'NoOfMsg':datasub_i.get('plan-Info').get('NoOfMsg'),
+            'NoOfBots':datasub_i.get('plan-Info').get('NoOfBots'),
+            'NoOfCharacters':datasub_i.get('plan-Info').get('NoOfCharacters'),      
+        }
+    }
     print(datasub," MMMMMMMM")
 
     # print("dataDb =",dataDb)

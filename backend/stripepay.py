@@ -32,6 +32,11 @@ MONGO = os.getenv("MONGO")
 client = MongoClient(MONGO)
 db = client['chatbot']
 
+from datetime import date
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+import time 
+
 data = [
     {
         'price_data': {
@@ -126,6 +131,55 @@ gUser = None
 # gChk2 = False 
 
 
+subscriptionData = {
+    'amount':0,
+    'plan':'Free',
+    'NoOfMsg':20,
+    'NoOfBots':2,
+    'NoOfCharacters':20000,
+}
+
+def choose_option(option):
+    if option == "year-hobby":
+       return {'amount':20000,
+    'plan':'Hobby',
+    'NoOfMsg':500,
+    'NoOfBots':10,
+    'NoOfCharacters':500000,}
+    elif option == "year-standard":
+       return {'amount':40000,
+    'plan':'Standard',
+    'NoOfMsg':4000,
+    'NoOfBots':25,
+    'NoOfCharacters':5000000,}
+    elif option == "year-pro":
+       return {'amount':300000,
+    'plan':'Professional',
+    'NoOfMsg':30000,
+    'NoOfBots':50,
+    'NoOfCharacters':10000000,}
+    elif option == "month-hobby":
+       return {'amount':1900,
+    'plan':'Hobby',
+    'NoOfMsg':500,
+    'NoOfBots':10,
+    'NoOfCharacters':500000,}
+    elif option == "month-standard":
+       return {'amount':3900,
+    'plan':'Standard',
+    'NoOfMsg':4000,
+    'NoOfBots':25,
+    'NoOfCharacters':5000000,}
+    elif option == "month-pro":
+       return {'amount':30000,
+    'plan':'Professional',
+    'NoOfMsg':30000,
+    'NoOfBots':50,
+    'NoOfCharacters':10000000,}
+    else:
+        # Code for other cases
+        print("Invalid option")
+
 # @stripepay.route('/', methods=['GET'])
 # def get_index():
 #     return current_app.send_static_file('index.html')
@@ -206,8 +260,6 @@ def order_success():
     try:
         session = stripe.checkout.Session.retrieve(session_id)
         customer = stripe.Customer.retrieve(session.customer)
-        # Rest of your code handling the successful retrieval of the session and customer
-        # ...
 
     except stripe.error.StripeError as e:
         return f"Stripe error: {e}"
@@ -215,7 +267,7 @@ def order_success():
     except Exception as e:
         return f"Error: {e}"
     
-    sub_data={
+    pay_data={
         'username': gUser,
         'payment':customer,
         'product':gProduct
@@ -223,9 +275,28 @@ def order_success():
     try:
         # global gChk2
         # if gChk == True and gChk2 == True:
-          users_sub = db['user_payment']
-          users_sub.insert_one(sub_data) 
-          print("sub = ",sub_data)
+          users_pay = db['user_payment']
+          users_pay.insert_one(pay_data) 
+          sub = db['user_subscription']
+
+          sub_type = choose_option(pay_data['product']['product_id'])
+          print("TTTTTTTTTTTTTTTTTTTt",pay_data['product']['product_id'])
+          print("LLLLLLLLLLLLLLLLLMMMMMMMMMMMMm",sub_type)
+          created = datetime.now().date().strftime("%Y-%m-%d")
+          if sub_type == 'year-hobby' or sub_type == 'year-standard' or sub_type == 'year-pro':
+            expire = datetime.now().date()+relativedelta(years=1)
+          else:
+            expire = datetime.now().date()+relativedelta(months=1)  
+          expired = expire.strftime("%Y-%m-%d")
+          user_sub_data={
+            'plan-Info':sub_type,
+            'username':gUser['username'],
+            'created':created,
+            'expiration':expired ,
+        }
+
+          sub.replace_one({"username": gUser['username']},user_sub_data)
+          print("sub = ",pay_data)
           
           
     except OperationFailure as e:

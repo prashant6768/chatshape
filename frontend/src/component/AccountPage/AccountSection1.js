@@ -25,7 +25,7 @@ const AccountSection1 = () => {
     return (
         <div className='pb-5' style={{ backgroundColor: '#242439', height: '100%',width:'100vw' }}>
             <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-5' style={{ color: '#FFFFFF' }}>Account</h1>
-            <p className=' col-12 d-flex justify-content-center container fs-5 text-center mb-5' style={{ color: '#FFFFFF' }}>Your Account</p>
+            <p className=' col-12 d-flex justify-content-center container fs-5 text-center mb-2' style={{ color: '#FFFFFF' }}>Your Account</p>
             {/* <div className=' mt-2 d-flex justify-content-center pb-3'>
                 <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%' }} className='mx-3 mt-3 rounded-4 col-lg-6 col-11'>
                     <Card.Body className=' d-flex row justify-content-between'>
@@ -54,6 +54,7 @@ const AccountSection1 = () => {
                 
                     <div className='row d-flex justify-content-between'>
                    <Link to='/pricing' style={{textDecoration:'none'}}><Button className='fw-bolder fs-4 col-sm-4 col-12 d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">Go Pro</Button></Link>
+                   <Link to='/paymenthistory' style={{textDecoration:'none'}}><Button className='fw-bolder fs-4 col-sm-4 col-12 d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">View Payment History</Button></Link>
                     
                     </div>
                 </Card> 

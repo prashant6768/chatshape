@@ -14,6 +14,7 @@ import PrivateRoute from './component/PrivateRoute';
 import BlogIndiPage from './page/BlogIndiPage';
 import SuccessPage from './page/SuccessPage';
 import CancelPage from './page/CancelPage';
+import PaymentHistoryPage from './page/PaymentHistoryPage'
 // import jwt from 'jsonwebtoken'
 import * as jose from 'jose'
 
@@ -52,6 +53,7 @@ useEffect(()=>{
            <Route path ='/signup' element={<Signup/>}/>
            <Route path ='/SuccessPage' element={<PrivateRoute><SuccessPage/></PrivateRoute>}/>
            <Route path ='/CancelPage' element={<PrivateRoute><CancelPage/></PrivateRoute>}/>
+           <Route path ='/paymenthistory' element={<PrivateRoute><PaymentHistoryPage/></PrivateRoute>}/>
 
           
         </Routes>

@@ -3,7 +3,8 @@ import '../css/chatCss.css'
 // import * as jose from 'jose';
 import axios  from 'axios'
 import {ThreeDots} from 'react-loader-spinner';
-
+import { ToastContainer, toast } from 'react-toastify';
+import * as jose from 'jose';
 import env from 'react-dotenv'
 
 
@@ -35,6 +36,10 @@ const ChatUI = (botID) => {
   const[loading, setLoading] = useState(false);
   const BACKEND = 'http://localhost:5000/'
 
+  // const token = document.cookie.split('=')[1]
+  // const decoded = jose.decodeJwt(token,'notmysecretkey');
+  
+
   const handleInputChange = async(e) => {
     await setInputValue(e.target.value);
   };
@@ -57,7 +62,7 @@ const ChatUI = (botID) => {
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
-  }).then(res => {setChatbotMsg(res.data[0]); setLoading(false) })
+  }).then(res =>{if(res.data === 'SubE'){ setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade")} else{setChatbotMsg(res.data[0]); setLoading(false) }})
   };
 
 useEffect(()=>{   
@@ -78,8 +83,8 @@ useEffect(()=>{
 
 
   return (
-    <>
-    <div className="chat-container" style={{ backgroundColor:'#242439', height:'95vh',paddingBottom:'100px'}}>
+    <div className='d-flex' style={{ position:'relative' ,maxWidth:'540px', width:'100%'}}>
+    <div className="chat-container" style={{ backgroundColor:'#242439', height:'95vh',paddingBottom:'100px',maxWidth:'540px', width:'100%'}}>
       <div className="chat-messages " >
         {messages.map((message) => (
             message.text === ''|| null || undefined ? '':
@@ -99,16 +104,17 @@ useEffect(()=>{
           )}
       </div> 
     </div>
-    <form className="chat-input mt-5" style={{ minHeight:'50px',height:'50px',width:'100%',bottom:'0px', position:'fixed', backgroundColor:'#242439'}} onSubmit={handleSubmit}>
+    <form className="chat-input mt-5" style={{ minHeight:'50px',height:'50px',maxWidth:'540px', width:'100%',bottom:'0px', position:'fixed', backgroundColor:'#242439'}} onSubmit={handleSubmit}>
         <input
           type="text"
+          style={{minWidth:'50%'}}
           value={inputValue}
           onChange={handleInputChange}
           placeholder="Type a message..."
         />
         <button type="submit">Send</button>
       </form>
-    </>
+    </div>
   );
 };
 

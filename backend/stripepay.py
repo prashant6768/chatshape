@@ -126,7 +126,11 @@ data = [
 
 gSession_id = None
 gProduct = None
-gUser = None
+# gUser = None
+
+users_temp = db['users_temp']
+users_temp.create_index("gUser", unique=True)
+
 # gChk = None
 # gChk2 = False 
 
@@ -139,42 +143,42 @@ subscriptionData = {
     'NoOfCharacters':20000,
 }
 
-def choose_option(option):
+def choose_option(option,bot_2):
     if option == "year-hobby":
        return {'amount':20000,
     'plan':'Hobby',
     'NoOfMsg':500,
-    'NoOfBots':10,
+    'NoOfBots':10 - bot_2,
     'NoOfCharacters':500000,}
     elif option == "year-standard":
        return {'amount':40000,
     'plan':'Standard',
     'NoOfMsg':4000,
-    'NoOfBots':25,
+    'NoOfBots':25 - bot_2,
     'NoOfCharacters':5000000,}
     elif option == "year-pro":
        return {'amount':300000,
     'plan':'Professional',
     'NoOfMsg':30000,
-    'NoOfBots':50,
+    'NoOfBots':50 - bot_2,
     'NoOfCharacters':10000000,}
     elif option == "month-hobby":
        return {'amount':1900,
     'plan':'Hobby',
     'NoOfMsg':500,
-    'NoOfBots':10,
+    'NoOfBots':10 - bot_2,
     'NoOfCharacters':500000,}
     elif option == "month-standard":
        return {'amount':3900,
     'plan':'Standard',
     'NoOfMsg':4000,
-    'NoOfBots':25,
+    'NoOfBots':25 - bot_2,
     'NoOfCharacters':5000000,}
     elif option == "month-pro":
        return {'amount':30000,
     'plan':'Professional',
     'NoOfMsg':30000,
-    'NoOfBots':50,
+    'NoOfBots':50 - bot_2,
     'NoOfCharacters':10000000,}
     else:
         # Code for other cases
@@ -189,9 +193,11 @@ def create_checkout_session():
     try:
         key = request.get_json()['key']
         decoded = request.get_json()['decoded']
-        global gUser
-        gUser = decoded
+        # gUser = decoded
+        users_temp.insert_one({'gUser':decoded})
+
         print("key is ",key)
+        print(decoded)
         line={}
 
         for item in data:
@@ -204,17 +210,33 @@ def create_checkout_session():
         'currency': line['price_data']['currency'],
         'product_id': line['price_data']['product_data']['name']
          }       
+        print("213--------------------------",decoded) 
         print("purchasedata",purchase_data)
-        global gProduct
-        gProduct = purchase_data
+        # print("215--------------------------",gUser)
+        # gProduct = purchase_data
+        # users_temp.insert_one({'gProduct':purchase_data})
+        print("220--------------------------",decoded) 
+        users_temp.update_one({"gUser": decoded}, {"$set":{'gProduct':purchase_data}})
+
         payment_intent = stripe.PaymentIntent.create(
         amount=line['price_data']['unit_amount'],
         currency= line['price_data']['currency'],
-        description='Payment for Product',
+        description='Payment for Subscription To Zema',
+        payment_method_types=["card"],
+        # shipping={
+        #     "name": "Jenny Rosen",
+        #     "address": {
+        #     #   "line1": "510 Townsend St",
+        #     #   "postal_code": "98140",
+        #     #   "city": "San Francisco",
+        #     #   "state": "CA",
+        #       "country": "US",
+        #     },
+        #   },
         # metadata={'purchase_id': str(purchase_id)}
         )
     
- 
+        # print("238--------------------------",gUser)
         checkout_session = stripe.checkout.Session.create(
             mode='subscription',
             line_items = [line],
@@ -229,8 +251,10 @@ def create_checkout_session():
             # cancel_url=YOUR_DOMAIN + '?canceled=true',
         )
         print("CCCCCCCCCCCCCcc",checkout_session.id)
-        global gSession_id
-        gSession_id = checkout_session.id
+        # gSession_id = checkout_session.id
+        # users_temp.insert_one({'gSession_id': checkout_session.id})
+        print("259---------------------",decoded)
+        users_temp.update_one({"gUser": decoded}, {'$set':{'gSession_id': checkout_session.id}})
 
         payment_intent=payment_intent.id 
         # gChk = True
@@ -242,6 +266,7 @@ def create_checkout_session():
         # gChk = False
         # print("GCHK ERROR ",gChk)
         print("Error is ===",e)
+        users_temp.delete_one({'gUser':decoded})
         return "Server error", 500
 
     # key = request.get_json()['key']
@@ -249,8 +274,17 @@ def create_checkout_session():
     # return("create checkout session from the backend working")
 
 
-@stripepay.route('/order/success', methods=['GET'])
+@stripepay.route('/order/success', methods=['POST'])
 def order_success():
+    decoded = request.get_json()['decoded']
+    dbdata = users_temp.find_one({'gUser': decoded})
+    print("284------------------------",dbdata,decoded)
+
+    gUser = dbdata['gUser']
+    gSession_id = dbdata['gSession_id']
+    gProduct = dbdata['gProduct']
+    # session_id = gSession_id
+    # product_data = gProduct
     session_id = gSession_id
     product_data = gProduct
     print("PRODUCT data", product_data)
@@ -267,42 +301,55 @@ def order_success():
     except Exception as e:
         return f"Error: {e}"
     
+    created = datetime.now().date().strftime("%Y-%m-%d")
+    # if sub_type == 'year-hobby' or sub_type == 'year-standard' or sub_type == 'year-pro':
+    #     expire = datetime.now().date()+relativedelta(years=1)
+    # else:
+    #     expire = datetime.now().date()+relativedelta(months=1)  
+    #     expired = expire.strftime("%Y-%m-%d")
+    # gUser = users_temp['gUser']
     pay_data={
         'username': gUser,
         'payment':customer,
-        'product':gProduct
+        'product':gProduct,
+        'created':created
     }
     try:
-        # global gChk2
         # if gChk == True and gChk2 == True:
           users_pay = db['user_payment']
           users_pay.insert_one(pay_data) 
           sub = db['user_subscription']
+          bot_1 = db['users_website_crawl_data']
+        #   bot_2 = bot_1.count_documents({'email':gUser['username']})
+          bot_2 = bot_1.count_documents({'email':gUser})
 
-          sub_type = choose_option(pay_data['product']['product_id'])
+        #   num_c = db['users_website_crawl_data']<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+          sub_type = choose_option(pay_data['product']['product_id'],bot_2)
           print("TTTTTTTTTTTTTTTTTTTt",pay_data['product']['product_id'])
           print("LLLLLLLLLLLLLLLLLMMMMMMMMMMMMm",sub_type)
           created = datetime.now().date().strftime("%Y-%m-%d")
-          if sub_type == 'year-hobby' or sub_type == 'year-standard' or sub_type == 'year-pro':
+          if pay_data['product']['product_id'] == 'year-hobby' or pay_data['product']['product_id'] == 'year-standard' or pay_data['product']['product_id'] == 'year-pro':
             expire = datetime.now().date()+relativedelta(years=1)
           else:
             expire = datetime.now().date()+relativedelta(months=1)  
           expired = expire.strftime("%Y-%m-%d")
           user_sub_data={
             'plan-Info':sub_type,
-            'username':gUser['username'],
+            # 'username':gUser['username'],
+            'username':gUser,
             'created':created,
             'expiration':expired ,
         }
 
-          sub.replace_one({"username": gUser['username']},user_sub_data)
-          print("sub = ",pay_data)
-          
-          
-    except OperationFailure as e:
+        #   sub.replace_one({"username": gUser['username']},user_sub_data)
+          sub.replace_one({"username": gUser},user_sub_data)
+          print("sub = ",pay_data)       
+    except Exception as e:
+        users_temp.delete_one({'gUser':decoded})
         return ["Couldn't save data"]    
     # gChk2 = False
-    
+    users_temp.delete_one({'gUser':decoded})
     return [customer,gProduct,gUser]
 
 # @stripepay.route('/order/success', methods=['GET'])

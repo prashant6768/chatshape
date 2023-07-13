@@ -7,8 +7,9 @@ import * as jose from 'jose';
 
 const AccountSection1 = () => {
 
-    const token = document.cookie.split('=')[1]
-    const decoded = jose.decodeJwt(token, 'notmysecretkey');
+    // const token = document.cookie.split('=')[1]
+    // const decoded = jose.decodeJwt(token, 'notmysecretkey');
+    const decoded = document.cookie.split('=')[1]
     const BACKEND = 'http://localhost:5000/'
 
     const[data,setData]=useState('')
@@ -42,15 +43,15 @@ const AccountSection1 = () => {
             <div className=' mt-2 d-flex justify-content-center pb-5'>
                 <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%' }} className='mx-3 mt-5 p-2 rounded-4 col-lg-6 col-11'>
                 <Card.Text className='fw-bolder fs-4 col-sm-8 col-12 d-flex  justify-content-center container text-start me-auto mb-3' style={{ color: '#FFFFFF' }}>Manage subscription</Card.Text>
-                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-start me-auto mb-3' style={{ color: '#FFFFFF' }}>
+                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>
                                 Subscribed to: {data2.plan} plan
                                 </Card.Text>
-                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-start me-auto mb-3' style={{ color: '#FFFFFF' }}>Email: {data[1]}</Card.Text>
-                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-start me-auto mb-3' style={{ color: '#FFFFFF' }}>Bought on: {data[2]}</Card.Text>
-                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-start me-auto mb-3' style={{ color: '#FFFFFF' }}>Expiry on: {data[3]}</Card.Text>
-                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-start me-auto mb-3' style={{ color: '#FFFFFF' }}>Bots left: {data2.NoOfBots}</Card.Text>
-                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-start me-auto mb-3' style={{ color: '#FFFFFF' }}>Characters Left: {data2.NoOfCharacters}</Card.Text>
-                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-start me-auto mb-3' style={{ color: '#FFFFFF' }}>Messages Left: {data2.NoOfMsg}</Card.Text>
+                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-center me-auto mb-3' style={{ color: '#FFFFFF', wordBreak:'break-all' }}>Email: {data[1]}</Card.Text>
+                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Bought on: {data[2]}</Card.Text>
+                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Expiry on: {data[3]}</Card.Text>
+                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Bots left: {data2.NoOfBots}</Card.Text>
+                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Characters Left: {data2.NoOfCharacters}</Card.Text>
+                <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Messages Left: {data2.NoOfMsg}</Card.Text>
                 
                     <div className='row d-flex justify-content-between'>
                    <Link to='/pricing' style={{textDecoration:'none'}}><Button className='fw-bolder fs-4 col-sm-4 col-12 d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">Go Pro</Button></Link>

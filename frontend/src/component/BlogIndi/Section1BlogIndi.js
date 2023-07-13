@@ -90,7 +90,7 @@ console.log(x)
           </div>
         </div>
 
-        <div id={x.id} className=' row px-5 py-3 row d-flex  col-11  mx-xxl-5 mx-2 my-5  d-flex  justify-content-start ' style={{ height: '100%', borderRadius:'20px', backgroundColor:'white' }}>
+        <div id={x.id} className=' row px-sm-5 px-1 py-3 row d-flex  col-11  mx-xxl-5 mx-lg-2 mx-0 my-5  d-flex  justify-content-start ' style={{ height: '100%', borderRadius:'20px', backgroundColor:'white' }}>
           <p>{x.date}</p>
           <h1 className='fw-bolder fs-1'>{x.heading}</h1>
           <p className='py-3 fw-semibold'>{x.text}</p>

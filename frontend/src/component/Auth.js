@@ -13,9 +13,10 @@ export const decodeToken = (token) => {
     // console.log("Token = ",token)
    
     // const decoded = jose.decodeJwt(token,process.env.REACT_APP_JWT_SECRET_KEY);
-    const decoded = jose.decodeJwt(token,'notmysecretkey');
+    // const decoded = jose.decodeJwt(token,'notmysecretkey');
     // console.log("DEcoded =",decoded)
-    
+    console.log(token)
+    const decoded = token
     return decoded;
     
   } catch (error) {

@@ -74,7 +74,7 @@ const [screenWidth, setScreenWidth] = useState(window.innerWidth);
      <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pt-5' style={{ color: '#FFFFFF' }}>Manage Chatbot</h1>
      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 mt-5' style={{ color: '#FFFFFF' }}>{botname}</h3>
      <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{height:'100%',color:'#FFFFFF'}} >Add this Script to your website to get your chatbot</label>
-     <textarea id='textareascript' className='fs-4 d-flex justify-content-center container text-center  mb-3' style={{height:'100px', width:'95%',}} placeholder='Name of bot' value={`<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try2/popup.js" defer id="popup" cred="${id.id}"></script>`}/>
+     <textarea id='textareascript' className='fs-4 d-flex justify-content-center container text-center  mb-3' style={{height:'100px', width:'95%',}} placeholder='Script' value={`<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try-5/popup.js" defer id="popup" cred="${id.id}"></script>`}/>
     
        <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
        <form className='col-sm-9 col-12'>

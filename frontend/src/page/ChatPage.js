@@ -13,7 +13,7 @@ const ChatPage = () => {
   console.log("param from page is",)
 
   return (
-    <div className="card col-12" style={{ maxWidth:'500px' }}>
+    <div className="card col-12" style={{ maxWidth:'540px', width:'100%' }}>
         <ChatUI botID={id} />
     </div>
   )

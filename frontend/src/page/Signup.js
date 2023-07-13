@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import axios from 'axios'
 import NavbarC from '../component/NavbarC';
 import Footer from '../component/Footer';
@@ -21,6 +21,7 @@ const Signup = () => {
     const[loading2, setLoading2] = useState(false);
     const[otp,setOtp]=useState('')
     const[show,setShow]=useState(false)
+    const [isButtonDisabled,setIsButtonDisabled]=useState(true)
   
     const handleSubmit =async (e) => {
       e.preventDefault();
@@ -39,27 +40,58 @@ const Signup = () => {
       console.log('Submitted:', BACKEND);
     };
 
+    // const handleGoogle= async(e)=>{
+    //     e.preventDefault()
+    //     await axios.post(`${BACKEND}/auth/googlelogin`,{
+    //       'Content-type':'application/json', 
+    //       'Accept':'application/json',
+    //       'Access-Control-Allow-Origin':'*'
+    // }).then(res => console.log(res)).catch(err => console.log("GOOG ",err))
+    // }
+
     const handleOtp=async(e)=>{
        e.preventDefault()
        setLoading2(true)
-       await axios.post(`${BACKEND}/auth/getOTP`,{otp},{
+       await axios.post(`${BACKEND}/auth/getOTP`,{otp,username},{
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
   }).then((res)=>{console.log("signup = ",res); if(res.data === "NO"){toast.error("User Already Exists");setLoading2(false);}else if(res.data == "Verification Failed"){toast.error("Verification Failed");setLoading2(false);} else{toast.success("Profile created Successfully");setLoading2(false);}}).catch(err => {console.log(err);setLoading2(false);{toast.error("Some Error Occured")}})
     }
 
+    useEffect(()=>{
+
+      if(username === '' || name === '' || phone === '' || password === ''){
+        setIsButtonDisabled(true)
+      }else{
+        setIsButtonDisabled(false)
+      }
+
+    },[username,name,phone,password])
 
     const gradientC = true
 
   return (
     <div style={{width:'100vw'}}>
     <NavbarC gradientC={gradientC}/>
-    <div  style={{paddingTop:'100px', backgroundColor: '#242439', height: '100vh'}}>
+    <div  style={{paddingTop:'100px', backgroundColor: '#242439', minHeight: '1000px', height:'100%'}}>
     <div className='d-flex justify-content-center col-12'  >
     <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px',height:'380px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
     <div className="row">
       <h3>Signup</h3>
+
+{/* 
+      <div className="col-sm-12">
+        <label htmlFor="email" className="mb-1">
+          Email 
+        </label>
+        <div className="input-group mb-3">
+         <button className='btn btn-dark ' onClick={(e)=>{handleGoogle(e)}} >Google</button>
+        </div>
+      </div> */}
+
+
+
       <div className="col-sm-12">
         <label htmlFor="email" className="mb-1">
           Email 
@@ -131,6 +163,7 @@ const Signup = () => {
       <div className="col-12">
         <button
           type="submit"
+          disabled={isButtonDisabled}
           className="btn btn-primary mt-3 d-block w-100"
            onClick={(e) => handleSubmit(e)}
         >

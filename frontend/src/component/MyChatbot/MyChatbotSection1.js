@@ -10,8 +10,9 @@ import env from 'react-dotenv'
 
 const MyChatbotSection1 = () => {
 
-  const token = document.cookie.split('=')[1]
-  const decoded = jose.decodeJwt(token, 'notmysecretkey');
+  // const token = document.cookie.split('=')[1]
+  // const decoded = jose.decodeJwt(token, 'notmysecretkey');
+  const decoded = document.cookie.split('=')[1]
   const [dataArr, setDataArr] = useState([])
   const [botId,setBotId]=useState('')
   const BACKEND = 'http://localhost:5000/'
@@ -47,7 +48,7 @@ const MyChatbotSection1 = () => {
           //   </Card>
           // </div>
           <div className='d-flex my-2'  style={{ minHeight:'240px' }}>
-  <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0',width:'300px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
+  <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0',width:'280px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
     <Card.Body className="d-flex flex-column" style={{}}>
       <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{x.name}</Card.Title>
       <div className="mt-auto">

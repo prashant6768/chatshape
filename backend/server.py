@@ -70,7 +70,7 @@ app.register_blueprint(stripepay,url_prefix="/stripepay")
 client = MongoClient(MONGO)
 db = client['chatbot']
 
-Gsummary = None
+# Gsummary = None
 
 def start_ai(query,userData):
    
@@ -103,44 +103,61 @@ def start_ai(query,userData):
         for chunk in enumerate(text):
             summary = summarize_chain.predict(text=chunk,query=query)
             summaries.append(summary)
-            global Gsummary
-            Gsummary = summaries
+            # Gsummary = summaries
             # print("/////////",Gsummary,"////////") 
-            return Gsummary
+            users_collection.update_one({"email": dataDb['email']}, {'$set':{'summaries': summaries}})
+            return summaries
         # print(summaries) 
     summaries = summarize(data,query) 
 
 @app.route('/api/msg',methods=['POST'])
 def user_msg():
-    global query
+    # userName = request.get_json()['decoded']['username']
     data = request.get_json()['inputValue']
     userData = request.get_json()['botID']['botID']
+    getid_1  = db['users_website_crawl_data']
+    getid_2 = getid_1.find_one({'_id': ObjectId(userData)})
+    print("120----------",getid_2['email'])
+    userName = getid_2['email']
+
+#EXpiartion code
+    sub = db['user_subscription'] 
+    datasub_i = sub.find_one({'username':userName})
+    datasub={
+      'expiration':datasub_i.get('expiration'),
+    }
+    # print(datasub,"555555555555555555555555555555",datetime.strptime(datasub['expiration'], "%Y-%m-%d"),"WWW",datetime.now().date())
+    if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date():
+        print("EXpire---------------------------------------")
+        return "SubE"
+
     # print("user msg ////////////////////////",userData)
     start_ai(data,userData)
+    users_collection = db['users_website_crawl_data']
+    d = users_collection.find_one({'email':userName})
+    summaries = d['summaries']
+    users_collection.update_one({"email": userName}, {'$set':{'summaries': ''}})
     # print("X ==",Gsummary)
-    return Gsummary
+    return summaries
 
-urll = None
+# urll = None
 
 #create bot api start
 
 @app.route('/api/sendLinkData',methods=['POST'])
 def get_link_data():
     # print("INSide get the link data")
-    global urll
     urll = [request.get_json()['sendLink']]
-    userData = request.get_json()['decoded']['username']
+    # userData = request.get_json()['decoded']['username']
+    userData = request.get_json()['decoded']
     botName =  request.get_json()['botName']
     exclude = request.get_json()['exclude']
-    sub = db['user_subscription']
-    
+    sub = db['user_subscription'] 
     datasub_i = sub.find_one({'username':userData})
-    
     datasub={
       'expiration':datasub_i.get('expiration'),
       'plan-Info':{'NoOfBots':datasub_i.get('plan-Info').get('NoOfBots')}
     }
-
     # print(datasub,"555555555555555555555555555555",datetime.strptime(datasub['expiration'], "%Y-%m-%d"),"WWW",datetime.now().date())
     if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date():
         return "SubE"
@@ -226,7 +243,8 @@ def updatebot(id):
 
 @app.route('/api/mybots',methods=['GET','POST'])
 def get_mybots():
-    data =  request.get_json()['decoded']['username']
+    # data =  request.get_json()['decoded']['username']
+    data =  request.get_json()['decoded']
     # print("my bots ",data)
 
 
@@ -274,11 +292,14 @@ def scrape_links_and_buttons(url):
 
 @app.route('/api/subdata',methods=['POST'])
 def subdata():
-    data =  request.get_json()['decoded']['username']
+    data =  request.get_json()['decoded']
+    # data =  request.get_json()['decoded']['username']
+    print(data,'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm')
     users_collection = db['user_subscription']
 
     datasub_i = users_collection.find_one({'username':data}) 
     print("BBBBBBBBBBBBBBBbb",datasub_i.get('plan-Info.plan'))
+    # print("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPp")
     datasub={
         'username':datasub_i.get('username'),
         'created':datasub_i.get('created'),
@@ -287,7 +308,7 @@ def subdata():
             'amount':datasub_i.get('plan-Info').get('amount'),
             'plan':datasub_i.get('plan-Info').get('plan'),
             'NoOfMsg':datasub_i.get('plan-Info').get('NoOfMsg'),
-            'NoOfBots':datasub_i.get('plan-Info').get('NoOfBots'),
+            'NoOfBots':datasub_i.get('plan-Info').get('NoOfBots') ,
             'NoOfCharacters':datasub_i.get('plan-Info').get('NoOfCharacters'),      
         }
     }
@@ -295,6 +316,57 @@ def subdata():
 
     # print("dataDb =",dataDb)
     return [datasub['plan-Info'],datasub['username'],datasub['created'],datasub['expiration']]
+
+@app.route('/api/paymenthistory',methods=['POST'])
+def paymentdata():
+    # data =  request.get_json()['decoded']['username']
+    
+    data =  request.get_json()['decoded']
+    print("319------",data)
+    users_collection = db['user_payment']
+    dataDb =[] 
+    # datasub={
+    #     'username':datasub_i.get('username'),
+    #     'created':datasub_i.get('created'),
+    #     'payment':{
+    #         'currency':datasub_i.get('payment').get('currency'),
+    #         'name':datasub_i.get('payment').get('name'),
+    #         'id':datasub_i.get('payment').get('id'),
+    #         'name':datasub_i.get('payment').get('name'),
+    #     },
+    #     'product':{
+    #         'amount':datasub_i.get('product').get('amount'),
+    #         'product_id':datasub_i.get('product').get('product_id')
+
+    #     }
+        
+    # }
+    for datasub_i in users_collection.find({'username':data}):
+        datasub={
+        'username':datasub_i.get('username'),
+        'created':datasub_i.get('created'),
+        'payment':{
+            'currency':datasub_i.get('payment').get('currency'),
+            'name':datasub_i.get('payment').get('name'),
+            'id':datasub_i.get('payment').get('id'),
+            'name':datasub_i.get('payment').get('name'),
+        },
+        'product':{
+            'amount':datasub_i.get('product').get('amount'),
+            'product_id':datasub_i.get('product').get('product_id')
+
+        }
+        
+    }
+
+        # dataDb.append({'email': x['email'],'name':x['botname'] })  
+        dataDb.append(datasub) 
+
+        
+
+    print("dataDb =",dataDb)
+    return dataDb
+
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 from flask import Blueprint, current_app
-from flask import Flask, render_template, redirect, url_for, flash , request, make_response
+from flask import Flask, render_template, redirect, url_for, flash , request, make_response, session, abort
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length
@@ -13,6 +13,8 @@ from flask import session
 from flask_bcrypt import Bcrypt
 import jwt
 from pymongo.errors import OperationFailure
+import pathlib
+
 # from jose import jwt
 
 from flask_mail import Mail, Message
@@ -27,6 +29,9 @@ from flask import session
 
 import time    
 
+from google_auth_oauthlib.flow import Flow
+from flask import url_for, render_template
+
 # client = MongoClient('mongodb://localhost:27017/')
 
 load_dotenv(find_dotenv())
@@ -34,17 +39,60 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 MONGO = os.getenv("MONGO")
 EMAILPASS = os.getenv("EMAILPASS")
+AUTH_FILE_SECRET_KEY = os.getenv("AUTHFILE_SECRET_KEY")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+SESSION_SECRET = os.getenv("SESSION_SECRET")
 
 client = MongoClient(MONGO)
 db = client['chatbot']
 
 auth = Blueprint("auth",__name__)
 app = Flask(__name__)
+
+auth.secret_key = AUTH_FILE_SECRET_KEY
+
+
 # auth.config['SECRET_KEY'] = SECRET_KEY
 bcrypt = Bcrypt()
 
 CORS(auth) 
 # auth.secret_key = os.getenv("SESSION")
+
+# @auth.record_once
+# def configure_state(setup_state):
+#     app = setup_state.app
+#     app.secret_key =  SESSION_SECRET # Replace with your own secret key
+
+# client_secrets_file = os.path.join(pathlib.Path(__file__).parent,"client_secret.json")
+
+# flow = Flow.from_client_secrets_file(
+#     client_secrets_file = client_secrets_file,
+#     scopes = ['https://www.googleapis.com/auth/userinfo.profile','https://www.googleapis.com/auth/userinfo.email','openid'],
+#     redirect_uri='http://127.0.0.1:3000',
+#     )
+
+
+##################################### other google login method
+
+# from authlib.integrations.flask_client import OAuth
+# oauth = OAuth(auth)
+
+# oauth.register()
+
+# @auth.route('/logingoogle')
+# def logingoogle():
+#     redirect_uri = url_for('authorize', _external=True)
+#     return oauth.twitter.authorize_redirect(redirect_uri)
+
+# @auth.route('/authorize')
+# def authorize():
+#     token = oauth.twitter.authorize_access_token()
+#     resp = oauth.twitter.get('account/verify_credentials.json')
+#     resp.raise_for_status()
+#     profile = resp.json()
+#     # do something with the token and profile
+#     return redirect('/')
+
 
 default_sub = {
     'amount':0,
@@ -72,9 +120,6 @@ def verify_jwt_token(token):
     except jwt.InvalidTokenError:
         return None
 
-user_data=None
-otpSer= None
-
 
 @auth.route('/signup', methods=[ 'POST'])
 def signup():
@@ -86,9 +131,10 @@ def signup():
         passwordUser = request.get_json()['password']
         nameUser = request.get_json()['name']
         phone = request.get_json()['phone']
+
         otp = random.randint(100000, 999999)
         otp_store[username] = otp
-        global otpSer
+  
         otpSer = otp
         # session['otpSer_s'] = otp
         smtp_server = "smtp.gmail.com"
@@ -116,27 +162,36 @@ def signup():
             server.quit() 
       
         print("2")
-        global user_data
         user_data = {
             'username': username,
-            'password': bcrypt.generate_password_hash(passwordUser),
+            # 'password': bcrypt.generate_password_hash(passwordUser),  REMOVE BCRYPT FOR NOW
+            'password': passwordUser,
             'phone': phone,
-            'name':nameUser
+            'name':nameUser,
+             'otpSer':str(otpSer),
+             'verifyFlag': "N",
                      }
-
+        users_collection = db['users']
+        users_collection.create_index("username", unique=True)
+        users_collection.insert_one(user_data) 
      
     return "ok"
         
 @auth.route('/getOTP',methods=['POST'])
 def getOTP():
     user_otp = int(request.get_json()['otp'])
+    username = request.get_json()['username']
     print(user_otp,"user",type(user_otp))
-    print(otpSer,"server",type(otpSer))
-    print(user_data)
+    # print(otpSer,"server",type(otpSer))
+    users_collection_user = db['users']
+    user_data = users_collection_user.find_one({'username': username})
+    otpSer = user_data['otpSer']
+    print(user_data,"AAAAAAAAAAAAAAAaa",type(otpSer))
+    
    
 
-    if user_otp == otpSer:
-        users_collection = db['users']
+    if user_otp == int(otpSer):
+        # users_collection = db['users']
         users_subscription = db['user_subscription']
         
         created = datetime.now().date().strftime("%Y-%m-%d")
@@ -153,19 +208,44 @@ def getOTP():
         }
         
         try:
-            users_collection.create_index("username", unique=True)
+
+            users_collection_user.update_one( {'username': username} ,  { "$set": { 'verifyFlag': "Y" } })
+
+            # users_collection.create_index("username", unique=True)
             users_subscription.create_index("username", unique=True)
                     
-            users_collection.insert_one(user_data) 
+            # users_collection.insert_one(user_data) 
             users_subscription.insert_one(user_sub_data)
-            return "OK"       
+            return "OK"      
+            
         except OperationFailure as e:
             return "NO"
             # if you get user already exists erro it might be due to user existing in subscription schema
     else:
         return "Verification Failed"
    
+# @auth.route('/googlelogin',methods=['POST'])
+# def googlelogin():
+#     try:
+#        authorization_url, state = flow.authorization_url()
+#        session['state'] = state
+#        return redirect(authorization_url)
+#     except :
+#        return "ERROR"   
 
+# @app.route('/callback')
+# def callback():
+#     state = session.pop('state', None)
+#     flow = Flow.from_client_secrets_file(
+#         'client_secrets.json',
+#         scopes=['openid', 'email', 'profile'],
+#         redirect_uri=REDIRECT_URI,
+#         state=state
+#     )
+#     flow.fetch_token(authorization_response=request.url)
+#     credentials = flow.credentials
+
+#     return redirect(url_for('home'))
     
 
 @auth.route('/login', methods=[ 'POST'])
@@ -174,6 +254,8 @@ def login():
 
         username = request.get_json()['username']
         password = request.get_json()['password']
+        # ddd = json.loads(request.data, strict=False)
+        # print(ddd,"aaaaaaaaaaaaaaaaaaaaaaaa")
 
         users_collection = db['users']
 
@@ -186,19 +268,20 @@ def login():
         
         user_data_i = users_collection.find_one({'username': username})
         print("KKKKKKKKKKk",user_data_i.get('username'))
-        user_data = {
-            'username':user_data_i.get('username'),
-            'password':user_data_i.get('password'),
-        }
+        # user_data = {
+        dbusername =user_data_i.get('username')
+        dbpassword =user_data_i.get('password')
+        # }
 
-        if user_data and bcrypt.check_password_hash(user_data['password'], password):
-            token = create_jwt_token(username)
+        if dbusername and dbpassword == password :
+            # token = create_jwt_token(username)
             # session['token'] = token
-            response = make_response()
-            response.set_cookie('token', token)
-            # session['username'] = username
-            print("RESponsee ",response , token )
-            return token
+            # response = make_response()
+            # response.set_cookie('token', token)
+           # # session['username'] = username
+            # print("RESponsee ",response , token )
+            return dbusername
+            # return token
         else:
             error = 'Invalid credentials. Please try again.'
         

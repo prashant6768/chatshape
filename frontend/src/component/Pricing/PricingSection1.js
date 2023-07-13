@@ -10,8 +10,9 @@ import env from 'react-dotenv'
 
 const PricingSection1 = () => {
 
-    const token = document.cookie.split('=')[1]
-    const decoded = jose.decodeJwt(token, 'notmysecretkey');
+    // const token = document.cookie.split('=')[1]
+    // const decoded = jose.decodeJwt(token, 'notmysecretkey');
+    const decoded = document.cookie.split('=')[1]
 
     const [selectedOption, setSelectedOption] = useState('A');
     const BACKEND = 'http://localhost:5000/'
@@ -165,7 +166,7 @@ const PricingSection1 = () => {
                 <div className='d-flex  justify-content-center flex-wrap flex-row sectionwidth ' style={{  }}>
                     {selectedOption === 'B' ? dataCardsMonth.map(x => (
                                                    <div className=' px-0 my-2 d-flex justify-content-center'>
-                                <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width:'350px' }} className='mx-1 ms-4   mt-5 rounded-4'>
+                                <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width:'280px' }} className='mx-1 ms-4   mt-5 rounded-4'>
                             
                                 <Card.Body>
                                     <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >{x.priceTier}</Card.Title>
@@ -204,7 +205,7 @@ const PricingSection1 = () => {
        
                     dataCardsYear.map(x => (
                             <div className=' px-0 my-2 d-flex justify-content-center'>
-                                <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width:'350px' }} className='mx-1 ms-4   mt-5 rounded-4'>
+                                <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width:'280px' }} className='mx-1 ms-4   mt-5 rounded-4'>
                                     <Card.Body>
                                         <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >{x.priceTier}</Card.Title>
                                         <Card.Text className='fw-bolder fs-1 col-12 d-flex justify-content-center container text-start mb-3' style={{ color: '#FFFFFF' }}>{x.price}<p className='fs-5 mt-3 ' style={{ color: 'lightgrey', fontWeight: 'normal' }}>{x.month}</p></Card.Text>
@@ -244,7 +245,7 @@ const PricingSection1 = () => {
                     }
 
                     <div className=' px-0 my-2 d-flex justify-content-center'>
-                    <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width:'350px' }} className='mx-1 ms-4   mt-5 rounded-4'>
+                    <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width:'280px' }} className='mx-1 ms-4   mt-5 rounded-4'>
                             <Card.Body>
                                 <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >Enterprise</Card.Title>
                                 <Card.Text className='fw-bolder fs-1 col-12 d-flex justify-content-center container text-start mb-3' style={{ color: '#FFFFFF' }}><p className='fs-5 mt-3 ' style={{ color: 'lightgrey', fontWeight: 'normal' }}>For Custom chatbot tailored to your needs</p></Card.Text>

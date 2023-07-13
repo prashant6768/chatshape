@@ -9,8 +9,9 @@ import env from 'react-dotenv'
 
 const BotSection1 = () => {
 
-  const token = document.cookie.split('=')[1]
-  const decoded = jose.decodeJwt(token,'notmysecretkey');
+  // const token = document.cookie.split('=')[1]
+  // const decoded = jose.decodeJwt(token,'notmysecretkey');
+  const decoded = document.cookie.split('=')[1]
   const BACKEND = 'http://localhost:5000/'
 
   const[sendLink,setSendLink]= useState('')

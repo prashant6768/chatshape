@@ -12,9 +12,17 @@ const SuccessPage = () => {
   const[date,setDate]=useState('')
   const[time,setTime]=useState('')
 
+    // const token = document.cookie.split('=')[1]
+  // const decoded = jose.decodeJwt(token, 'notmysecretkey');
+  const decoded = document.cookie.split('=')[1]
+
 useEffect(()=>{
   
-axios.get(`${BACKEND}stripepay/order/success`).then(res => {console.log(res.data); setData(res.data[0]);setProduct(res.data[1]);setUser(res.data[2]) })
+axios.post(`${BACKEND}stripepay/order/success`,{decoded},{
+  'Content-type':'application/json', 
+  'Accept':'application/json',
+  'Access-Control-Allow-Origin':'*',
+}).then(res => {console.log(res.data); setData(res.data[0]);setProduct(res.data[1]);setUser(res.data[2]) })
 
 },[])
 
@@ -36,7 +44,7 @@ useEffect(()=>{
   <div className="card-body">
     <h1>Zema</h1>
     <h5 className="card-title mb-3"> Payment was Successful</h5>
-    <p>Zema User: {user.username}</p>
+    <p>Zema User: {user}</p>
     <p>Payment made at: {time}</p>
     <p>Payment made at: {date}</p>
     <p>Email: {data.email}</p>

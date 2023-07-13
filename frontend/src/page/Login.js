@@ -44,7 +44,7 @@ const Login = () => {
 
   <div style={{minWidth:'100vw'}}>
   <NavbarC gradientC={gradientC}/>
-  <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'100px', backgroundColor: '#242439', height: '100vh'}} >
+  <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'100px', backgroundColor: '#242439', minHeight: '1000px', height:'100%'}} >
  
   <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px', height:'350px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
   <div className="row">

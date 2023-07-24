@@ -1,7 +1,7 @@
 import React,{useState,useEffect} from 'react'
 import axios from 'axios'
 import env from 'react-dotenv'
-
+import Cookies from 'js-cookie';
 
 const SuccessPage = () => {
 
@@ -14,7 +14,7 @@ const SuccessPage = () => {
 
     // const token = document.cookie.split('=')[1]
   // const decoded = jose.decodeJwt(token, 'notmysecretkey');
-  const decoded = document.cookie.split('=')[1]
+  const decoded = Cookies.get('accessToken');
 
 useEffect(()=>{
   

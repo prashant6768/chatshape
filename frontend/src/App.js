@@ -28,11 +28,6 @@ import PrivacyPolicy from './page/PrivacyPolicy';
 
 const App = () => {
 
-useEffect(()=>{
-
- console.log(document.cookie.split('=')[1])
-
-})
 
   return (
    <div>

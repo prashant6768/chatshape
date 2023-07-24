@@ -15,6 +15,8 @@ import jwt
 from pymongo.errors import OperationFailure
 import pathlib
 
+from google.auth.transport import requests
+
 # from jose import jwt
 
 from flask_mail import Mail, Message
@@ -31,6 +33,9 @@ import time
 
 from google_auth_oauthlib.flow import Flow
 from flask import url_for, render_template
+from google.auth.transport import requests as google_auth_requests
+from google.auth.transport.requests import Request
+
 
 # client = MongoClient('mongodb://localhost:27017/')
 
@@ -49,50 +54,19 @@ db = client['chatbot']
 auth = Blueprint("auth",__name__)
 app = Flask(__name__)
 
+
 auth.secret_key = AUTH_FILE_SECRET_KEY
 
 
 # auth.config['SECRET_KEY'] = SECRET_KEY
 bcrypt = Bcrypt()
 
-CORS(auth) 
-# auth.secret_key = os.getenv("SESSION")
-
-# @auth.record_once
-# def configure_state(setup_state):
-#     app = setup_state.app
-#     app.secret_key =  SESSION_SECRET # Replace with your own secret key
-
-# client_secrets_file = os.path.join(pathlib.Path(__file__).parent,"client_secret.json")
-
-# flow = Flow.from_client_secrets_file(
-#     client_secrets_file = client_secrets_file,
-#     scopes = ['https://www.googleapis.com/auth/userinfo.profile','https://www.googleapis.com/auth/userinfo.email','openid'],
-#     redirect_uri='http://127.0.0.1:3000',
-#     )
-
-
-##################################### other google login method
-
-# from authlib.integrations.flask_client import OAuth
-# oauth = OAuth(auth)
-
-# oauth.register()
-
-# @auth.route('/logingoogle')
-# def logingoogle():
-#     redirect_uri = url_for('authorize', _external=True)
-#     return oauth.twitter.authorize_redirect(redirect_uri)
-
-# @auth.route('/authorize')
-# def authorize():
-#     token = oauth.twitter.authorize_access_token()
-#     resp = oauth.twitter.get('account/verify_credentials.json')
-#     resp.raise_for_status()
-#     profile = resp.json()
-#     # do something with the token and profile
-#     return redirect('/')
-
+CORS(auth, origins='http://localhost:3000') 
+app.secret_key = os.getenv("SESSION_SECRET_1")
+CORS(app, origins='http://localhost:3000')
+from google.auth import exceptions as google_auth_exceptions
+from google.auth.transport import requests as google_auth_requests
+from google.oauth2 import id_token
 
 default_sub = {
     'amount':0,
@@ -101,6 +75,100 @@ default_sub = {
     'NoOfBots':2,
     'NoOfCharacters':20000,
 }
+
+@auth.route("/googlelogin")
+def login_google():
+  
+    flow = Flow.from_client_secrets_file(
+        "client_secret.json",
+        scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"],
+        redirect_uri= os.getenv("GOOGLE_REDIRECT_URI"),
+    )
+
+    authorization_url, state = flow.authorization_url(
+        prompt="consent",
+        # response_type="code"
+    )
+
+    
+    session["oauth_state"] = state
+    state2 = session.pop("oauth_state", None)
+    print("121---------------------state2",state2)
+
+    print("120------------------state",state)
+    print("124-----------------redirect--------",authorization_url)
+    
+    return authorization_url
+
+
+
+@auth.route("/callback")
+def callback_google():
+    # print("State------------------127-----------",state)
+
+    flow = Flow.from_client_secrets_file(
+        "client_secret.json",
+        scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"],
+        redirect_uri="http://localhost:5000/auth/callback",
+    )
+    flow.fetch_token(authorization_response=request.url)
+
+    request_obj = requests.Request()
+
+    id_info = id_token.verify_oauth2_token(
+        flow.credentials.id_token,
+        requests.Request(),
+        os.getenv("GOOGLE_CLIENT_ID"),
+        clock_skew_in_seconds=10,
+        )
+    print("165-------------------------",id_info)
+    email = id_info["email"]
+    name = id_info.get("name", email.split("@")[0])
+    username = id_info.get("email")
+    
+    print("169----------------------------------------------------------------------",username)
+
+    #login
+    users_collection = db['users']
+    if users_collection.find_one({'username': username}) == None:
+        user_data = {
+            'username': username,
+            'password': '',
+            'phone': '',
+            'name':name,
+             'otpSer':'',
+             'verifyFlag': "Y",
+                     }
+        users_collection.create_index("username", unique=True)
+        users_collection.insert_one(user_data) 
+
+        users_subscription = db['user_subscription']
+        created = datetime.now().date().strftime("%Y-%m-%d")
+        expire = datetime.now().date()+relativedelta(years=1)
+        expired = expire.strftime("%Y-%m-%d")
+        
+        user_sub_data={
+            'plan-Info':default_sub,
+            'username':user_data['username'],
+            'created':created,
+            'expiration':expired ,
+        }
+        users_subscription.create_index("username", unique=True)
+        users_subscription.insert_one(user_sub_data)
+
+        redirect_url = 'http://localhost:3000/login' 
+        redirect_url += '?access_token=' + username
+        redirect_url += '&sl=' + 's'
+        return redirect(redirect_url)           
+
+    else:
+        redirect_url = 'http://localhost:3000/login' 
+        redirect_url += '?access_token=' + username
+        redirect_url += '&sl=' + 'l'
+        return redirect(redirect_url)
+    
+    return "Auth Failed"
+
 
 def create_jwt_token(username):
     payload = {
@@ -222,31 +290,9 @@ def getOTP():
             return "NO"
             # if you get user already exists erro it might be due to user existing in subscription schema
     else:
+        users_collection_user.delete_many( {'username': username})
         return "Verification Failed"
-   
-# @auth.route('/googlelogin',methods=['POST'])
-# def googlelogin():
-#     try:
-#        authorization_url, state = flow.authorization_url()
-#        session['state'] = state
-#        return redirect(authorization_url)
-#     except :
-#        return "ERROR"   
-
-# @app.route('/callback')
-# def callback():
-#     state = session.pop('state', None)
-#     flow = Flow.from_client_secrets_file(
-#         'client_secrets.json',
-#         scopes=['openid', 'email', 'profile'],
-#         redirect_uri=REDIRECT_URI,
-#         state=state
-#     )
-#     flow.fetch_token(authorization_response=request.url)
-#     credentials = flow.credentials
-
-#     return redirect(url_for('home'))
-    
+       
 
 @auth.route('/login', methods=[ 'POST'])
 def login():

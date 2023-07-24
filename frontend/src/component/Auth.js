@@ -1,9 +1,10 @@
 import * as jose from 'jose';
+import Cookies from 'js-cookie';
 
 
 export const getAccessToken = () => {
 
-const token = document.cookie.split('=')[1]
+  const token = Cookies.get('accessToken');
   return token;
 };
 

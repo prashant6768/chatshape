@@ -1,11 +1,12 @@
 import React,{useEffect} from 'react'
 import '../BlogPage/gradientCss.css'
+import Cookies from 'js-cookie'
 
 const Section1blog = () => {
 
 useEffect(()=>{
-  const token = document.cookie.split('=')[1]
-  console.log(token)
+  const decoded = Cookies.get('accessToken');
+  console.log(decoded)
 },[])
 
   return (

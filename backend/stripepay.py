@@ -146,37 +146,37 @@ subscriptionData = {
 def choose_option(option,bot_2):
     if option == "year-hobby":
        return {'amount':20000,
-    'plan':'Hobby',
+    'plan':'year-hobby',
     'NoOfMsg':500,
     'NoOfBots':10 - bot_2,
     'NoOfCharacters':500000,}
     elif option == "year-standard":
        return {'amount':40000,
-    'plan':'Standard',
+    'plan':'year-standard',
     'NoOfMsg':4000,
     'NoOfBots':25 - bot_2,
     'NoOfCharacters':5000000,}
     elif option == "year-pro":
        return {'amount':300000,
-    'plan':'Professional',
+    'plan':'year-pro',
     'NoOfMsg':30000,
     'NoOfBots':50 - bot_2,
     'NoOfCharacters':10000000,}
     elif option == "month-hobby":
        return {'amount':1900,
-    'plan':'Hobby',
+    'plan':'month-hobby',
     'NoOfMsg':500,
     'NoOfBots':10 - bot_2,
     'NoOfCharacters':500000,}
     elif option == "month-standard":
        return {'amount':3900,
-    'plan':'Standard',
+    'plan':'month-standard',
     'NoOfMsg':4000,
     'NoOfBots':25 - bot_2,
     'NoOfCharacters':5000000,}
     elif option == "month-pro":
        return {'amount':30000,
-    'plan':'Professional',
+    'plan':'month-pro',
     'NoOfMsg':30000,
     'NoOfBots':50 - bot_2,
     'NoOfCharacters':10000000,}
@@ -322,12 +322,13 @@ def order_success():
           bot_1 = db['users_website_crawl_data']
         #   bot_2 = bot_1.count_documents({'email':gUser['username']})
           bot_2 = bot_1.count_documents({'email':gUser})
+          print("325------------------",bot_2)
 
         #   num_c = db['users_website_crawl_data']<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
           sub_type = choose_option(pay_data['product']['product_id'],bot_2)
-          print("TTTTTTTTTTTTTTTTTTTt",pay_data['product']['product_id'])
-          print("LLLLLLLLLLLLLLLLLMMMMMMMMMMMMm",sub_type)
+        #   print("TTTTTTTTTTTTTTTTTTTt",pay_data['product']['product_id'])
+        #   print("LLLLLLLLLLLLLLLLLMMMMMMMMMMMMm",sub_type)
           created = datetime.now().date().strftime("%Y-%m-%d")
           if pay_data['product']['product_id'] == 'year-hobby' or pay_data['product']['product_id'] == 'year-standard' or pay_data['product']['product_id'] == 'year-pro':
             expire = datetime.now().date()+relativedelta(years=1)
@@ -344,7 +345,9 @@ def order_success():
 
         #   sub.replace_one({"username": gUser['username']},user_sub_data)
           sub.replace_one({"username": gUser},user_sub_data)
-          print("sub = ",pay_data)       
+          char_1 = db['users_website_crawl_data']
+          char_1.update_many({"email": gUser}, {'$set':{'NoOfCharacters': sub_type['NoOfCharacters']}})
+          print("sub = ",sub_type['NoOfCharacters'])       
     except Exception as e:
         users_temp.delete_one({'gUser':decoded})
         return ["Couldn't save data"]    

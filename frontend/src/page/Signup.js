@@ -5,6 +5,7 @@ import Footer from '../component/Footer';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {ThreeDots} from 'react-loader-spinner';
+import {BsGoogle} from 'react-icons/bs'
 
 import env from 'react-dotenv'
 
@@ -33,21 +34,19 @@ const Signup = () => {
           'Accept':'application/json',
           'Access-Control-Allow-Origin':'*'
     }).then(res => { console.log(res); setLoading(false)})
-    // .then((res)=>{console.log("signup = ",res); if(res.data === "NO"){toast.error("User Already Exists");setLoading(false);} else{toast.success("Profile created Successfully");setLoading(false);}})
-      // .then(data => {document.cookie =`accessToken = ${data.data.accessToken}` })
       .catch(err => {console.log("signup form err = ",err); toast.error("Something went wrong");setLoading(false);})
   
       console.log('Submitted:', BACKEND);
     };
 
-    // const handleGoogle= async(e)=>{
-    //     e.preventDefault()
-    //     await axios.post(`${BACKEND}/auth/googlelogin`,{
-    //       'Content-type':'application/json', 
-    //       'Accept':'application/json',
-    //       'Access-Control-Allow-Origin':'*'
-    // }).then(res => console.log(res)).catch(err => console.log("GOOG ",err))
-    // }
+    const handleGoogle= async(e)=>{
+        e.preventDefault()
+    await axios.get(`${BACKEND}auth/googlelogin`,{
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+}).then(res => {window.location.href = res.data ; console.log(res.data)}).catch(err => console.log("GOOG ",err))
+    }
 
     const handleOtp=async(e)=>{
        e.preventDefault()
@@ -76,19 +75,20 @@ const Signup = () => {
     <NavbarC gradientC={gradientC}/>
     <div  style={{paddingTop:'100px', backgroundColor: '#242439', minHeight: '1000px', height:'100%'}}>
     <div className='d-flex justify-content-center col-12'  >
-    <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px',height:'380px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
+    <form action="#" className="mt-4 register-form rounded-3 p-3 mx-1 " style={{width:'330px',height:'470px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
     <div className="row">
       <h3>Signup</h3>
+      
 
-{/* 
+
       <div className="col-sm-12">
         <label htmlFor="email" className="mb-1">
-          Email 
+          Google Login / Signup
         </label>
         <div className="input-group mb-3">
-         <button className='btn btn-dark ' onClick={(e)=>{handleGoogle(e)}} >Google</button>
+         <button className='btn btn-dark col-12 ' onClick={(e)=>{handleGoogle(e)}} >Google <BsGoogle style={{color:'white'}} className='ms-2'/></button>
         </div>
-      </div> */}
+      </div>
 
 
 
@@ -145,7 +145,7 @@ const Signup = () => {
       </div>
       <div className="col-sm-12">
         <label htmlFor="password" className="mb-1">
-          Password <span className="text-danger">*</span>
+          Password 
         </label>
         <div className="input-group mb-3">
           <input
@@ -160,7 +160,7 @@ const Signup = () => {
           />
         </div>
       </div>
-      <div className="col-12">
+      <div className="col-12 py-2">
         <button
           type="submit"
           disabled={isButtonDisabled}
@@ -188,7 +188,7 @@ const Signup = () => {
 <div className="row">
   <div className="col-sm-12">
     <label htmlFor="email" className="mb-1">
-     Check for OTP in your email <span className="text-danger">*</span>
+     Check for OTP in your email
     </label>
     <div className="input-group mb-3">
       <input
@@ -209,7 +209,7 @@ const Signup = () => {
       className="btn btn-primary mt-3 d-block w-100"
        onClick={(e) => handleOtp(e)}
     >
-      Submit
+      Sign Up
     </button>
   </div>
 </div>

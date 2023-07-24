@@ -1,7 +1,7 @@
 import React from 'react'
 import NavbarC from '../component/NavbarC'
 import Footer from '../component/Footer'
-import BotSection1 from '../component/CreateBot.js/BotSection1'
+import BotSection1 from '../component/CreateBot/BotSection1'
 
 const CreateBot = () => {
 

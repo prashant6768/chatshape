@@ -1,4 +1,7 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
+import { useNavigate } from 'react-router-dom';
+
+import { useLocation } from 'react-router-dom';
 import axios from 'axios'
 import NavbarC from '../component/NavbarC';
 import Footer from '../component/Footer'
@@ -6,6 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie'
 import {ThreeDots} from 'react-loader-spinner';
+import {BsGoogle} from 'react-icons/bs'
 import * as jose from 'jose';
 import env from 'react-dotenv'
 
@@ -15,6 +19,10 @@ const Login = () => {
     const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const[loading, setLoading] = useState(false);
+  const[param,setParam]=useState('')
+  const[sl,setSl]=useState('')
+  const navigate = useNavigate();
+
 
   const handleSubmit =async (e) => {
     e.preventDefault();
@@ -37,8 +45,49 @@ const Login = () => {
     // document.cookie = "accessToken; expires=Thu, 01 Jan 1970 00:00:00 UTC; ";
     Cookies.remove('accessToken')
      toast.success("Logout Successful")
-     window.location.reload(true)
+     navigate('/login');
   }
+
+  const handleGoogle= async(e)=>{
+    e.preventDefault()
+await axios.get(`${BACKEND}auth/googlelogin`,{
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+  },
+}).then(res => {window.location.href = res.data ; console.log(res.data)}).catch(err => console.log("GOOG ",err))
+}
+
+
+  const location = useLocation();
+
+  useEffect(() => {
+    // Parse the query parameters from the URL
+    const params =new URLSearchParams(window.location.search);
+    setParam(params.get('access_token'))
+    setSl(params.get('sl'))
+    console.log(param)
+  }, [location.search]);
+
+  useEffect(()=>{
+    if(param !== null){
+    // console.log(param,"WWWWWWWWWWq",sl)
+    console.log(sl,"ddd",param)
+
+    if(sl === 's'){
+      Cookies.set('accessToken', `${param}`)
+      toast.success("Profile created Successfully")
+      console.log(param,"SSSSSSSSSSS")
+    }else if(sl === 'l'){
+      Cookies.set('accessToken', `${param}`)
+      toast.success("Login successful")
+      console.log(param,"LLLLLLLLL")
+    }
+   
+    console.log(param)
+    console.log(sl)
+  }
+
+  },[param])
 
   return (
 
@@ -46,9 +95,19 @@ const Login = () => {
   <NavbarC gradientC={gradientC}/>
   <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'100px', backgroundColor: '#242439', minHeight: '1000px', height:'100%'}} >
  
-  <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px', height:'350px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
+  <form action="#" className="mt-4 register-form rounded-3 p-3 mx-1 " style={{width:'330px', height:'425px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
   <div className="row">
     <h3>Login</h3>
+
+    <div className="col-sm-12">
+        <label htmlFor="email" className="mb-1">
+          Google Login / Signup
+        </label>
+        <div className="input-group mb-3">
+         <button className='btn btn-dark col-12 ' onClick={(e)=>{handleGoogle(e)}} >Google <BsGoogle style={{color:'white'}} className='ms-2'/></button>
+        </div>
+      </div>
+
     <div className="col-sm-12">
       <label htmlFor="email" className="mb-1">
         Email <span className="text-danger">*</span>
@@ -89,7 +148,7 @@ const Login = () => {
         className="btn btn-primary mt-3 d-block w-100"
          onClick={(e) => handleSubmit(e)}
       >
-        Submit
+        Login
       </button>
     </div>
     <div className="col-12">

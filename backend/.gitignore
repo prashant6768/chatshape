@@ -1,5 +1,6 @@
 .DS_Store
 .env
+client_secret.json
 .flaskenv
 *.pyc
 *.pyo

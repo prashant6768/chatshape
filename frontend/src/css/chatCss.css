@@ -10,6 +10,7 @@
     padding: 8px;
     margin: 8px;
     border-radius: 8px;
+    word-break: break-all;
   }
   
   .sent {
@@ -17,7 +18,7 @@
     color: #ffffff;
     align-self: flex-end;
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     margin-left: auto;
     width:75%;
   }
@@ -33,7 +34,7 @@
     margin-right: auto;
     align-self: flex-start;
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     width:75%;
   }
   

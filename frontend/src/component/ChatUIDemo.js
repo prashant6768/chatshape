@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import '../../src/css/chatCss.css'
 import { Form, Button, Dropdown, DropdownButton } from 'react-bootstrap';
 // import * as jose from 'jose';
@@ -7,6 +7,8 @@ import axios from 'axios'
 import { ThreeDots } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import sendIcon from '../assets/send.png'
+// file_example_MP3_700KB
+import lamejs from 'lamejs';
 
 import * as jose from 'jose';
 import env from 'react-dotenv'
@@ -37,23 +39,60 @@ const ChatUIDemo = (botID) => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [chatbotMsg, setChatbotMsg] = useState('');
-    const[sPrompt,setSPrompt]= useState([])
+    const[suggestedPrompt,setSPrompt]= useState([])
+    const[spromptHide,setSpromptHide]=useState(false)
     const [plan, setPlan] = useState('')
     const [mark, setMark] = useState(false)
     const [loading, setLoading] = useState(false);
+    const[uniqueCon,setUniqueCon]= useState(1)
+    const[now,setNow]=useState('')
     const BACKEND = 'http://localhost:5000/'
+    // const BACKEND = 'http://3.19.246.7'
 
     const handleInputChange = async (e) => {
-        await setInputValue(e.target.value);
+        await setInputValue(e.target.value)
     };
 
+    const handleSubmitP=(x)=>{
+       
+        if (x.trim() === '') {
+            return;
+        }
+        setSpromptHide(true)
+
+         const newMessage =  {
+            id: messages.length + 1,
+            text: x,
+            sender: 'me',
+        };
+        let inputValue = x
+        console.log(spromptHide)
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        setLoading(true);
+        axios.post(`${BACKEND}/api/msg`, { inputValue, botID,uniqueCon }, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0) ;console.log(messages," === from backend"); setLoading(false) } })
+   
+    }
+
+    
+    useEffect(()=>{
+        if(uniqueCon === 1){
+      setNow(new Date().toLocaleDateString()+ ' '+ new Date().toLocaleTimeString())
+        }
+    },[uniqueCon])
+
     const handleSubmit = async (e) => {
+    
         e.preventDefault();
+        setSpromptHide(true)
         if (inputValue.trim() === '') {
             return;
         }
 
-        const newMessage = {
+         const newMessage =  {
             id: messages.length + 1,
             text: inputValue,
             sender: 'me',
@@ -61,16 +100,30 @@ const ChatUIDemo = (botID) => {
 
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
-        axios.post(`${BACKEND}/api/msg`, { inputValue, botID }, {
+        axios.post(`${BACKEND}/api/msg`, { inputValue, botID,uniqueCon }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0][0]); setPlan(res.data[1]); console.log(res.data); setLoading(false) } })
+        })
+        // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
+        .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages,"=== backend www", res.data); setUniqueCon(0) ; setLoading(false) } }).catch(err => console.log(err))
     };
 
     useEffect(()=>{
-       axios.get(`${BACKEND}/api/fontdata/${botID.botID}`).then(res => {setFontData(res.data); setSPrompt(res.data.suggestedPrompt) ;setChatbotMsg(res.data.initialMsg)}).catch(err => console.log(err))
-    console.log(sPrompt)
+      console.log("111111==",messages)
+      const filteredArray = messages.filter(item => item.text !== '');
+      const processedArray = filteredArray.map(({ id, ...x }) => x);
+      console.log("222== ",processedArray)
+      axios.post(`${BACKEND}api/history`, { botID,processedArray,now,uniqueCon }, {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+    }).then(res => console.log(res.data," === from backend message history ")).catch(err => console.log(err))
+    },[chatbotMsg])
+
+    useEffect(()=>{
+       axios.get(`${BACKEND}/api/fontdata/${botID.botID}`).then(res => {setFontData(res.data); setSPrompt(res.data.sPrompt) ;setChatbotMsg(res.data.initialMsg); console.log(res.data.initialMsg,"=font api init")}).catch(err => console.log(err))
+    console.log(suggestedPrompt)
     },[])
 
 
@@ -158,7 +211,78 @@ const ChatUIDemo = (botID) => {
         'Verdana',
     ];
 
- 
+// const handleAudio=()=>{
+
+// }   
+
+const [permission, setPermission] = useState(false);
+const [stream, setStream] = useState(null);
+const mediaRecorder = useRef(null);
+const [recordingStatus, setRecordingStatus] = useState("inactive");
+const [audioChunks, setAudioChunks] = useState([]);
+const [audio, setAudio] = useState(null);
+
+const getMicrophonePermission = async () => {
+    if ("MediaRecorder" in window) {
+        try {
+            const streamData = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: false,
+            });
+            setPermission(true);
+            setStream(streamData);
+        } catch (err) {
+            alert(err.message);
+        }
+    } else {
+        alert("The MediaRecorder API is not supported in your browser.");
+    }}
+    const mimeType = "audio/webm";
+    const startRecording = async () => {
+        setRecordingStatus("recording");
+        //create new Media recorder instance using the stream
+        const media = new MediaRecorder(stream, { type: mimeType });
+        //set the MediaRecorder instance to the mediaRecorder ref
+        mediaRecorder.current = media;
+        //invokes the start method to start the recording process
+        mediaRecorder.current.start();
+        let localAudioChunks = [];
+        mediaRecorder.current.ondataavailable = (event) => {
+           if (typeof event.data === "undefined") return;
+           if (event.data.size === 0) return;
+           localAudioChunks.push(event.data);
+        };
+        setAudioChunks(localAudioChunks);
+      };
+      const stopRecording = () => {
+        setRecordingStatus("inactive");
+        //stops the recording instance
+        mediaRecorder.current.stop();
+        mediaRecorder.current.onstop = () => {
+          //creates a blob file from the audiochunks data
+           const audioBlob = new Blob(audioChunks, { type: mimeType });
+      
+
+           setAudio(audioBlob);
+           setAudioChunks([]);
+        };
+      };
+
+      useEffect(()=>{
+        if(audio !== null){
+            const formData = new FormData();
+            formData.append('audio', audio, 'recording.webm');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ', ' + pair[1]);
+              }
+       
+        axios.post(`${BACKEND}api/audio`,  formData, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }).then(res => console.log(res.data)).catch(err => console.log(err))
+    }
+      },[audio])
 
 
     return (
@@ -293,12 +417,12 @@ const ChatUIDemo = (botID) => {
                         </div>
                         {/* #######################3 suggested prompts */}
                         <div style={{ position: 'absolute',  left: '20px', bottom: '50px', width:'75%'}}>
-                        {sPrompt.map(x =>(
-                        <div  className='received message'  style={{  backgroundColor: fontData.cpuFontColor, fontSize: fontData.fontSize, color: fontData.cpuFontTextColor, fontFamily: fontData.font, width:'75%'  }} >{x}</div>
+                        { suggestedPrompt === undefined || spromptHide === true ? '': suggestedPrompt.map(x =>(
+                        <div  className='received message' onClick={()=>{handleSubmitP(x)}} value={x}  style={{  backgroundColor: fontData.cpuFontColor, fontSize: fontData.fontSize, color: fontData.cpuFontTextColor, fontFamily: fontData.font, width:'75%'  }}  >{x}</div>
                         ))}
                         </div>
                         </div>
-                    <form className="chat-input mt-5" style={{ minHeight: '50px', height: '50px', maxWidth: '540px', minWidth: '240px', width: '100%', bottom: '-2px', position: 'absolute', backgroundColor: fontData.backgroundColor, borderColor: 'black', borderWidth: '2px' }} onSubmit={handleSubmit}>
+                    <form className="chat-input mt-5" style={{ minHeight: '50px', height: '50px', maxWidth: '540px', minWidth: '240px', width: '100%', bottom: '-2px', position: 'absolute', backgroundColor: fontData.backgroundColor, borderColor: 'black', borderWidth: '2px' }} onSubmit={(e)=>handleSubmit(e)}>
                         <input
                             type="text"
                             style={{ minWidth: '50%' }}
@@ -306,9 +430,37 @@ const ChatUIDemo = (botID) => {
                             onChange={handleInputChange}
                             placeholder="Type a message..."
                         />
-                        <button type="submit" ><img src={sendIcon} alt='Send' style={{ height: '25px', width: '40px', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} /></button>
+                        
+  {/* <button className="btn btn-outline-secondary me-2" onClick={getMicrophonePermission}  type="button" id="button-addon2">B</button> */}
+  <div className="audio-controls me-2">
+    {!permission ? (
+    <button onClick={getMicrophonePermission} type="button">
+        P
+    </button>
+    ) : null}
+    {permission && recordingStatus === "inactive" ? (
+    <button onClick={startRecording} type="button">
+        R
+    </button>
+    ) : null}
+    {recordingStatus === "recording" ? (
+    <button onClick={stopRecording} type="button">
+        S
+    </button>
+    ) : null}
+</div>
+
+                        <button type="submit" ><img src={sendIcon} alt='Send' style={{ height: '22px', width: '25px', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} /></button>
                         {/* <button type="submit" ><img src="https://icons.veryicon.com/png/o/internet--web/iview-3-x-icons/ios-send.png" style={{ height:'25px', width:'40px', backgroundSize:'contain', backgroundRepeat:'no-repeat'}}/></button> */}
                     </form>
+                    {audio ? (
+  <div className="audio-container">
+     <audio src={audio} controls></audio>
+     <a download href={audio}>
+        Download Recording
+     </a>
+   </div>
+) : null}
                 </div>
             </div>
             <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />

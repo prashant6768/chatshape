@@ -12,6 +12,7 @@ import env from 'react-dotenv'
 
 const Signup = () => {
 
+  // const BACKEND = 'http://3.19.246.7'
   const BACKEND = 'http://localhost:5000/'
 
     const [username, setUsername] = useState('');

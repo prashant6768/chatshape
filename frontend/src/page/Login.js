@@ -1,5 +1,7 @@
 import React,{useState,useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import Nav from 'react-bootstrap/Nav';
 
 import { useLocation } from 'react-router-dom';
 import axios from 'axios'
@@ -16,6 +18,7 @@ import env from 'react-dotenv'
 const Login = () => {
 
   const BACKEND = 'http://localhost:5000/'
+  // const BACKEND = 'http://3.19.246.7'
     const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const[loading, setLoading] = useState(false);
@@ -95,9 +98,18 @@ await axios.get(`${BACKEND}auth/googlelogin`,{
   <NavbarC gradientC={gradientC}/>
   <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'100px', backgroundColor: '#242439', minHeight: '1000px', height:'100%'}} >
  
-  <form action="#" className="mt-4 register-form rounded-3 p-3 mx-1 " style={{width:'330px', height:'425px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
+  <form action="#" className="mt-4 register-form rounded-3 p-3 mx-1 " style={{width:'330px', height:'465px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
   <div className="row">
     <h3>Login</h3>
+
+    <div className="col-sm-12">
+        {/* <label htmlFor="signup" className="mb-1">
+          Don't have an account? Signup
+        </label> */}
+        <div className="input-group mb-3">
+        <Link to='/signup' style={{ textDecoration:'none'}}><Nav.Link href="#link" className='btn link' style={{ }}>Don't have an account? Signup</Nav.Link></Link>        
+        </div>
+      </div>
 
     <div className="col-sm-12">
         <label htmlFor="email" className="mb-1">

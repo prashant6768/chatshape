@@ -9,23 +9,29 @@ const Footer = () => {
     <div  className='sectionOneGradient row mx-0' style={{ height: '100%',width:'100vw' }}>
         <div className=' col-lg-5 col-10 container' >
             <div  className='fw-bolder col-10 d-flex justify-content-lg-start justify-content-center container pt-3' style={{ color: '#FFFFFF' }}>
-                <ul style={{ listStyle:'none' }} className='text-center px-0'>
+                <ul style={{ listStyle:'none' }} className='text-lg-start text-center px-0'>
                     <Link to='/' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><img src={logo} alt='ZEMA' style={{ height:'80px'}} /></Nav.Link></Link>
                     <Link to='/signup' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Sign Up</h4></Nav.Link></Link>
                     <Link to='/login' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Login</h4></Nav.Link></Link>
-                    
+                    <Link to='/blog' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Blog</h4></Nav.Link></Link>
                 </ul>
             </div>
         </div>
         <div className=' col-lg-5 col-10 container ' >
             <div  className='fw-bolder col-10 d-flex justify-content-lg-end justify-content-center container pt-3' style={{ color: '#FFFFFF' }}>
-                <ul style={{ listStyle:'none' }} className='text-center px-0'>
-                    <li className='my-4' ><h4>@company | All Rights Reserved</h4></li>
-                    <Link to='/privacy' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Privacy Policy</h4></Nav.Link></Link>
-                  <Link to='/terms' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Terms of Service</h4></Nav.Link></Link>
+                <ul style={{ listStyle:'none' }} className='text-center text-lg-end px-0'>
+                    <h3 className='my-4'>Get a Chatbot for your Website</h3>
+                   <h4 >@company | All Rights Reserved</h4>
+                   <Link to='/create' style={{textDecoration:'none'}}><button type="button" style={{color:'red', backgroundColor:'white'}} className="btn fw-bold mt-3  btn-lg rounded-pill px-5">Get Chatbot</button></Link>
+                    {/* <Link to='/privacy' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Privacy Policy</h4></Nav.Link></Link>
+                  <Link to='/terms' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Terms of Service</h4></Nav.Link></Link> */}
                      
                 </ul>
             </div>
+        </div>
+        <div className=' col-lg-8 col-12 container d-flex justify-content-center '>
+        <Link to='/privacy' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4 mx-3' ><h4>Privacy Policy</h4></Nav.Link></Link>
+        <Link to='/terms' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4 mx-3' ><h4>Terms of Service</h4></Nav.Link></Link>
         </div>
 
     </div>

@@ -34,21 +34,56 @@ const ChatUI = (botID) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [chatbotMsg,setChatbotMsg]= useState('')
+  const[suggestedPrompt,setSPrompt]= useState([])
+  const[spromptHide,setSpromptHide]=useState(false)
   const[plan,setPlan]=useState('')
   const[mark,setMark]=useState(false)
   const[loading, setLoading] = useState(false);
+  const[uniqueCon,setUniqueCon]= useState(1)
+  const[now,setNow]=useState('')
   const BACKEND = 'http://localhost:5000/'
 
   // const token = document.cookie.split('=')[1]
   // const decoded = jose.decodeJwt(token,'notmysecretkey');
-  
+ 
+  const handleSubmitP=(x)=>{
+       
+    if (x.trim() === '') {
+        return;
+    }
+    setSpromptHide(true)
+
+     const newMessage =  {
+        id: messages.length + 1,
+        text: x,
+        sender: 'me',
+    };
+    let inputValue = x
+    console.log(spromptHide)
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setLoading(true);
+    axios.post(`${BACKEND}/api/msg`, { inputValue, botID, uniqueCon }, {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+    })
+    .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0) ;console.log(res.data," === from backend"); setLoading(false) } })
+
+}
 
   const handleInputChange = async(e) => {
     await setInputValue(e.target.value);
   };
 
+  useEffect(()=>{
+    if(uniqueCon === 1){
+  setNow(new Date().toLocaleDateString()+ ' '+ new Date().toLocaleTimeString())
+    }
+},[uniqueCon])
+
   const handleSubmit =async (e) => {
     e.preventDefault();
+    setSpromptHide(true)
     if (inputValue.trim() === '') {
       return;
     }
@@ -61,12 +96,28 @@ const ChatUI = (botID) => {
 
      setMessages((prevMessages) => [...prevMessages, newMessage]);
      setLoading(true); 
-    axios.post(`${BACKEND}/api/msg`,{inputValue,botID},{
+    axios.post(`${BACKEND}/api/msg`,{inputValue,botID,uniqueCon},{
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
-  }).then(res =>{if(res.data === 'SubE'){ setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade")}else if(res.data == 'noid'){setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted")} else{setChatbotMsg(res.data[0][0]);setPlan(res.data[1]); console.log(res.data); setLoading(false) }})
+  })
+  .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(res.data,"=== backend www", res.data[0]); setUniqueCon(0) ;setLoading(false) } }).catch(err => console.log(err))
   };
+
+
+
+ useEffect(()=>{
+  console.log("111111==",messages)
+  const filteredArray = messages.filter(item => item.text !== '');
+  const processedArray = filteredArray.map(({ id, ...x }) => x);
+  console.log("222== ",processedArray)
+  axios.post(`${BACKEND}api/history`, { botID,processedArray,now,uniqueCon }, {
+    'Content-type': 'application/json',
+    'Accept': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+}).then(res => console.log(res.data," === from backend message history ")).catch(err => console.log(err))
+},[chatbotMsg])
+
 
 useEffect(()=>{   
         const newMessage = {
@@ -106,9 +157,13 @@ const [fontData, setFontData] = useState({
 
 
 
+// useEffect(()=>{
+//   axios.get(`${BACKEND}/api/fontdata/${botID.botID}`).then(res => {setFontData(res.data); setChatbotMsg(res.data.initialMsg)}).catch(err => console.log(err))
+// console.log(botID.botID)
+// },[])
 useEffect(()=>{
-  axios.get(`${BACKEND}/api/fontdata/${botID.botID}`).then(res => {setFontData(res.data); setChatbotMsg(res.data.initialMsg)}).catch(err => console.log(err))
-console.log(botID.botID)
+  axios.get(`${BACKEND}/api/fontdata/${botID.botID}`).then(res => {setFontData(res.data); setSPrompt(res.data.sPrompt) ;setChatbotMsg(res.data.initialMsg); console.log(res.data.initialMsg,"=font api init")}).catch(err => console.log(err))
+console.log(suggestedPrompt)
 },[])
 
 const messageStyleSend = {
@@ -134,6 +189,10 @@ const fontOptions = [
   'Courier New',
   'Verdana',
 ];
+
+
+
+
 
   return (
     <div className='d-flex' style={{ position:'relative',height:'100vh' ,maxWidth:'540px', width:'100%', borderTopWidth:'1px',borderBottomWidth:'0px' ,borderLeftWidth:'0px' ,borderRightWidth:'0px' ,  borderColor:'black',borderStyle:"solid" }}>
@@ -161,6 +220,12 @@ const fontOptions = [
             ''
           )}
       </div> 
+      {/* SUGGESTED PROMPT */}
+      <div style={{ position: 'absolute',  left: '20px', bottom: '50px', width:'75%'}}>
+                        { suggestedPrompt === undefined || spromptHide === true ? '': suggestedPrompt.map(x =>(
+                        <div  className='received message' onClick={()=>{handleSubmitP(x)}} value={x}  style={{  backgroundColor: fontData.cpuFontColor, fontSize: fontData.fontSize, color: fontData.cpuFontTextColor, fontFamily: fontData.font, width:'75%'  }}  >{x}</div>
+                        ))}
+                        </div>
     </div>
     <form className="chat-input mt-5" style={{ minHeight:'50px',height:'50px',maxWidth:'540px', width:'100%',bottom:'0px', position:'fixed', backgroundColor:fontData.backgroundColor, borderColor:'black', borderWidth:'2px'}} onSubmit={handleSubmit}>
         <input

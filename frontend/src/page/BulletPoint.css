@@ -1,0 +1,32 @@
+li::before {
+    content: "• ";
+    color: white; /* or whatever color you prefer */
+  }
+
+ 
+
+  .numbered-list {
+    list-style-type: none; /* Remove the default list style */
+    counter-reset: my-counter; /* Reset the counter */
+  }
+  
+  .list-item {
+    display: flex; /* Use flexbox to align dt and number on the same line */
+  }
+  
+  .list-item::before {
+    content: counter(my-counter); /* Display the counter value as list marker */
+    counter-increment: my-counter; /* Increment the counter for each item */
+    color: #FFFFFF; /* Set the color for the numbers */
+    font-weight: bold; /* Set the font weight for the numbers */
+    margin-right: 5px; /* Optional: Add spacing between number and dt */
+    font-size:x-large;
+  }
+  
+  .list-item-content {
+    flex: 1; /* Fill the remaining space to align dt and dd */
+  }
+  
+  ol{
+    padding-left:'0px'
+  }

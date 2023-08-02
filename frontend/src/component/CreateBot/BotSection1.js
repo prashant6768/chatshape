@@ -16,6 +16,7 @@ const BotSection1 = () => {
   const decoded = Cookies.get('accessToken');
   console.log("------------decoded",decoded)
   const BACKEND = 'http://localhost:5000/'
+//  const BACKEND = 'http://3.19.246.7/'
 
   const[sendLink,setSendLink]= useState('')
   const[botName,setBot]=useState('')
@@ -50,25 +51,15 @@ const BotSection1 = () => {
       console.log(pair[0] + ', ' + pair[1]);
     }
 
-     axios.post(`${BACKEND}/api/sendLinkData`,formData,{
+     axios.post(`${BACKEND}api/sendLinkData`,formData,{
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*',
-    }).then(res=>{if(res.data == 'BotF'){ toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoading(false);}else if(res.data == 'FillOne'){ toast.error('Atleast fill one of these, PDF or website URL'); setLoading(false);}else if(res.data == 'SubE'){ toast.error('Your Subscription has Expired, renew subscription for more'); setLoading(false);}else if(res.data == 'noname'){ toast.error('Botname is compulsary'); setLoading(false);}else{toast.success('Stored successfully!'); console.log(res); setLoading(false);}}).catch(err => {console.log("error  botsection 1 ",err); toast.error('API request failed!'); setLoading(false);})
+    })
+    // .then(res =>console.log("FROM BACKEND = ",res.data)).catch(err => console.log(err))
+    .then(res=>{if(res.data == 'BotF'){ toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoading(false);}else if(res.data == 'FillOne'){ toast.error('Atleast fill one of these, PDF or website URL'); setLoading(false);}else if(res.data == 'SubE'){ toast.error('Your Subscription has Expired, renew subscription for more'); setLoading(false);}else if(res.data == 'noname'){ toast.error('Botname is compulsary'); setLoading(false);}else{toast.success('Stored successfully!'); console.log(res.data,"CHKKKKKKKKKKKK"); setLoading(false);}}).catch(err => {console.log("error  botsection 1 ",err); toast.error('API request failed!'); setLoading(false);})
     console.log(formData)
     }
-
-
-// useEffect(()=>{
-// if(botName !== ''){
-//   console.log(exclude,'---exclude')
-//  axios.post(`${BACKEND}/api/sendLinkData`,{sendLink,decoded,botName,pdf,exclude},{
-//     'Content-type':'application/json', 
-//     'Accept':'application/json',
-//     'Access-Control-Allow-Origin':'*',
-// }).then(res=>{if(res.data == 'BotF'){ toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoading(false);}else if(res.data == 'SubE'){ toast.error('Your Subscription has Expired, renew subscription for more'); setLoading(false);}else if(res.data == 'noname'){ toast.error('Botname is compulsary'); setLoading(false);}else{toast.success('Stored successfully!'); console.log(res); setLoading(false);}}).catch(err => {console.log("error  botsection 1 ",err); toast.error('API request failed!'); setLoading(false);})
-// console.log(sendLink,botName,decoded)
-// }
 
 },[exclude])
  

@@ -17,6 +17,7 @@ const MyChatbotSection1 = () => {
   const [dataArr, setDataArr] = useState([])
   const [botId,setBotId]=useState('')
   const BACKEND = 'http://localhost:5000/'
+  // const BACKEND = 'http://3.19.246.7'
 
   useEffect(() => {
     axios.post(`${BACKEND}/api/mybots`, { decoded }, {
@@ -25,6 +26,7 @@ const MyChatbotSection1 = () => {
       'Access-Control-Allow-Origin': '*'
     })
       .then(res => {setDataArr(res.data); console.log(res.data)}).catch(err => console.log(" error from mybots", err))
+      console.log("chk for console log")
   }, [])
 
  useEffect(()=>{

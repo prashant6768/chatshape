@@ -16,6 +16,7 @@ const AccountSection1 = () => {
     // const decoded = document.cookie.split('=')[1]
     const decoded = Cookies.get('accessToken');
     const BACKEND = 'http://localhost:5000/'
+    // const BACKEND = 'http://3.19.246.7'
 
     const[data,setData]=useState('')
     const[data2,setData2]=useState('')
@@ -38,7 +39,7 @@ const AccountSection1 = () => {
             'Content-type':'application/json', 
             'Accept':'application/json',
             'Access-Control-Allow-Origin':'*',
-        }).then(res=> { setName(res.data.name); setPhone(res.data.phone)}).catch(err => console.log(err))
+        }).then(res=> { setName(res.data.name); setPhone(res.data.phone); console.log(res.data,"profile")}).catch(err => console.log(err))
     },[])
 
     const handleProfile=(e)=>{

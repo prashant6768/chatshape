@@ -33,6 +33,11 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import TokenTextSplitter
 
+from langchain.document_loaders import Docx2txtLoader
+from langchain.document_loaders import TextLoader
+from langchain.output_parsers import CommaSeparatedListOutputParser
+from langchain.llms import OpenAIChat
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -63,19 +68,53 @@ from datetime import date
 from datetime import date
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import ast
 
 from apscheduler.schedulers.background import BackgroundScheduler
+
+#### import for method 2 ######################33
+
+import os
+from dotenv import find_dotenv, load_dotenv
+
+from langchain.document_loaders import SeleniumURLLoader
+# from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import TokenTextSplitter
+
+import pickle
+import faiss
+
+
+# from langchain.chains import RetrievalQAwithSourcesChain
+# from langchain.chains import RetrievalQA
+from langchain.chains.question_answering import load_qa_chain
+from langchain import OpenAI
+from langchain.chat_models import ChatOpenAI
+
+######### import for 2nd method finished ###########3
+
+import speech_recognition as sr
+from pydub import AudioSegment
+AudioSegment
+import pyttsx3
+import ffmpeg
+import io
+import tempfile
+import wave
+import soundfile as sf
+
+ffmpeg_path = r'C:/ffmpeg/ffmpeg-6.0-full_build/bin'
+os.environ['PATH'] = f'{ffmpeg_path};' + os.environ['PATH']
+
+
 scheduler = BackgroundScheduler()
 scheduler.start()
-
-
 
 app = Flask(__name__)
 CORS(app) 
 
 app.register_blueprint(auth, url_prefix="/auth")
 app.register_blueprint(stripepay,url_prefix="/stripepay")
-
 
 client = MongoClient(MONGO)
 db = client['chatbot']
@@ -86,6 +125,7 @@ app.secret_key = os.getenv("SESSION_SECRET_1")
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  ################################# for using http instead of https in google auth
 
 app.config['PDF'] = 'PDF'
+app.config['AUDIO']= 'AUDIO'
 
 dataOfSubs = {
             "year-hobby": {
@@ -204,9 +244,146 @@ def monthly_task():
 scheduler.add_job(monthly_task, 'cron', day='1', hour='0', minute='0')  
 # scheduler.add_job(monthly_task, 'interval', minutes=1)  
 
+##########################################################################333  data analytics daily task of saving data
+
+def daily_task():
+    dataCrawl = db['users_website_crawl_data']
+    today_date = datetime.now().strftime("%Y-%m-%d")
+    for x in dataCrawl.find():
+        NoOfCharacters = x['NoOfCharacters']
+        username = x['email']
+        subDb = db['user_subscription']
+        subData = subDb.find_one({'username':username})['plan-Info']['NoOfCharacters']
+        uniqueCon = x['UniqueCon']
+        todayUseChar = subData - NoOfCharacters
+        charData = {
+            'usage':todayUseChar,
+            'date':today_date
+        }
+        ConData={
+            'ConNo':uniqueCon,
+            'date':today_date
+        }
+        dataCrawl.update_one(
+            {'_id': x['_id']},
+            {'$push': {'charData': charData}}
+        )
+        dataCrawl.update_one(
+            {'_id': x['_id']}, 
+            {'$push': {'UniqueConData': ConData}}
+        )
+        dataCrawl.update_one(
+            {'_id': x['_id']}, 
+            {'$set': {'UniqueCon': 0}}
+        )
+
+scheduler.add_job(daily_task,  'interval', minutes=1440) 
+
+
+
+##########################################################################3  record audio files from react
+@app.route('/api/audio',methods=['POST'])
+def audio():
+     audio = request.files.get('audio')
+     print("audio-----------274",audio)
+     audioC = convert_webm_to_wav(audio)
+     print("audioC-----------------------------------290 ",audioC)
+     text = recognize_audio(audioC)
+     if os.path.exists(audioC):
+        os.remove(audioC)
+     return text   
+
+def convert_webm_to_wav(webm_file):
+    # Save the uploaded WebM file
+    unique = secure_filename(webm_file.filename)
+    unique = webm_file.filename.split('.')[0] + str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', '')+ '.' + webm_file.filename.split('.')[1] 
+    output_path_webm = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['AUDIO'], unique)
+    webm_file.save(output_path_webm)
+    output_path_wav =output_path_webm.replace(".webm", ".wav")
+    print("------293", output_path_webm,"------",output_path_wav)
+    webm_to_wav(output_path_webm,output_path_wav)
+    if os.path.exists(output_path_webm):
+        os.remove(output_path_webm)
+    return output_path_wav
+
+
+def webm_to_wav(input_path, output_path):
+    # Load the WebM file using pydub
+    audio = AudioSegment.from_file(input_path, format="webm")
+
+    # Export the audio as WAV format using ffmpeg
+    audio.export(output_path, format="wav")
+
+
+def recognize_audio(audio_file):
+    # Initialize the speech recognition engine
+    recognizer = sr.Recognizer()
+
+    try:
+        # Perform speech recognition on the WebM audio
+        with sr.AudioFile(audio_file) as source:
+            audio = recognizer.record(source)
+
+        text = recognizer.recognize_google(audio)
+        return text
+
+    except sr.UnknownValueError:
+        return "Oops! Could not understand audio."
+
+    except sr.RequestError as e:
+        return f"Error during speech recognition: {e}"
+
+
+##############################################################3 history chat save to db
+@app.route('/api/history',methods=['POST'])
+def history():
+    data = request.get_json()['processedArray']
+    userData = request.get_json()['botID']['botID']
+    now = request.get_json()['now']
+    uniqueCon = request.get_json()['uniqueCon']
+
+    users_collection = db['users_website_crawl_data']
+    user_history = db['user_history']
+    objId= ObjectId(userData)
+    print("---279",now,"---",data)
+    # dataDb_i = users_collection.find_one({'_id':objId})
+    if now != '' and len(data) != 0:
+        print("---282",now,"---",data)
+        print(uniqueCon,"------",str(type(uniqueCon)))
+        if uniqueCon == 1:
+            print("UNI----285")
+            user_history.insert_one({'time':now, 'botID':userData, 'chatHistory':data})
+            return "uni"
+        else:
+            print("-------289---",user_history.find_one({"botID":str(userData) }))
+            user_history.update_one({"botID":str(userData),'time':now }, {"$set": {"chatHistory": data}})  
+            return 'NO uni'
+    return 'OK'
+
+####################################################################3 chat history get
+@app.route('/api/historyget/<id>',methods=['GET'])
+def historyget(id):
+    user_history = db['user_history']
+    hist = []
+    for x in user_history.find({'botID':str(id)}):
+        if len(x['chatHistory']) <= 1:
+            user_history.delete_one({'_id': x['_id']})
+    for x in user_history.find({'botID':str(id)}):
+        data = {
+            'time':x['time'],
+            'history':x['chatHistory']
+        }
+        hist.append(data) 
+        
+    # print("--------303------",hist,"---------303--------")
+    return hist
+
+
+
+
 ######################################### LLM Code
-def start_ai(query,userData):
-   
+def start_ai(query,userData,uniqueCon):
+  try:  
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(userData)
     dataDb_i = users_collection.find_one({'_id':objId})
@@ -214,36 +391,93 @@ def start_ai(query,userData):
     dataDb = {
         'crawldata':dataDb_i.get('crawldata'),
         'crawldataPdf':dataDb_i.get('crawldataPdf'),
+        # 'crawl':dataDb_i.get('crawl'),
         'email':dataDb_i.get('email'),
         'botname':dataDb_i.get('botname'),
         'url':dataDb_i.get('url'),
         'prompt':dataDb_i.get('prompt')
     }
+    print("=-------------284",str(type([query])))
     
+
+    # if uniqueCon == 1:
+        # users_collection.update_one({"_id":objId }, {"$push": {"History":{"time": datetime.now(), "HistoryChat":['User'+query]}}})
+    # else:
+        # users_collection.update_one({"_id":objId }, {"$push":{"HistoryChat":{"$each":['User: '+query]}}})
+        # users_collection.update_one({"_id":objId }, {"$push": {"History":{"HistoryChat":{"$each":['User: '+query]}}}})
+
+    # text=None
+    # data = dataDb['crawldata']
+    # dataPdf = dataDb['crawldataPdf']
+    # try:  
+    #  text1 = dataDb['crawl']
     data = dataDb['crawldata']
     dataPdf = dataDb['crawldataPdf']
     prompt = str(dataDb['prompt'])
+    text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=10, length_function=len)
+    text = text_splitter.create_documents([dataPdf,data])
+    # except Exception as e:
+    #  print("-----------------------------259",e)  
 
-    query = query
-    text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=300, length_function=len)
-    text = text_splitter.create_documents( [data, dataPdf])
+    # print("----257----------",text,"-------------257----------")
   
-    def summarize(data,query):
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo",temperature=0.7)
-        template=prompt
-        prompt_template = PromptTemplate(input_variables=["text","query"],template=template)
-        memory = ConversationBufferMemory( input_key="query")
-        summarize_chain = LLMChain(llm=llm, prompt=prompt_template,verbose=True)
-        summaries= []
-        for chunk in enumerate(text):
-            summary = summarize_chain.predict(text=chunk,query=query)
-            summaries.append(summary)
-            # Gsummary = summaries
-            # print("/////////",Gsummary,"////////") 
-            users_collection.update_one({"email": dataDb['email']}, {'$set':{'summaries': summaries}})
-            return summaries
-        # print(summaries) 
-    summaries = summarize(data,query) 
+    
+
+    # if data == "['']":
+    #     data = ''
+    # if dataPdf == "['']":
+    #     dataPdf = ''
+    
+    
+    # text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=10, length_function=len)
+    # text = text_splitter.create_documents([dataPdf,data])
+
+
+    print("------237--------",text,"----------------237")
+    # print("----------------242----------",type(text))
+    
+    #######################3 new method
+    
+    PROMPT = PromptTemplate(
+    template=prompt, input_variables=["text", "query"]
+)
+    chain_type_kwargs = {"prompt": PROMPT}
+    qa_chain = load_qa_chain(ChatOpenAI(model_name="gpt-3.5-turbo",temperature=0.7), chain_type="map_reduce")
+    answer = qa_chain.run(input_documents= text, question=query)
+    print("---------279---------",answer,"-----------279-----------",PROMPT)
+    # users_collection.update_one({"_id":objId }, {"$push": {"History":{"HistoryChat":{"$each":['AI: '+answer]}}}})
+    return answer
+  
+    #######################3 new method finish
+
+#     def summarize(data,query): 
+#         print('-------------------274-----------')
+#         llm = ChatOpenAI(model_name="gpt-3.5-turbo",temperature=0.7)
+#         # llm = OpenAIChat(model_name="gpt-4",temperature=0.7)
+#         template=prompt
+#         prompt_template = PromptTemplate(input_variables=["text","query"],template=template)
+#         print("252------------",prompt_template)
+        
+#         memory = ConversationBufferMemory( input_key="query")
+#         summarize_chain = LLMChain(llm=llm, prompt=prompt_template,verbose=True)
+#         summaries= []
+#         for chunk in enumerate(text):
+#           try:  
+#             summary = summarize_chain.predict(text=chunk,query=query)
+#             print(str(text),"------------------------261")
+           
+#             summaries.append(summary)
+#             users_collection.update_one({"email": dataDb['email']}, {'$set':{'summaries': summaries}})
+#             print(summaries,"---------------267")
+#             return summaries
+#           except Exception as e:
+#             return str(e)  
+#         print(summaries,"---------------267") 
+#         return summaries  
+#     # summaries = summarize(data,query) 
+#     summaries = summarize(data,query) 
+  except Exception as e:
+    return str(e)  
 
 ############################################### get message from users chatbot and send data back after getting response from LLM
 @app.route('/api/msg',methods=['POST'])
@@ -251,6 +485,7 @@ def user_msg():
     # userName = request.get_json()['decoded']['username']
     data = request.get_json()['inputValue']
     userData = request.get_json()['botID']['botID']
+    uniqueCon = request.get_json()['uniqueCon']
     getid_1  = db['users_website_crawl_data']
     try:
         getid_2 = getid_1.find_one({'_id': ObjectId(userData)})
@@ -258,7 +493,7 @@ def user_msg():
             return "noid"
     except:
         return "noid"    
-    print("241----------",getid_2)
+    # print("241----------",getid_2)
     userName = getid_2['email']
 
     #EXpiartion code
@@ -279,20 +514,23 @@ def user_msg():
         return "SubE"
 
     # print("user msg ////////////////////////",userData)
-    start_ai(data,userData)
+    summaries = start_ai(data,userData,uniqueCon)
+    
     users_collection = db['users_website_crawl_data']
-    d = users_collection.find_one({'email':userName})
-    summaries = d['summaries']
-    users_collection.update_one({"email": userName}, {'$set':{'summaries': ''}})
+    # d = users_collection.find_one({'email':userName})
+    # summaries = d['summaries']
+    # users_collection.update_one({"email": userName}, {'$set':{'summaries': ''}})
     plan_info_1 = db['user_subscription']
     plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.NoOfMsg":-1}})
 
     users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
+    users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"UniqueCon": uniqueCon}})
+
     print("143-----------------------------",str(summaries),"---",len(str(summaries)))
 
-
+    
     # print("X ==",Gsummary)
-    return [summaries, planname]
+    return [summaries, planname,uniqueCon]
 
 
 
@@ -343,6 +581,9 @@ def get_link_data():
     pdfFile = request.files.get('pdfFile')
     print("-------pdf",pdfFile)
     print("-----------url",len(urll))
+    if botName == '':
+        return 'noname'
+
     if pdfFile == None and len(urll) == 0:
         print("-------------------NO ENtry")
         return "FillOne"
@@ -357,14 +598,16 @@ def get_link_data():
            print("------------------------344----------ok",pdf)
            print("-----------351----------",str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', ''))
         except Exception as e:
-            print("-----------346------------NO",e)      
+            print("-----------346------------NO",e) 
+            return e     
     print("---------336----------",urll,exclude,userData,botName,pdf)
-    if botName == '':
-        return 'noname'
     print("299------exclude initial-------",exclude)
     print("288-------------",pdf)
     sub = db['user_subscription'] 
+    # return jsonify(sub)
     datasub_i = sub.find_one({'username':userData})
+    # datasub =datasub_i.get('expiration'),
+
     datasub={
       'expiration':datasub_i.get('expiration'),
       'plan-Info':{
@@ -388,41 +631,53 @@ def get_link_data():
 
 ################################################################## exclude links and store data from links in db
 def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
+  try:  
     print("364---------------------",len(urls))
     data=''
     docs=''
     if len(urls) == 0:
         print("378-------------------")
-        data = ['']
+        data = ''
     else:
         print("-------387--------",urls)
+        # return str(type(urls.split()))
         page_links = scrape_links_and_buttons(urls)
+        # return page_links
+        # print("------------------414--------",page_links)
+        # return page_links
+
         print("pdf---------------------363----Links-----",page_links)
         print("----------296------",type(exclude.split(","))) 
         page_links_x = [link for link in page_links if link not in exclude.split(",")]
+        # page_links_x = urls
+        # str(type(page_links_x))
         print("Page links x:", page_links_x)
         loader = SeleniumURLLoader(urls=page_links_x)
         data = loader.load()
 
+
+    
     if len(pdf) != 0 :  #CHange this to not equal to after testing------------------------------------------------------------------  
         print("381--------------",pdf)   
         loaderPDF = OnlinePDFLoader(
         pdf
         )
+        
         print("382--------------",loaderPDF) 
         docs = loaderPDF.load()
         # print(docs,"--------------------336 pdf")
     else:
-        docs = ['']  
+        docs = ''  
         print("______-----------------386")  
     print("------------410",type(urls))
-
+    
     users_collection = db['users_website_crawl_data']
     user_sub = db['user_subscription']
     user_data = {
         'NoOfCharacters': NoOfCharacters,
         'crawldata': str(data),
         'crawldataPdf':str(docs),
+        # 'crawl':str(data1),
         'email': userData,
         'botname':botName,
         'url':urls,
@@ -438,6 +693,10 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
             'backgroundColor': '#242439',
             'fontSize': '12px',
         },
+        'charData':[],
+        'UniqueCon':0,
+        'UniqueConData':[],
+        'History':[],
         'prompt':" You are a world class analyst.You are having a conversation with the user about the  text and you have to answer the users questions. Please follow these rules: 1. Make it engaging and informative. 2. Should address the {query} very well. 3. Don't repeat your sentences and information 4. Always mention name of things or people you talk about. 5.Don't mention your name when answering, go straight to the answer   {text}  Human: {query} "             
     } 
     try:
@@ -445,9 +704,160 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
         #  print(user_sub.find_one({"username":userData}),"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
        user_sub.update_one({"username": userData}, {"$inc": {"plan-Info.NoOfBots":-1}})
        print("Data stored successfully!")
+       if os.path.exists(pdf):
+          os.remove(pdf)
     except Exception as e:
        print("Error storing data:============", str(e),"===========================")
     # print("dat stored hopefully = ")
+    return "FOUND NO ERROR"
+  except Exception as e:
+    return str(e)  
+
+
+######################################################################3  Retrain your chatbots sources 
+@app.route('/api/updateLinkData/<id>',methods=['POST'])
+def retrain(id):
+    objId= ObjectId(id)
+    urll = request.form.get('sendLink')
+    exclude = request.form.get('exclude')
+    pdfFile = request.files.get('pdfFile')
+    print("-------pdf",pdfFile)
+    print("-----------url",len(urll))
+
+    if pdfFile == None and len(urll) == 0:
+        print("-------------------NO ENtry")
+        return "FillOne"
+    print("-------------------------Entry")
+    pdf = ''
+    unique = ''
+    if pdfFile:
+        try:
+           unique = pdfFile.filename.split('.')[0] + str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', '')+ '.' + pdfFile.filename.split('.')[1] 
+           pdf = os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['PDF'],secure_filename(unique))
+           pdfFile.save(pdf)
+           print("------------------------568----------ok",pdf)
+           print("-----------569----------",str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', ''))
+        except Exception as e:
+            print("-----------571------------NO",e) 
+            return e     
+    print("---------573----------",urll,exclude,pdf)
+    print("574------exclude initial-------",exclude)
+    print("575-------------",pdf)
+    userDb = db['users_website_crawl_data']
+    print("---------577-------------",objId)
+    userData_i = userDb.find_one({'_id':objId})
+    
+    NoOfCharacters = userData_i.get('NoOfCharacters')
+    userData = userData_i.get('email')
+
+    print("----------579--------------",userData)
+    sub = db['user_subscription'] 
+    datasub_i = sub.find_one({'username':userData})
+
+    datasub={
+      'expiration':datasub_i.get('expiration'),
+      'plan-Info':{
+       'NoOfBots':datasub_i.get('plan-Info').get('NoOfBots'),
+       }
+    }
+    if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date():
+        return "SubE"
+    if datasub['plan-Info']['NoOfBots'] < 1:
+       return "BotF" 
+
+    print("593-----------exclude----------",exclude)
+    get_data_retrain(urll,userData,objId,pdf,unique,exclude,NoOfCharacters)
+    return urll
+
+################################################################## retrain data part 2 - exclude links and store data from links in db
+def get_data_retrain(urls,userData,objId,pdf,unique,exclude, NoOfCharacters):
+  try:  
+    print("600---------------------",len(urls))
+    data=''
+    docs=''
+    if len(urls) == 0:
+        print("604-------------------")
+        data = ''
+    else:
+        print("-------607--------",urls)
+        # return str(type(urls.split()))
+        page_links = scrape_links_and_buttons(urls)
+        # return page_links
+        # print("------------------414--------",page_links)
+        # return page_links
+
+        print("pdf---------------------614----Links-----",page_links)
+        print("----------615------",type(exclude.split(","))) 
+        page_links_x = [link for link in page_links if link not in exclude.split(",")]
+        # page_links_x = urls
+        # str(type(page_links_x))
+        print("Page links x:", page_links_x)
+        loader = SeleniumURLLoader(urls=page_links_x)
+        data = loader.load()
+
+
+    
+    if len(pdf) != 0 :  #CHange this to not equal to after testing------------------------------------------------------------------  
+        print("626--------------",pdf)   
+        loaderPDF = OnlinePDFLoader(
+        pdf
+        )
+        
+        print("631--------------",loaderPDF) 
+        docs = loaderPDF.load()
+        # print(docs,"--------------------336 pdf")
+    else:
+        docs = ''  
+        print("______-----------------386")  
+    print("------------637",type(urls))
+    
+    users_collection = db['users_website_crawl_data']
+    user_sub = db['user_subscription']
+
+    try:
+       users_collection.update_one({'_id':objId},{"$set":
+       {
+        'NoOfCharacters': NoOfCharacters,
+        'crawldata': str(data),
+        'crawldataPdf':str(docs),
+        'url':urls,
+        'pdf':unique,
+        }})
+        #  print(user_sub.find_one({"username":userData}),"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+       print("Data stored successfully!")
+    except Exception as e:
+       print("Error storing data:============", str(e),"===========================")
+    # print("dat stored hopefully = ")
+    return "FOUND NO ERROR"
+  except Exception as e:
+    return str(e)  
+
+##########################################################################3  char graph date
+@app.route('/api/chartChar/<id>',methods=['POST'])
+def getchardate(id):
+    objId= ObjectId(id)
+    users_collection = db['users_website_crawl_data']
+    dataDb_i = users_collection.find_one({'_id':objId})
+    time = request.get_json()['selectedTime']
+    dataDb = [d for d in dataDb_i.get('charData') if d['date'].startswith(time)]
+    if dataDb == []:
+        return "nodata"
+    print("--------693------",dataDb)
+    return dataDb
+
+@app.route('/api/chartCon/<id>',methods=['POST'])
+def getcondate(id):
+    objId= ObjectId(id)
+    users_collection = db['users_website_crawl_data']
+    dataDb_i = users_collection.find_one({'_id':objId})
+    time = request.get_json()['selectedTimeCon']
+    dataDb = [d for d in dataDb_i.get('UniqueConData') if d['date'].startswith(time)]
+    if dataDb == []:
+        return "nodata"
+    print("--------693------",dataDb)
+    return dataDb
+
+
 
 ############################################################# send data about individual bots back to frontend
 @app.route('/api/updatebot/<id>',methods=['GET'])
@@ -456,7 +866,9 @@ def getupdatebot(id):
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(id)
     dataDb_i = users_collection.find_one({'_id':objId})
-    print("--------------458--------",dataDb_i)
+    current_month = datetime.now().date().strftime("%Y-%m")
+
+    print("--------------697--------",current_month)
     # print(dataDb_i)
     dataDb = {
         'email':dataDb_i.get('email'),
@@ -465,7 +877,9 @@ def getupdatebot(id):
         'url':dataDb_i.get('url'),
         'pdf':dataDb_i.get('pdf'),
         'initialMsg':dataDb_i.get('initialMsg'),
-        'suggestedPrompt':dataDb_i.get('suggestedPrompt')
+        'suggestedPrompt':dataDb_i.get('suggestedPrompt'),
+        'charData':[d for d in dataDb_i.get('charData') if d['date'].startswith(current_month)],
+        'UniqueConData':[d for d in dataDb_i.get('UniqueConData') if d['date'].startswith(current_month)]
     }
     data={
         'email':dataDb['email'],
@@ -474,7 +888,9 @@ def getupdatebot(id):
         'url':dataDb['url'],
         'pdf':dataDb['pdf'],
         'initialMsg':dataDb['initialMsg'],
-        'sPrompt':dataDb['suggestedPrompt']
+        'sPrompt':dataDb['suggestedPrompt'],
+        'charData':dataDb['charData'],
+        'UniqueConData':dataDb['UniqueConData']
 
     }
     # print(data)
@@ -497,7 +913,7 @@ def getfontdata(id):
         'backgroundColor':dataDb_i.get('backgroundColor'),
         'fontSize':dataDb_i.get('fontSize'),
         'initialMsg':iMsg,
-        'suggestedPrompt':sPrompt
+        'sPrompt':sPrompt
         
     }
     print(dataDb_i.get('font'))
@@ -585,6 +1001,7 @@ def get_mybots():
 
 ################################################ scraper code
 def scrape_links_and_buttons(url):
+  try:
     options = Options()
     options.add_argument('--headless')  
     options.add_argument('--disable-gpu')
@@ -609,10 +1026,10 @@ def scrape_links_and_buttons(url):
        if link not in unique_links:
          unique_links.append(link)        
 
-
-
     driver.quit()
     return unique_links
+  except Exception as e:
+    return str(e)  
 
 ######################################################### send subscription info back to frontend
 @app.route('/api/subdata',methods=['POST'])

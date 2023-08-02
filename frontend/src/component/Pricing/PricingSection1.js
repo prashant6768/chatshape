@@ -6,6 +6,8 @@ import axios from 'axios';
 import * as jose from 'jose';
 import '../Pricing/toggle.css'
 import env from 'react-dotenv'
+import { Link } from 'react-router-dom';
+import Nav from 'react-bootstrap/Nav';
 import Cookies from 'js-cookie';
 
 
@@ -16,7 +18,8 @@ const PricingSection1 = () => {
     const decoded = Cookies.get('accessToken');
 
     const [selectedOption, setSelectedOption] = useState('A');
-    const BACKEND = 'http://localhost:5000/'
+    // const BACKEND = 'http://localhost:5000/'
+    const BACKEND = 'http://3.19.246.7'
     const handleOptionClick = (option) => {
         setSelectedOption(option);
     };
@@ -172,7 +175,42 @@ const PricingSection1 = () => {
                                 <Card.Body>
                                     <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >{x.priceTier}</Card.Title>
                                     <Card.Text className='fw-bolder fs-1 col-12 d-flex justify-content-center container text-start mb-3' style={{ color: '#FFFFFF' }}>{x.price}<p className='fs-5 mt-3 ' style={{ color: 'lightgrey', fontWeight: 'normal' }}>{x.month}</p></Card.Text>
-                                    {x.subscribe ? <Button onClick={(e)=>handleSub(e.target.value)} value={x.key} className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">Subscribe</Button> : <Button disabled className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84', visibility: 'hidden' }} variant="primary">Subscribe</Button>}
+                                    {/* {x.subscribe ? (<Button onClick={(e)=>handleSub(e.target.value)} value={x.key} className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">Subscribe</Button>) : (<Button disabled className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84', visibility: 'hidden' }} variant="primary">Subscribe</Button>)} */}
+                                   
+                                    {decoded && x.subscribe ? (
+  <Button
+    onClick={(e) => handleSub(e.target.value)}
+    value={x.key}
+    className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5'
+    style={{ color: '#FFFFFF', backgroundColor: '#620B84' }}
+    variant="primary"
+  >
+    Subscribe
+  </Button>
+) : (
+  <>
+    {decoded ? (
+      <Button
+        disabled
+        className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5'
+        style={{ color: '#FFFFFF', backgroundColor: '#620B84', visibility: 'hidden' }}
+        variant="primary"
+      >
+        Subscribe
+      </Button>
+    ) : (
+      <Link style={{ textDecoration:'none'}} to="/login"><Button
+      value={x.key}
+      className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5'
+      style={{ color: '#FFFFFF', backgroundColor: '#620B84', textDecoration:'none' }}
+      variant="primary"
+    >
+      Subscribe
+    </Button></Link>
+    )}
+  </>
+)}
+
                                     <Card.Text className='fw-bolder fs-5 col-12 d-flex justify-content-start container text-start mb-5' style={{ color: '#FFFFFF' }}>
                                         What is included :
                                     </Card.Text>
@@ -210,7 +248,42 @@ const PricingSection1 = () => {
                                     <Card.Body>
                                         <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >{x.priceTier}</Card.Title>
                                         <Card.Text className='fw-bolder fs-1 col-12 d-flex justify-content-center container text-start mb-3' style={{ color: '#FFFFFF' }}>{x.price}<p className='fs-5 mt-3 ' style={{ color: 'lightgrey', fontWeight: 'normal' }}>{x.month}</p></Card.Text>
-                                        {x.subscribe ? <Button  onClick={(e)=>handleSub(e.target.value)} value={x.key} className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">Subscribe</Button> : <Button disabled className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84', visibility: 'hidden' }} variant="primary">Subscribe</Button>}
+                                        {/* {x.subscribe ? <Button  onClick={(e)=>handleSub(e.target.value)} value={x.key} className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">Subscribe</Button> : <Button disabled className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84', visibility: 'hidden' }} variant="primary">Subscribe</Button>} */}
+
+
+                                        {decoded && x.subscribe ? (
+  <Button
+    onClick={(e) => handleSub(e.target.value)}
+    value={x.key}
+    className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5'
+    style={{ color: '#FFFFFF', backgroundColor: '#620B84' }}
+    variant="primary"
+  >
+    Subscribe
+  </Button>
+) : (
+  <>
+    {decoded ? (
+      <Button
+        disabled
+        className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5'
+        style={{ color: '#FFFFFF', backgroundColor: '#620B84', visibility: 'hidden' }}
+        variant="primary"
+      >
+        Subscribe
+      </Button>
+    ) : (
+      <Link style={{ textDecoration:'none'}} to="/login"><Button
+      value={x.key}
+      className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5'
+      style={{ color: '#FFFFFF', backgroundColor: '#620B84', textDecoration:'none' }}
+      variant="primary"
+    >
+      Subscribe
+    </Button></Link>
+    )}
+  </>
+)}
 
                                         <Card.Text className='fw-bolder fs-5 col-12 d-flex justify-content-start container text-start mb-5' style={{ color: '#FFFFFF' }}>
                                             What is included :

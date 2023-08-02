@@ -20,3 +20,7 @@
     width: 100%;
   }
 
+  .custom-accordion .accordion-button{
+    background-color: #212529; /* Replace with the desired color */
+    color:#FFFFFF
+  }

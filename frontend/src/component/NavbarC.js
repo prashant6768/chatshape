@@ -11,13 +11,8 @@ import Cookies from 'js-cookie';
 
 const NavbarC = ({gradientC}) => {
 
-  const[tok,setTok]=useState(null)
    const decoded = Cookies.get('accessToken');
 
-   useEffect(()=>{
-    if(tok === null){console.log("NULLLLLLLLLLl")}
-    else{console.log("PPPPPPPPPPPPPPPPPPPPP")}
-   },[])
 
    
 

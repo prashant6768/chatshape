@@ -101,9 +101,10 @@ const BotSection1 = () => {
        <input className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3' value={botName} placeholder='Name of bot' onChange={(e)=> setBot(e.target.value)}  />
        </div>
        <div className='form-group'>
-        { botName !== '' ?
+        { botName !== '' && loading !== true ?
        <button className='btn btn-outline-warning px-5 ' onClick={(e)=>handleSubmit(e)}>Create Bot</button>
        :  <button disabled='true' className='btn btn-outline-warning px-5 ' onClick={(e)=>handleSubmit(e)}>Create Bot</button>
+       
         }
        </div>
        <div className='form-group d-flex justify-content-center'>

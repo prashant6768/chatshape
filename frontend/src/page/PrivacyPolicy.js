@@ -2,6 +2,7 @@ import React from 'react'
 import NavbarC from '../component/NavbarC'
 import Footer from '../component/Footer'
 import './BulletPoint.css'
+import ScriptLoaderHOC from '../component/ScriptLoaderHOC';
 
 const PrivacyPolicy = () => {
 
@@ -9,6 +10,11 @@ const PrivacyPolicy = () => {
 
   return (
     <>
+     <ScriptLoaderHOC
+        scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try-13/popup.js"
+        id="popup"
+        cred="64ca2d70c6e8de9e5d052d56"
+      />
       <NavbarC gradientC={gradientC} />
       <div className='pb-5' style={{ backgroundColor: '#242439', height: '100%', minHeight: '100vh', width: '100vw', wordBreak:'break-word' }}>
          <h1 className='fw-bolder col-12 d-flex justify-content-start container text-start pb-2 pt-5' style={{ color: '#FFFFFF' }}>Privacy Policy</h1>

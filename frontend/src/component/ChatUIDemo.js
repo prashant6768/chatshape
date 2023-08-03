@@ -6,8 +6,10 @@ import { Form, Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from 'axios'
 import { ThreeDots } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
+import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa'
+import { BsStopCircle } from 'react-icons/bs'
 import sendIcon from '../assets/send.png'
-// file_example_MP3_700KB
+
 import lamejs from 'lamejs';
 
 import * as jose from 'jose';
@@ -39,28 +41,29 @@ const ChatUIDemo = (botID) => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [chatbotMsg, setChatbotMsg] = useState('');
-    const[suggestedPrompt,setSPrompt]= useState([])
-    const[spromptHide,setSpromptHide]=useState(false)
+    const [suggestedPrompt, setSPrompt] = useState([])
+    const [spromptHide, setSpromptHide] = useState(false)
     const [plan, setPlan] = useState('')
     const [mark, setMark] = useState(false)
     const [loading, setLoading] = useState(false);
-    const[uniqueCon,setUniqueCon]= useState(1)
-    const[now,setNow]=useState('')
+    const [audioSub, setAudioSub] = useState(false)
+    const [uniqueCon, setUniqueCon] = useState(1)
+    const [now, setNow] = useState('')
     const BACKEND = 'http://localhost:5000/'
-    // const BACKEND = 'http://3.19.246.7'
+    // const BACKEND = 'http://3.19.246.7/'
 
     const handleInputChange = async (e) => {
         await setInputValue(e.target.value)
     };
 
-    const handleSubmitP=(x)=>{
-       
+    const handleSubmitP = (x) => {
+
         if (x.trim() === '') {
             return;
         }
         setSpromptHide(true)
 
-         const newMessage =  {
+        const newMessage = {
             id: messages.length + 1,
             text: x,
             sender: 'me',
@@ -69,30 +72,32 @@ const ChatUIDemo = (botID) => {
         console.log(spromptHide)
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
-        axios.post(`${BACKEND}/api/msg`, { inputValue, botID,uniqueCon }, {
+        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0) ;console.log(messages," === from backend"); setLoading(false) } })
-   
+        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } })
+
     }
 
-    
-    useEffect(()=>{
-        if(uniqueCon === 1){
-      setNow(new Date().toLocaleDateString()+ ' '+ new Date().toLocaleTimeString())
+
+    useEffect(() => {
+        if (uniqueCon === 1) {
+            setNow(new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString())
         }
-    },[uniqueCon])
+    }, [uniqueCon])
 
     const handleSubmit = async (e) => {
-    
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
+
         setSpromptHide(true)
         if (inputValue.trim() === '') {
             return;
         }
 
-         const newMessage =  {
+        const newMessage = {
             id: messages.length + 1,
             text: inputValue,
             sender: 'me',
@@ -100,31 +105,31 @@ const ChatUIDemo = (botID) => {
 
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
-        axios.post(`${BACKEND}/api/msg`, { inputValue, botID,uniqueCon }, {
+        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
         })
-        // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
-        .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages,"=== backend www", res.data); setUniqueCon(0) ; setLoading(false) } }).catch(err => console.log(err))
+            // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
+            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false) } }).catch(err => console.log(err))
     };
 
-    useEffect(()=>{
-      console.log("111111==",messages)
-      const filteredArray = messages.filter(item => item.text !== '');
-      const processedArray = filteredArray.map(({ id, ...x }) => x);
-      console.log("222== ",processedArray)
-      axios.post(`${BACKEND}api/history`, { botID,processedArray,now,uniqueCon }, {
-        'Content-type': 'application/json',
-        'Accept': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-    }).then(res => console.log(res.data," === from backend message history ")).catch(err => console.log(err))
-    },[chatbotMsg])
+    useEffect(() => {
+        console.log("111111==", messages)
+        const filteredArray = messages.filter(item => item.text !== '');
+        const processedArray = filteredArray.map(({ id, ...x }) => x);
+        console.log("222== ", processedArray)
+        axios.post(`${BACKEND}api/history`, { botID, processedArray, now, uniqueCon }, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }).then(res => console.log(res.data, " === from backend message history ")).catch(err => console.log(err))
+    }, [chatbotMsg])
 
-    useEffect(()=>{
-       axios.get(`${BACKEND}/api/fontdata/${botID.botID}`).then(res => {setFontData(res.data); setSPrompt(res.data.sPrompt) ;setChatbotMsg(res.data.initialMsg); console.log(res.data.initialMsg,"=font api init")}).catch(err => console.log(err))
-    console.log(suggestedPrompt)
-    },[])
+    useEffect(() => {
+        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); console.log(res.data.initialMsg, "=font api init") }).catch(err => console.log(err))
+        console.log(suggestedPrompt)
+    }, [])
 
 
     useEffect(() => {
@@ -179,11 +184,11 @@ const ChatUIDemo = (botID) => {
     const handleFontSubmit = (event) => {
         event.preventDefault();
         setLoading(true);
-        axios.put(`${BACKEND}/api/fontdata/${botID.botID}`,{fontData},{
-            'Content-type':'application/json', 
-            'Accept':'application/json',
-            'Access-Control-Allow-Origin':'*'
-      }).then(res => {if(res.data === 'Yes'){toast.success('Font Changes were successful');  setLoading(false);}else{toast.success('Some error occured');  setLoading(false);}}).catch((err)=>{console.log("error manage bots ",err); toast.error('API request failed!'); setLoading(false);})
+        axios.put(`${BACKEND}api/fontdata/${botID.botID}`, { fontData }, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }).then(res => { if (res.data === 'Yes') { toast.success('Font Changes were successful'); setLoading(false); } else { toast.success('Some error occured'); setLoading(false); } }).catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoading(false); })
         console.log(fontData);
     };
 
@@ -211,32 +216,33 @@ const ChatUIDemo = (botID) => {
         'Verdana',
     ];
 
-// const handleAudio=()=>{
+    // const handleAudio=()=>{
 
-// }   
+    // }   
 
-const [permission, setPermission] = useState(false);
-const [stream, setStream] = useState(null);
-const mediaRecorder = useRef(null);
-const [recordingStatus, setRecordingStatus] = useState("inactive");
-const [audioChunks, setAudioChunks] = useState([]);
-const [audio, setAudio] = useState(null);
+    const [permission, setPermission] = useState(false);
+    const [stream, setStream] = useState(null);
+    const mediaRecorder = useRef(null);
+    const [recordingStatus, setRecordingStatus] = useState("inactive");
+    const [audioChunks, setAudioChunks] = useState([]);
+    const [audio, setAudio] = useState(null);
 
-const getMicrophonePermission = async () => {
-    if ("MediaRecorder" in window) {
-        try {
-            const streamData = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: false,
-            });
-            setPermission(true);
-            setStream(streamData);
-        } catch (err) {
-            alert(err.message);
+    const getMicrophonePermission = async () => {
+        if ("MediaRecorder" in window) {
+            try {
+                const streamData = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: false,
+                });
+                setPermission(true);
+                setStream(streamData);
+            } catch (err) {
+                alert(err.message);
+            }
+        } else {
+            alert("The MediaRecorder API is not supported in your browser.");
         }
-    } else {
-        alert("The MediaRecorder API is not supported in your browser.");
-    }}
+    }
     const mimeType = "audio/webm";
     const startRecording = async () => {
         setRecordingStatus("recording");
@@ -248,67 +254,75 @@ const getMicrophonePermission = async () => {
         mediaRecorder.current.start();
         let localAudioChunks = [];
         mediaRecorder.current.ondataavailable = (event) => {
-           if (typeof event.data === "undefined") return;
-           if (event.data.size === 0) return;
-           localAudioChunks.push(event.data);
+            if (typeof event.data === "undefined") return;
+            if (event.data.size === 0) return;
+            localAudioChunks.push(event.data);
         };
         setAudioChunks(localAudioChunks);
-      };
-      const stopRecording = () => {
+    };
+    const stopRecording = () => {
         setRecordingStatus("inactive");
         //stops the recording instance
         mediaRecorder.current.stop();
         mediaRecorder.current.onstop = () => {
-          //creates a blob file from the audiochunks data
-           const audioBlob = new Blob(audioChunks, { type: mimeType });
-      
+            //creates a blob file from the audiochunks data
+            const audioBlob = new Blob(audioChunks, { type: mimeType });
 
-           setAudio(audioBlob);
-           setAudioChunks([]);
+
+            setAudio(audioBlob);
+            setAudioChunks([]);
         };
-      };
+    };
 
-      useEffect(()=>{
-        if(audio !== null){
+
+    useEffect(() => {
+        if (audio !== null) {
             const formData = new FormData();
             formData.append('audio', audio, 'recording.webm');
             for (let pair of formData.entries()) {
                 console.log(pair[0] + ', ' + pair[1]);
-              }
-       
-        axios.post(`${BACKEND}api/audio`,  formData, {
-            'Content-type': 'application/json',
-            'Accept': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        }).then(res => console.log(res.data)).catch(err => console.log(err))
-    }
-      },[audio])
+            }
 
+            axios.post(`${BACKEND}api/audio`, formData, {
+                'Content-type': 'application/json',
+                'Accept': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            }).then(res => { console.log(res.data); setInputValue(res.data); setAudioSub(true); setAudio(null) }).catch(err => console.log(err))
+        }
+    }, [audio])
+
+    useEffect(() => {
+        if (audioSub === true) {
+            handleSubmit()
+            setInputValue('')
+        }
+        setAudioSub(false)
+    }, [audioSub])
 
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
 
-{/*  ############################### Font select form */}
+            {/*  ############################### Font select form */}
 
-            <div style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }} className=' rounded-5 my-5 col-lg-5 col-11 d-flex justify-content-center '>
+            <div style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }} className=' rounded-5 my-5 col-lg-5 col-10 d-flex justify-content-center '>
                 <form className='d-flex row justify-content-around mt-3 ' onSubmit={handleFontSubmit}>
-                    <div  style={{ color: '#FFFFFF', backgroundColor: '#171725', border:'1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
-                    <Form.Label>Font:</Form.Label>
-        <DropdownButton
-          title={fontData.font || 'Select a font'}
-          variant="secondary"
-          drop='down-centered'
-          id="dropdown-font"
-          onSelect={(eventKey) => handleFontChange({ target: { name: 'font', value: eventKey } })}
-        >
-          {fontOptions.map((fontOption) => (
-            <Dropdown.Item key={fontOption} eventKey={fontOption}>
-              {fontOption}
-            </Dropdown.Item>
-          ))}
-        </DropdownButton>
+                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                        <Form.Label>Font:</Form.Label>
+                        <DropdownButton
+                            title={fontData.font || 'Select a font'}
+                            variant="secondary"
+                            drop='down-centered'
+                            id="dropdown-font"
+                            onSelect={(eventKey) => handleFontChange({ target: { name: 'font', value: eventKey } })}
+                        >
+                            {fontOptions.map((fontOption) => (
+                                <Dropdown.Item key={fontOption} eventKey={fontOption}>
+                                    {fontOption}
+                                </Dropdown.Item>
+                            ))}
+                        </DropdownButton>
                     </div>
-                    <div  style={{ color: '#FFFFFF', backgroundColor: '#171725', border:'1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             User Font Color:
                             <input
@@ -320,7 +334,7 @@ const getMicrophonePermission = async () => {
                             />
                         </label>
                     </div>
-                    <div  style={{ color: '#FFFFFF', backgroundColor: '#171725', border:'1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             User Text Color:
                             <input
@@ -332,7 +346,7 @@ const getMicrophonePermission = async () => {
                             />
                         </label>
                     </div>
-                    <div  style={{ color: '#FFFFFF', backgroundColor: '#171725', border:'1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             CPU Font Color:
                             <input
@@ -344,7 +358,7 @@ const getMicrophonePermission = async () => {
                             />
                         </label>
                     </div>
-                    <div  style={{ color: '#FFFFFF', backgroundColor: '#171725', border:'1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             CPU Text Color:
                             <input
@@ -356,7 +370,7 @@ const getMicrophonePermission = async () => {
                             />
                         </label>
                     </div>
-                    <div  style={{ color: '#FFFFFF', backgroundColor: '#171725', border:'1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             Background Color:
                             <input
@@ -368,26 +382,26 @@ const getMicrophonePermission = async () => {
                             />
                         </label>
                     </div>
-                    <div  style={{ color: '#FFFFFF', backgroundColor: '#171725', border:'1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             Font Size:
                             <input
                                 type="number"
                                 name="fontSize"
-                                style={{width:'60px'}}
+                                style={{ width: '60px' }}
                                 value={fontData.fontSize}
                                 onChange={handleFontChange}
                                 required
                             />
                         </label>
                     </div>
-                    <div  className='col-8 col-sm-9 fs-5 rounded-3 text-center  py-2  my-3' >
-                        <button className='btn btn-outline-warning px-5'  type="submit">Submit</button>
+                    <div className='col-8 col-sm-9 fs-5 rounded-3 text-center  py-2  my-3' >
+                        <button className='btn btn-outline-warning px-5' type="submit">Submit</button>
                     </div>
                 </form>
             </div>
 
-{/* ##################################### Chat UI DEMO */}
+            {/* ##################################### Chat UI DEMO */}
 
             <div className='d-flex justify-content-center my-5 col-lg-5 col-11'>
                 <div className='d-flex  ' style={{ position: 'relative', height: '600px', minWidth: '240px', maxWidth: '540px', width: '100%' }}>
@@ -416,13 +430,13 @@ const getMicrophonePermission = async () => {
                             )}
                         </div>
                         {/* #######################3 suggested prompts */}
-                        <div style={{ position: 'absolute',  left: '20px', bottom: '50px', width:'75%'}}>
-                        { suggestedPrompt === undefined || spromptHide === true ? '': suggestedPrompt.map(x =>(
-                        <div  className='received message' onClick={()=>{handleSubmitP(x)}} value={x}  style={{  backgroundColor: fontData.cpuFontColor, fontSize: fontData.fontSize, color: fontData.cpuFontTextColor, fontFamily: fontData.font, width:'75%'  }}  >{x}</div>
-                        ))}
+                        <div style={{ position: 'absolute', left: '20px', bottom: '50px', width: '75%' }}>
+                            {suggestedPrompt === undefined || spromptHide === true ? '' : suggestedPrompt.map(x => (
+                                <div className='received message' onClick={() => { handleSubmitP(x) }} value={x} style={{ backgroundColor: fontData.cpuFontColor, fontSize: fontData.fontSize, color: fontData.cpuFontTextColor, fontFamily: fontData.font, width: '75%' }}  >{x}</div>
+                            ))}
                         </div>
-                        </div>
-                    <form className="chat-input mt-5" style={{ minHeight: '50px', height: '50px', maxWidth: '540px', minWidth: '240px', width: '100%', bottom: '-2px', position: 'absolute', backgroundColor: fontData.backgroundColor, borderColor: 'black', borderWidth: '2px' }} onSubmit={(e)=>handleSubmit(e)}>
+                    </div>
+                    <form className="chat-input mt-5" style={{ minHeight: '50px', height: '50px', maxWidth: '540px', minWidth: '240px', width: '100%', bottom: '-2px', position: 'absolute', backgroundColor: fontData.backgroundColor, borderColor: 'black', borderWidth: '2px' }} onSubmit={(e) => handleSubmit(e)}>
                         <input
                             type="text"
                             style={{ minWidth: '50%' }}
@@ -430,37 +444,36 @@ const getMicrophonePermission = async () => {
                             onChange={handleInputChange}
                             placeholder="Type a message..."
                         />
-                        
-  {/* <button className="btn btn-outline-secondary me-2" onClick={getMicrophonePermission}  type="button" id="button-addon2">B</button> */}
-  <div className="audio-controls me-2">
-    {!permission ? (
-    <button onClick={getMicrophonePermission} type="button">
-        P
-    </button>
-    ) : null}
-    {permission && recordingStatus === "inactive" ? (
-    <button onClick={startRecording} type="button">
-        R
-    </button>
-    ) : null}
-    {recordingStatus === "recording" ? (
-    <button onClick={stopRecording} type="button">
-        S
-    </button>
-    ) : null}
-</div>
+
+                        <div className="audio-controls me-2">
+                            {!permission ? (
+                                <button onClick={getMicrophonePermission} type="button">
+                                    <FaMicrophoneSlash />
+                                </button>
+                            ) : null}
+                            {permission && recordingStatus === "inactive" ? (
+                                <button onClick={startRecording} type="button">
+                                    <FaMicrophone />
+                                </button>
+                            ) : null}
+                            {recordingStatus === "recording" ? (
+                                <button onClick={stopRecording} type="button">
+                                    <BsStopCircle />
+                                </button>
+                            ) : null}
+                        </div>
 
                         <button type="submit" ><img src={sendIcon} alt='Send' style={{ height: '22px', width: '25px', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} /></button>
                         {/* <button type="submit" ><img src="https://icons.veryicon.com/png/o/internet--web/iview-3-x-icons/ios-send.png" style={{ height:'25px', width:'40px', backgroundSize:'contain', backgroundRepeat:'no-repeat'}}/></button> */}
                     </form>
-                    {audio ? (
+                    {/* {audio ? (
   <div className="audio-container">
      <audio src={audio} controls></audio>
      <a download href={audio}>
         Download Recording
      </a>
    </div>
-) : null}
+) : null} */}
                 </div>
             </div>
             <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />

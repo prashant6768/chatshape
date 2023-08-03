@@ -38,6 +38,8 @@ from langchain.document_loaders import TextLoader
 from langchain.output_parsers import CommaSeparatedListOutputParser
 from langchain.llms import OpenAIChat
 
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -355,7 +357,7 @@ def history():
             user_history.insert_one({'time':now, 'botID':userData, 'chatHistory':data})
             return "uni"
         else:
-            print("-------289---",user_history.find_one({"botID":str(userData) }))
+            # print("-------289---",user_history.find_one({"botID":str(userData) }))
             user_history.update_one({"botID":str(userData),'time':now }, {"$set": {"chatHistory": data}})  
             return 'NO uni'
     return 'OK'
@@ -366,6 +368,7 @@ def historyget(id):
     user_history = db['user_history']
     hist = []
     for x in user_history.find({'botID':str(id)}):
+        print(x['chatHistory'])
         if len(x['chatHistory']) <= 1:
             user_history.delete_one({'_id': x['_id']})
     for x in user_history.find({'botID':str(id)}):
@@ -442,7 +445,7 @@ def start_ai(query,userData,uniqueCon):
     template=prompt, input_variables=["text", "query"]
 )
     chain_type_kwargs = {"prompt": PROMPT}
-    qa_chain = load_qa_chain(ChatOpenAI(model_name="gpt-3.5-turbo",temperature=0.7), chain_type="map_reduce")
+    qa_chain = load_qa_chain(ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-3.5-turbo",temperature=0.7), chain_type="map_reduce")
     answer = qa_chain.run(input_documents= text, question=query)
     print("---------279---------",answer,"-----------279-----------",PROMPT)
     # users_collection.update_one({"_id":objId }, {"$push": {"History":{"HistoryChat":{"$each":['AI: '+answer]}}}})
@@ -762,7 +765,7 @@ def retrain(id):
     }
     if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date():
         return "SubE"
-    if datasub['plan-Info']['NoOfBots'] < 1:
+    if datasub['plan-Info']['NoOfBots'] < 0:
        return "BotF" 
 
     print("593-----------exclude----------",exclude)

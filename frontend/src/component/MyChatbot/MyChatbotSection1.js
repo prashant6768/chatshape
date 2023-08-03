@@ -17,10 +17,10 @@ const MyChatbotSection1 = () => {
   const [dataArr, setDataArr] = useState([])
   const [botId,setBotId]=useState('')
   const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.19.246.7'
+  // const BACKEND = 'http://3.19.246.7/'
 
   useEffect(() => {
-    axios.post(`${BACKEND}/api/mybots`, { decoded }, {
+    axios.post(`${BACKEND}api/mybots`, { decoded }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'

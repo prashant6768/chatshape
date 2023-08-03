@@ -8,11 +8,12 @@ import {ThreeDots} from 'react-loader-spinner';
 import {BsGoogle} from 'react-icons/bs'
 
 import env from 'react-dotenv'
+import ScriptLoaderHOC from '../component/ScriptLoaderHOC';
 
 
 const Signup = () => {
 
-  // const BACKEND = 'http://3.19.246.7'
+  // const BACKEND = 'http://3.19.246.7/'
   const BACKEND = 'http://localhost:5000/'
 
     const [username, setUsername] = useState('');
@@ -29,7 +30,7 @@ const Signup = () => {
       e.preventDefault();
       setShow(true)
       setLoading(true); 
-      await axios.post(`${BACKEND}/auth/signup`,{username,password,name,phone},{
+      await axios.post(`${BACKEND}auth/signup`,{username,password,name,phone},{
         // await axios.post('http://18.218.218.167:8000/auth/signup',{username,password},{
           'Content-type':'application/json', 
           'Accept':'application/json',
@@ -52,7 +53,7 @@ const Signup = () => {
     const handleOtp=async(e)=>{
        e.preventDefault()
        setLoading2(true)
-       await axios.post(`${BACKEND}/auth/getOTP`,{otp,username},{
+       await axios.post(`${BACKEND}auth/getOTP`,{otp,username},{
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
@@ -73,6 +74,11 @@ const Signup = () => {
 
   return (
     <div style={{width:'100vw'}}>
+       <ScriptLoaderHOC
+        scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try-13/popup.js"
+        id="popup"
+        cred="64ca2d70c6e8de9e5d052d56"
+      />
     <NavbarC gradientC={gradientC}/>
     <div  style={{paddingTop:'100px', backgroundColor: '#242439', minHeight: '1000px', height:'100%'}}>
     <div className='d-flex justify-content-center col-12'  >
@@ -184,8 +190,8 @@ const Signup = () => {
   </form>
   </div>
   { show ?
-  <div className='d-flex justify-content-center col-12' style={{paddingTop:'60px',paddingBottom:'100px', backgroundColor: '#242439', height: '100vh'}} >
-  <form action="#" className="mt-4 register-form rounded-3 p-3 " style={{width:'330px',height:'160px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
+  <div className='d-flex justify-content-center col-12 ' style={{paddingTop:'60px',paddingBottom:'100px', backgroundColor: '#242439', height: '100vh'}} >
+  <form action="#" className="mt-4 register-form rounded-3 p-3 mx-1" style={{width:'330px',height:'160px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
 <div className="row">
   <div className="col-sm-12">
     <label htmlFor="email" className="mb-1">

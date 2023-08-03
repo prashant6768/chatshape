@@ -11,11 +11,11 @@ const PaymentSection1 = () => {
   const decoded = Cookies.get('accessToken');
   const [dataArr, setDataArr] = useState([])
   const[sorted,setSorted]= useState('')
-  // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'http://3.19.246.7'
+  const BACKEND = 'http://localhost:5000/'
+  // const BACKEND = 'http://3.19.246.7/'
 
   useEffect(() => {
-    axios.post(`${BACKEND}/api/paymenthistory`, { decoded }, {
+    axios.post(`${BACKEND}api/paymenthistory`, { decoded }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'

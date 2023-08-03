@@ -5,8 +5,8 @@ import Cookies from 'js-cookie';
 
 const SuccessPage = () => {
 
-  // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'http://3.19.246.7'
+  const BACKEND = 'http://localhost:5000/'
+  // const BACKEND = 'http://3.19.246.7/'
   const[data,setData]=useState('')
   const[product,setProduct]=useState('')
   const[user,setUser]=useState('')
@@ -19,7 +19,7 @@ const SuccessPage = () => {
 
 useEffect(()=>{
   
-axios.post(`${BACKEND}/stripepay/order/success`,{decoded},{
+axios.post(`${BACKEND}stripepay/order/success`,{decoded},{
   'Content-type':'application/json', 
   'Accept':'application/json',
   'Access-Control-Allow-Origin':'*',

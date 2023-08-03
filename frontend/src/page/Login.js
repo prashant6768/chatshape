@@ -2,6 +2,7 @@ import React,{useState,useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Nav from 'react-bootstrap/Nav';
+import ScriptLoaderHOC from '../component/ScriptLoaderHOC';
 
 import { useLocation } from 'react-router-dom';
 import axios from 'axios'
@@ -18,7 +19,7 @@ import env from 'react-dotenv'
 const Login = () => {
 
   const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.19.246.7'
+  // const BACKEND = 'http://3.19.246.7/'
     const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const[loading, setLoading] = useState(false);
@@ -31,7 +32,7 @@ const Login = () => {
     e.preventDefault();
     
     setLoading(true); 
-    await axios.post(`${BACKEND}/auth/login`,{username,password},{
+    await axios.post(`${BACKEND}auth/login`,{username,password},{
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
@@ -95,6 +96,11 @@ await axios.get(`${BACKEND}auth/googlelogin`,{
   return (
 
   <div style={{minWidth:'100vw'}}>
+     <ScriptLoaderHOC
+        scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try-13/popup.js"
+        id="popup"
+        cred="64ca2d70c6e8de9e5d052d56"
+      />
   <NavbarC gradientC={gradientC}/>
   <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'100px', backgroundColor: '#242439', minHeight: '1000px', height:'100%'}} >
  

@@ -2,6 +2,7 @@ import React from 'react'
 import NavbarC from '../component/NavbarC'
 import Footer from '../component/Footer'
 import './BulletPoint.css'
+import ScriptLoaderHOC from '../component/ScriptLoaderHOC';
 
 const TermsOfService = () => {
 
@@ -9,6 +10,11 @@ const TermsOfService = () => {
 
   return (
     <>
+     <ScriptLoaderHOC
+        scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try-13/popup.js"
+        id="popup"
+        cred="64ca2d70c6e8de9e5d052d56"
+      />
       <NavbarC gradientC={gradientC} />
       <div className='pb-5' style={{ backgroundColor: '#242439', height: '100%', minHeight: '100vh', width: '100vw' }}>
         <h1 className='fw-bolder col-12 d-flex justify-content-start container text-start pb-2 pt-5' style={{ color: '#FFFFFF' }}>Terms Of Service</h1>
@@ -16,8 +22,10 @@ const TermsOfService = () => {
 
 
         <ol className="numbered-list ps-3" style={{ wordBreak:'break-word'}}>
-          <li className="list-item">
+        <li className="list-item my-4">
+        {/* <li className="list-item my-4"> */}
             <div className="list-item-content">
+              
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Introduction</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>These Terms of Service (“Terms”, “Terms of Service”) are used to determine the rules of the
                 Service and to clarify the legal relationship between the entity using the Service and the
@@ -34,7 +42,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>PERSONAL DATA</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>
@@ -71,7 +79,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>General Rules</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>
@@ -130,7 +138,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Account</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>Account set-up is possible through the Website. Account set-up requires logging in using
@@ -150,7 +158,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Communications</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>By creating an Account, you can agree to subscribe to newsletters, marketing or promotional
@@ -158,7 +166,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Subscriptions</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>Some parts of Service are billed on a subscription basis (“Subscription(s)”). You will be billed
@@ -188,7 +196,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Fee Changes</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>The Company, in its sole discretion and at any time, may modify Subscription fees for the
@@ -200,14 +208,14 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Refunds</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>Except when required by law, paid Subscription fees are non-refundable.</dd>
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Content</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>Our Service and Website allows you to post, link, store, share and otherwise make available
@@ -234,7 +242,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Prohibited Uses</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>You may use Service or Website only for lawful purposes and in accordance with Terms. You
@@ -311,7 +319,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Analytics</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>We may use third-party service providers to monitor and analyze the use of our Service and
@@ -326,7 +334,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Intellectual Property</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>The Service, the Website and their original content (excluding Content), features and
@@ -363,7 +371,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Copyright Policy</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>We respect the intellectual property rights of others. It is our policy to respond to any claim
@@ -380,7 +388,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>DMCA Notice and Procedure for Copyright Infringement Claims</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>You may submit a notification pursuant to the Digital Millennium Copyright Act (DMCA) by
@@ -420,7 +428,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Error Reporting and Feedback</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>The Company tries – to the best of its ability – to support the Guests and Users in solving
@@ -442,7 +450,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Links to Other Websites</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>Our Service and/or Website may contain links to Other Websites that are not owned or
@@ -457,7 +465,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Disclaimer of Warranty</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>THE SERVICES ARE PROVIDED BY COMPANY ON AN “AS IS” AND “AS AVAILABLE” BASIS.
@@ -483,7 +491,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Limitation of Liability</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>The Company shall not be liable for the consequences of complying with the content of tips,
@@ -517,7 +525,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>The Guest’s/User’s Liability</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>The Guest and/or User is fully liable for the consequences of authorized or unauthorized
@@ -529,7 +537,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Service breaks</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>The Company does not guarantee the permanent accessibility of the Service or the Website.
@@ -545,7 +553,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Personal Data Protection and Security</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>The Company processes personal data with due diligence and ensuring adequate technical
@@ -562,7 +570,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Termination</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>We may terminate or suspend your Account and ban access to Service immediately, without
@@ -575,7 +583,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Governing Law</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>These Terms shall be governed and construed in accordance with the laws of State of
@@ -588,7 +596,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Changes To Service</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>We reserve the right to withdraw or amend our Service, and any service or material we
@@ -599,7 +607,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Amendments To Terms</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>We may amend Terms at any time by posting the amended terms on this site. It is your
@@ -615,7 +623,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Waiver And Severability</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>No waiver by Company of any term or condition set forth in Terms shall be deemed a further
@@ -628,7 +636,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Acknowledgement</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>BY USING SERVICE OR OTHER SERVICES PROVIDED BY US, YOU ACKNOWLEDGE THAT YOU
@@ -636,7 +644,7 @@ const TermsOfService = () => {
             </div>
           </li>
 
-          <li className="list-item">
+          <li className="list-item my-4">
             <div className="list-item-content">
               <dt className='fs-4 col-12 d-flex justify-content-start container text-start mx-1' style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Contact Us</dt>
               <dd className='fs-4 col-12 d-flex justify-content-start container text-start ' style={{ color: '#FFFFFF' }}>Any time you wish to contact the Company, please send email at: contact@zema.io</dd>

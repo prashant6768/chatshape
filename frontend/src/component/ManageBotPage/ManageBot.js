@@ -74,7 +74,7 @@ const messageStyleRec = {
   const [vis, setVis] = useState('Bot Properties')
   const [resizer, setResizer] = useState(true)
   const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.19.246.7'
+  // const BACKEND = 'http://3.19.246.7/'
 
 
   const [sendLink, setSendLink] = useState('')
@@ -185,7 +185,7 @@ const messageStyleRec = {
     e.preventDefault()
     setLoadingdel(true);
     console.log("Delete")
-    await axios.post(`${BACKEND}/api/deletebot/${id.id}`, {
+    await axios.post(`${BACKEND}api/deletebot/${id.id}`, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
@@ -284,7 +284,7 @@ const messageStyleRec = {
       {vis === 'Bot Properties' ?
         <div >
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }} >Add this Script to your website to get your chatbot</label>
-          <textarea id='textareascript' className='fs-4 d-flex justify-content-center container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={`<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try-9/popup.js" defer id="popup" cred="${id.id}"></script>`} />
+          <textarea id='textareascript' className='fs-4 d-flex justify-content-center container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={`<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try-13/popup.js" defer id="popup" cred="${id.id}"></script>`} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URL used</label>
           <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='URL Used' value={url} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >Pdf Used</label>
@@ -324,7 +324,7 @@ const messageStyleRec = {
             </form>
           </div>
           {/* retrain bot */}
-          <div className='fs-4 col-12 d-flex row justify-content-center  text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
+          <div className='fs-4 col-12 d-flex row justify-content-center mx-auto text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
             <div className="form-group col-12 mt-5 mb-3 fw-bold">
               <label>Retrain your Chatbot:</label>
             </div>
@@ -397,7 +397,7 @@ const messageStyleRec = {
       }
       {vis === 'Bot Analytics' ?
         <div >
-          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }} >Analytics</label>
+          {/* <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }} >Analytics</label> */}
           <label className='fs-4 d-flex justify-content-center container text-center mt-5 mb-5' style={{ height: '100%', color: '#FFFFFF' }} >Characters used</label>
           <div className='fs-4 d-flex justify-content-center  text-center mt-1 mb-5'>
 

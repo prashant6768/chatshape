@@ -18,8 +18,8 @@ const PricingSection1 = () => {
     const decoded = Cookies.get('accessToken');
 
     const [selectedOption, setSelectedOption] = useState('A');
-    // const BACKEND = 'http://localhost:5000/'
-    const BACKEND = 'http://3.19.246.7'
+    const BACKEND = 'http://localhost:5000/'
+    // const BACKEND = 'http://3.19.246.7/'
     const handleOptionClick = (option) => {
         setSelectedOption(option);
     };
@@ -138,7 +138,7 @@ const PricingSection1 = () => {
 
     const handleSub=async(key)=>{
         console.log(key)
-        await axios.post(`${BACKEND}/stripepay/create-checkout-session`,{key,decoded},{
+        await axios.post(`${BACKEND}stripepay/create-checkout-session`,{key,decoded},{
             'Content-type':'application/json', 
             'Accept':'application/json',
             'Access-Control-Allow-Origin':'*',

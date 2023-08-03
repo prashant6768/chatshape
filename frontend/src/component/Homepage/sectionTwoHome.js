@@ -1,5 +1,5 @@
-import React,{useState, useEffect} from 'react'
-import { AiFillCheckCircle, AiFillQuestionCircle } from 'react-icons/ai'
+import React,{useState} from 'react'
+// import { AiFillCheckCircle, AiFillQuestionCircle } from 'react-icons/ai'
 import Accordion from 'react-bootstrap/Accordion';
 
 const SectionTwoHome = () => {
@@ -52,7 +52,7 @@ const SectionTwoHome = () => {
 <div className='row mx-0 d-flex ' style={{ width: '100vw', minHeight:'400px' }}>
   <div className='row mx-0 d-flex ' >
   <div className='pt-5 col-xxl-4 col-12 d-flex justify-content-center' >
-    <div className="d-flex flex-column h-100 py-3 rounded-4" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', maxWidth:'550px' }}>
+    <div className="d-flex flex-column h-100 py-3 rounded-4" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', maxWidth:'550px', minWidth:'260px' }}>
       <p className='fs-3 col-12 d-flex justify-content-center container text-center ' style={{ color: '#FFFFFF' }}>"Works seamlessly as advertised."</p>
       <div className='fs-4 col-12 d-flex justify-content-center container text-center mt-auto' style={{ color: '#FFFFFF' }}>
         <p className='px-3 col-6 mt-auto' >Arden Milsowick</p>
@@ -61,7 +61,7 @@ const SectionTwoHome = () => {
     </div>
   </div>
   <div className='pt-5 col-xxl-4 col-12 d-flex justify-content-center '>
-    <div className="d-flex flex-column h-100 py-3 rounded-4" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', maxWidth:'550px' }}>
+    <div className="d-flex flex-column h-100 py-3 rounded-4" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', maxWidth:'550px', minWidth:'260px' }}>
       <p className='fs-3 col-12 d-flex justify-content-center container text-center' style={{ color: '#FFFFFF' }}>"Chatbot works for my customers and supports our non-profit in answering basic questions"</p>
       <div className='fs-4 col-12 d-flex justify-content-center container text-center mt-auto' style={{ color: '#FFFFFF' }}>
         <p className='px-3 col-6 mt-auto' >Aisha Duncan</p>
@@ -70,7 +70,7 @@ const SectionTwoHome = () => {
     </div>
   </div>
   <div className='pt-5 col-xxl-4 col-12 d-flex justify-content-center'>
-    <div className="d-flex flex-column h-100 py-3 rounded-4" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' , maxWidth:'550px'}}>
+    <div className="d-flex flex-column h-100 py-3 rounded-4" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' , maxWidth:'550px', minWidth:'260px'}}>
       <p className='fs-3 col-12 d-flex justify-content-center container text-center' style={{ color: '#FFFFFF' }}>"Excited to learn what else Zema will launch in the coming months"</p>
       <div className='fs-4 col-12 d-flex justify-content-center container text-center mt-auto' style={{ color: '#FFFFFF' }}>
         <p className='px-3 col-6 mt-auto' >Sharon Kingsley</p>

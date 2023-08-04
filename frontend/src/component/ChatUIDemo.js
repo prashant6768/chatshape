@@ -7,6 +7,8 @@ import axios from 'axios'
 import { ThreeDots } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa'
+import {HiSpeakerWave, HiSpeakerXMark} from 'react-icons/hi2'
+// import {} from 'react-icons/hi2'
 import { BsStopCircle } from 'react-icons/bs'
 import sendIcon from '../assets/send.png'
 
@@ -76,7 +78,7 @@ const ChatUIDemo = (botID) => {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } })
+        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
 
     }
 
@@ -111,7 +113,7 @@ const ChatUIDemo = (botID) => {
             'Access-Control-Allow-Origin': '*'
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
-            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false) } }).catch(err => console.log(err))
+            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
     };
 
     useEffect(() => {
@@ -142,6 +144,13 @@ const ChatUIDemo = (botID) => {
             console.log("W")
         } else {
             setMessages((prevMessages) => [...prevMessages, newMessage]);
+            if (speechTog === true) {
+                const speechSynthesis = window.speechSynthesis;
+                const utterance = new SpeechSynthesisUtterance(chatbotMsg);
+                speechSynthesis.speak(utterance);
+            }
+            console.log("speech tog  is set to ",speechTog)
+
         }
         setInputValue('');
         setChatbotMsg('')
@@ -226,6 +235,7 @@ const ChatUIDemo = (botID) => {
     const [recordingStatus, setRecordingStatus] = useState("inactive");
     const [audioChunks, setAudioChunks] = useState([]);
     const [audio, setAudio] = useState(null);
+    const [speechTog, setSpeechTog] = useState(false)
 
     const getMicrophonePermission = async () => {
         if ("MediaRecorder" in window) {
@@ -299,14 +309,23 @@ const ChatUIDemo = (botID) => {
         setAudioSub(false)
     }, [audioSub])
 
+    const handleToggleSpeech = () => {
+        setSpeechTog((prevTog) => !prevTog);
+        console.log("sppppppppppppech ", speechTog)
+    };
+
+
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
 
             {/*  ############################### Font select form */}
 
-            <div style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }} className=' rounded-5 my-5 col-lg-5 col-10 d-flex justify-content-center '>
+            <div style={{ backgroundColor: '#212529' }} className=' rounded-4 my-5 col-lg-5 col-10 d-flex justify-content-center '>
                 <form className='d-flex row justify-content-around mt-3 ' onSubmit={handleFontSubmit}>
-                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >Update how your Chatbot looks</label>          
+                    </div>
+                    <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <Form.Label>Font:</Form.Label>
                         <DropdownButton
                             title={fontData.font || 'Select a font'}
@@ -322,7 +341,7 @@ const ChatUIDemo = (botID) => {
                             ))}
                         </DropdownButton>
                     </div>
-                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             User Font Color:
                             <input
@@ -334,7 +353,7 @@ const ChatUIDemo = (botID) => {
                             />
                         </label>
                     </div>
-                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             User Text Color:
                             <input
@@ -346,7 +365,7 @@ const ChatUIDemo = (botID) => {
                             />
                         </label>
                     </div>
-                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             CPU Font Color:
                             <input
@@ -358,7 +377,7 @@ const ChatUIDemo = (botID) => {
                             />
                         </label>
                     </div>
-                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             CPU Text Color:
                             <input
@@ -370,7 +389,7 @@ const ChatUIDemo = (botID) => {
                             />
                         </label>
                     </div>
-                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             Background Color:
                             <input
@@ -382,7 +401,7 @@ const ChatUIDemo = (botID) => {
                             />
                         </label>
                     </div>
-                    <div style={{ color: '#FFFFFF', backgroundColor: '#171725', border: '1px solid #4A5AB0' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                    <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
                             Font Size:
                             <input
@@ -403,8 +422,10 @@ const ChatUIDemo = (botID) => {
 
             {/* ##################################### Chat UI DEMO */}
 
+
             <div className='d-flex justify-content-center my-5 col-lg-5 col-11'>
-                <div className='d-flex  ' style={{ position: 'relative', height: '600px', minWidth: '240px', maxWidth: '540px', width: '100%' }}>
+
+                <div className='d-flex  ' style={{ position: 'relative', height: '600px', minWidth: '240px', maxWidth: '540px', width: '100%', marginTop:'100px' }}>
                     {
                         mark ?
                             <h1 className='bg-primary mx-3' style={{ position: 'absolute', opacity: '15%', left: '20px', bottom: '50px' }}>Powered by Zema</h1> : <p></p>
@@ -444,6 +465,17 @@ const ChatUIDemo = (botID) => {
                             onChange={handleInputChange}
                             placeholder="Type a message..."
                         />
+                        <div className="me-2">
+                            {
+                                speechTog === false ?
+                                    <button onClick={handleToggleSpeech} type="button">
+                                        <HiSpeakerXMark />
+                                    </button> :
+                                    <button onClick={handleToggleSpeech} type="button">
+                                        <HiSpeakerWave />
+                                    </button>
+                            }
+                        </div>
 
                         <div className="audio-controls me-2">
                             {!permission ? (

@@ -31,3 +31,17 @@
       color: blue;
     }
   }
+
+ 
+
+  /* Assuming your accordion container has the "custom-accordion" class */
+.custom-accordion .accordion-button::before {
+  /* Change the color property to white or any other desired color */
+  color: white;
+}
+
+/* Optional: Change the color of the arrow on active accordion items */
+.custom-accordion .accordion-button:not(.collapsed)::before {
+  /* Change the color property to white or any other desired color */
+  color: white;
+}

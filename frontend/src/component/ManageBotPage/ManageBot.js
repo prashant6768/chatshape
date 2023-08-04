@@ -267,7 +267,7 @@ const messageStyleRec = {
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
       <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pt-5' style={{ color: '#FFFFFF' }}>Manage Chatbot</h1>
-      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 mt-5' style={{ color: '#FFFFFF' }}>{botname}</h3>
+      <h2 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 mt-5' style={{ color: '#FFFFFF' }}>{botname}</h2>
       <div>
         <ul className='fw-bolder fs-5 row col-12 d-flex justify-content-around   text-center mb-5 mt-5' style={{ color: '#FFFFFF', listStyle: 'none', textDecoration: 'none' }}>
           {['Bot Properties', 'Demo Chat', 'Bot Analytics'].map(x => (
@@ -283,17 +283,17 @@ const messageStyleRec = {
       </div>
       {vis === 'Bot Properties' ?
         <div >
-          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }} >Add this Script to your website to get your chatbot</label>
-          <textarea id='textareascript' className='fs-4 d-flex justify-content-center container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={`<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try-13/popup.js" defer id="popup" cred="${id.id}"></script>`} />
+          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF', marginTop:'100px' }} >Add this Script to your website to get your chatbot</label>
+          <textarea id='textareascript' className='fs-4 d-flex justify-content-center container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={`<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js" defer id="popup" cred="${id.id}"></script>`} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URL used</label>
           <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='URL Used' value={url} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >Pdf Used</label>
-          <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='PDF Used' value={pdf} />
+          <input className='fs-4 d-flex justify-content-center container mt-1 text-center  ' style={{ width: '95%', marginBottom:'100px' }} readOnly placeholder='PDF Used' value={pdf} />
           {/* update bot */}
-          <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
-            <form className='col-sm-9 col-12'>
-              <div className="form-group mt-3 mb-3 fw-bold">
-                <label>You can update these properties :</label>
+          <div className='fs-4 col-12 d-flex justify-content-center  text-center mb-5 mt-3' style={{ color: '#FFFFFF', backgroundColor:'#242439' }}>
+            <form className='col-sm-9 mb-5 col-11 mx-auto ' style={{marginTop:'50px'}}>
+              <div className="form-group mt-5 mb-5 fs-2 fw-bold">
+                <label  >You can update these properties :</label>
               </div>
               <div className="form-group">
                 <label>Name of Chatbot</label>

@@ -6,6 +6,7 @@ import { ThreeDots } from 'react-loader-spinner';
 import sendIcon from '../assets/send.png'
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa'
 import { BsStopCircle } from 'react-icons/bs'
+import {HiSpeakerWave, HiSpeakerXMark} from 'react-icons/hi2'
 import { ToastContainer, toast } from 'react-toastify';
 import * as jose from 'jose';
 import env from 'react-dotenv'
@@ -142,6 +143,13 @@ const ChatUI = (botID) => {
       console.log("W")
     } else {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
+      if (speechTog === true) {
+        const speechSynthesis = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(chatbotMsg);
+        speechSynthesis.speak(utterance);
+        console.log("should have spoken")
+    }
+    console.log("speech tog  is set to ",speechTog)
     }
     setInputValue('');
     setChatbotMsg('')
@@ -212,6 +220,7 @@ const ChatUI = (botID) => {
   const [audioChunks, setAudioChunks] = useState([]);
   const [audio, setAudio] = useState(null);
   const [audioSub, setAudioSub] = useState(false)
+  const [speechTog, setSpeechTog] = useState(false)
 
 
   const getMicrophonePermission = async () => {
@@ -288,6 +297,10 @@ const ChatUI = (botID) => {
       setAudioSub(false)
   }, [audioSub])
 
+  const handleToggleSpeech = () => {
+    setSpeechTog((prevTog) => !prevTog);
+    console.log("sppppppppppppech ", speechTog)
+};
 
 
 
@@ -332,6 +345,18 @@ const ChatUI = (botID) => {
           onChange={handleInputChange}
           placeholder="Type a message..."
         />
+
+<div className="me-2">
+                            {
+                                speechTog === false ?
+                                    <button onClick={handleToggleSpeech} type="button">
+                                        <HiSpeakerXMark />
+                                    </button> :
+                                    <button onClick={handleToggleSpeech} type="button">
+                                        <HiSpeakerWave />
+                                    </button>
+                            }
+                        </div>
 
         <div className="audio-controls me-2">
           {!permission ? (

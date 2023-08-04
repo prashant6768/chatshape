@@ -11,7 +11,7 @@ const PrivacyPolicy = () => {
   return (
     <>
      <ScriptLoaderHOC
-        scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-try-13/popup.js"
+        scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js"
         id="popup"
         cred="64ca2d70c6e8de9e5d052d56"
       />

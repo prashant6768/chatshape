@@ -6,6 +6,7 @@ from bson import ObjectId
 from auth import auth
 from stripepay import stripepay
 from flask import Flask, jsonify, request
+from flask import Flask, send_file
 import json
 import asyncio
 from flask_cors import CORS
@@ -15,6 +16,7 @@ import json
 import os
 from langchain import OpenAI, LLMChain, PromptTemplate
 from langchain.chat_models import ChatOpenAI 
+import  pythoncom
 
 from langchain.document_loaders import SeleniumURLLoader
 from langchain.document_loaders import UnstructuredFileLoader
@@ -279,7 +281,7 @@ def daily_task():
             {'$set': {'UniqueCon': 0}}
         )
 
-scheduler.add_job(daily_task,  'interval', minutes=1440) 
+scheduler.add_job(daily_task,'cron' , day='*', hour='0', minute='0')  
 
 
 
@@ -347,10 +349,10 @@ def history():
     users_collection = db['users_website_crawl_data']
     user_history = db['user_history']
     objId= ObjectId(userData)
-    print("---279",now,"---",data)
+    # print("---279",now,"---",data)
     # dataDb_i = users_collection.find_one({'_id':objId})
     if now != '' and len(data) != 0:
-        print("---282",now,"---",data)
+        # print("---282",now,"---",data)
         print(uniqueCon,"------",str(type(uniqueCon)))
         if uniqueCon == 1:
             print("UNI----285")
@@ -390,6 +392,7 @@ def start_ai(query,userData,uniqueCon):
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(userData)
     dataDb_i = users_collection.find_one({'_id':objId})
+    # return "this is a fake answer"
 
     dataDb = {
         'crawldata':dataDb_i.get('crawldata'),
@@ -401,90 +404,32 @@ def start_ai(query,userData,uniqueCon):
         'prompt':dataDb_i.get('prompt')
     }
     print("=-------------284",str(type([query])))
-    
 
-    # if uniqueCon == 1:
-        # users_collection.update_one({"_id":objId }, {"$push": {"History":{"time": datetime.now(), "HistoryChat":['User'+query]}}})
-    # else:
-        # users_collection.update_one({"_id":objId }, {"$push":{"HistoryChat":{"$each":['User: '+query]}}})
-        # users_collection.update_one({"_id":objId }, {"$push": {"History":{"HistoryChat":{"$each":['User: '+query]}}}})
-
-    # text=None
-    # data = dataDb['crawldata']
-    # dataPdf = dataDb['crawldataPdf']
-    # try:  
-    #  text1 = dataDb['crawl']
     data = dataDb['crawldata']
     dataPdf = dataDb['crawldataPdf']
     prompt = str(dataDb['prompt'])
     text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=10, length_function=len)
     text = text_splitter.create_documents([dataPdf,data])
-    # except Exception as e:
-    #  print("-----------------------------259",e)  
-
-    # print("----257----------",text,"-------------257----------")
-  
-    
-
-    # if data == "['']":
-    #     data = ''
-    # if dataPdf == "['']":
-    #     dataPdf = ''
-    
-    
-    # text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=10, length_function=len)
-    # text = text_splitter.create_documents([dataPdf,data])
-
 
     print("------237--------",text,"----------------237")
-    # print("----------------242----------",type(text))
-    
-    #######################3 new method
     
     PROMPT = PromptTemplate(
     template=prompt, input_variables=["text", "query"]
 )
     chain_type_kwargs = {"prompt": PROMPT}
-    qa_chain = load_qa_chain(ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-3.5-turbo",temperature=0.7), chain_type="map_reduce")
+    qa_chain = load_qa_chain(ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-4",temperature=0.7), chain_type="map_reduce")
     answer = qa_chain.run(input_documents= text, question=query)
     print("---------279---------",answer,"-----------279-----------",PROMPT)
     # users_collection.update_one({"_id":objId }, {"$push": {"History":{"HistoryChat":{"$each":['AI: '+answer]}}}})
     return answer
-  
-    #######################3 new method finish
 
-#     def summarize(data,query): 
-#         print('-------------------274-----------')
-#         llm = ChatOpenAI(model_name="gpt-3.5-turbo",temperature=0.7)
-#         # llm = OpenAIChat(model_name="gpt-4",temperature=0.7)
-#         template=prompt
-#         prompt_template = PromptTemplate(input_variables=["text","query"],template=template)
-#         print("252------------",prompt_template)
-        
-#         memory = ConversationBufferMemory( input_key="query")
-#         summarize_chain = LLMChain(llm=llm, prompt=prompt_template,verbose=True)
-#         summaries= []
-#         for chunk in enumerate(text):
-#           try:  
-#             summary = summarize_chain.predict(text=chunk,query=query)
-#             print(str(text),"------------------------261")
-           
-#             summaries.append(summary)
-#             users_collection.update_one({"email": dataDb['email']}, {'$set':{'summaries': summaries}})
-#             print(summaries,"---------------267")
-#             return summaries
-#           except Exception as e:
-#             return str(e)  
-#         print(summaries,"---------------267") 
-#         return summaries  
-#     # summaries = summarize(data,query) 
-#     summaries = summarize(data,query) 
   except Exception as e:
     return str(e)  
 
 ############################################### get message from users chatbot and send data back after getting response from LLM
 @app.route('/api/msg',methods=['POST'])
 def user_msg():
+  try:  
     # userName = request.get_json()['decoded']['username']
     data = request.get_json()['inputValue']
     userData = request.get_json()['botID']['botID']
@@ -520,9 +465,6 @@ def user_msg():
     summaries = start_ai(data,userData,uniqueCon)
     
     users_collection = db['users_website_crawl_data']
-    # d = users_collection.find_one({'email':userName})
-    # summaries = d['summaries']
-    # users_collection.update_one({"email": userName}, {'$set':{'summaries': ''}})
     plan_info_1 = db['user_subscription']
     plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.NoOfMsg":-1}})
 
@@ -530,48 +472,12 @@ def user_msg():
     users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"UniqueCon": uniqueCon}})
 
     print("143-----------------------------",str(summaries),"---",len(str(summaries)))
-
-    
+ 
     # print("X ==",Gsummary)
     return [summaries, planname,uniqueCon]
-
-
-
-# ##################################################### create bot api start and expiration code original  pdf using url format
-# @app.route('/api/sendLinkData',methods=['POST'])
-# def get_link_data():
-#     # print("INSide get the link data")
-#     urll = [request.get_json()['sendLink']]
-#     # userData = request.get_json()['decoded']['username']
-#     userData = request.get_json()['decoded']
-#     botName =  request.get_json()['botName']
-#     exclude = request.get_json()['exclude']
-#     pdf = request.get_json()['pdf']
-#     if botName == '':
-#         return 'noname'
-#     print("299------exclude initial-------",exclude)
-#     print("288-------------",pdf)
-#     sub = db['user_subscription'] 
-#     datasub_i = sub.find_one({'username':userData})
-#     datasub={
-#       'expiration':datasub_i.get('expiration'),
-#       'plan-Info':{
-#        'NoOfBots':datasub_i.get('plan-Info').get('NoOfBots'),
-#        'NoOfCharacters': datasub_i.get('plan-Info').get('NoOfCharacters')
-#        }
-#     }
-#     # print(datasub,"555555555555555555555555555555",datetime.strptime(datasub['expiration'], "%Y-%m-%d"),"WWW",datetime.now().date())
-#     if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date():
-#         return "SubE"
-#     if datasub['plan-Info']['NoOfBots'] < 1:
-#        return "BotF" 
-#     # print("the link i recieved ",urll)
-#     # print("username is ==", userData)
-#     # print("305-----------------",request.get_json()['exclude'])
-#     print("318-----------exclude----------",exclude)
-#     get_data(urll,userData,botName,pdf,exclude,datasub['plan-Info']['NoOfCharacters'])
-#     return urll
-
+  except Exception as e:
+    print("-----482-------",str(e))
+    return["Some Error Occured !!!!"]  
 
 ##################################################### create bot api start and expiration code original  pdf using upload multipart formdata format
 @app.route('/api/sendLinkData',methods=['POST'])
@@ -628,6 +534,9 @@ def get_link_data():
     # print("305-----------------",request.get_json()['exclude'])
     print("318-----------exclude----------",exclude)
     get_data(urll,userData,botName,pdf,unique,exclude,datasub['plan-Info']['NoOfCharacters'])
+    if os.path.exists(pdf):
+        print("os path -------532",pdf)
+        os.remove(pdf)
     return urll
 
 
@@ -707,8 +616,6 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
         #  print(user_sub.find_one({"username":userData}),"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
        user_sub.update_one({"username": userData}, {"$inc": {"plan-Info.NoOfBots":-1}})
        print("Data stored successfully!")
-       if os.path.exists(pdf):
-          os.remove(pdf)
     except Exception as e:
        print("Error storing data:============", str(e),"===========================")
     # print("dat stored hopefully = ")
@@ -770,6 +677,9 @@ def retrain(id):
 
     print("593-----------exclude----------",exclude)
     get_data_retrain(urll,userData,objId,pdf,unique,exclude,NoOfCharacters)
+    if os.path.exists(pdf):
+        print("os path -------532",pdf)
+        os.remove(pdf)
     return urll
 
 ################################################################## retrain data part 2 - exclude links and store data from links in db

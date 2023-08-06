@@ -91,7 +91,7 @@ const PricingSection1 = () => {
             four: 'Limited Knowledge Base',
             five: '',
             six: '',
-            price: '0$/',
+            price: '0 USD/',
             month: 'year',
             key: ''
         },
@@ -104,7 +104,7 @@ const PricingSection1 = () => {
             four: 'Unlimited File Uploads',
             five: '',
             six: '',
-            price: '1200 USD/',
+            price: '960 USD/',
             month: 'year',
             key: 'year-hobby'
         },
@@ -117,7 +117,7 @@ const PricingSection1 = () => {
             four: 'Automated Integration',
             five: '',
             six: '',
-            price: '3000 USD/',
+            price: '2400 USD/',
             month: 'year',
             key: 'year-standard'
         },

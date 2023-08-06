@@ -63,7 +63,7 @@ Ask a question to get started.</h2>
             <div className='d-flex justify-content-around col-xxl-3 col-lg-7 col-sm-9 col-11 my-5'>
             <div className="card px-1" style={{width:'500px'}}>
               <div className="circular-image-container">
-                <img className="circular-image" src='https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg' alt="loading" />
+                <img className="circular-image" src='https://img.freepik.com/premium-photo/business-education-office-concept-portrait-smiling-businessman_380164-65299.jpg' alt="loading" />
               </div>
               <div className="card-content px-1 " style={{ height: '100%' }}>
                 <p className='fs-4 col-12  d-flex justify-content-center container text-center'>"Works seamlessly as advertised."</p>
@@ -77,7 +77,7 @@ Ask a question to get started.</h2>
 <div className='d-flex justify-content-around col-xxl-3 col-lg-7 col-sm-9 col-11 my-5'>
             <div className="card px-1" style={{width:'500px'}}>
               <div className="circular-image-container">
-                <img className="circular-image" src='https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg' alt="loading" />
+                <img className="circular-image" src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAtDFxX2Rehk2Jlnh-ALXcZqTQ2npj0kMNdQ&usqp=CAU' alt="loading" />
               </div>
               <div className="card-content px-1">
                 <p className='fs-4 col-12 mb-4 d-flex justify-content-center container text-center'>"Chatbot works for my customers and supports our non-profit in answering basic questions"</p>
@@ -91,7 +91,7 @@ Ask a question to get started.</h2>
             <div className='d-flex justify-content-around col-xxl-3 col-lg-7 col-sm-9 col-11 my-5'>
             <div className="card px-1 " style={{width:'500px'}}>
               <div className="circular-image-container">
-                <img className="circular-image" src='https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg' alt="loading" />
+                <img className="circular-image" src='https://format.creatorcdn.com/0eb8003e-5c43-4658-b86b-5fa281c59ad6/0/0/0/23,0,485,617,580,772/0-0-0/c4b47866-a545-4ce2-bc9f-dcf943b289c2/1/2/HS04.jpg?fjkss=exp=2005158694~hmac=aac5dff8f66a9a6112c79632ec508c456aefe00eef4328615b0f604a9b4a300e' alt="loading" />
               </div>
               <div className="card-content px-1">
                 <p className='fs-4 col-12 mb-4 d-flex justify-content-center container text-center'>"Excited to learn what else Zema will launch in the coming months"</p>

@@ -6,6 +6,9 @@ import {BiCustomize} from 'react-icons/bi'
 import {MdOutlineIntegrationInstructions , MdOutlinePrivacyTip , MdSentimentVerySatisfied} from 'react-icons/md'
 import {MdLanguage} from 'react-icons/md'
 import Card from 'react-bootstrap/Card';
+import f1 from '../../assets/feature1.PNG'
+import f2 from '../../assets/feature2.PNG'
+import f3 from '../../assets/feature3.PNG'
 
 const SectionOneFeature = () => {
   return (
@@ -18,7 +21,7 @@ const SectionOneFeature = () => {
 
     <div className='row col-lg-10 col-12 my-5'>
         <div className='col-lg-6 col-12'>
-<img src="https://24toolbox.com/assets/image/og/dummy-%C4%ABmage-generator-tool.jpg?ver=220114.01" style={{ width:'100%', height:'100%'}} alt="loading"/>
+<img src={f1} style={{ width:'100%', height:'100%'}} alt="loading"/>
         </div>
         <div className='col-lg-6 col-12'>
         <h1 className=' col-12 d-flex justify-content-center justify-content-lg-start container text-center text-lg-start mt-4 mb-4' style={{ color: '#FFFFFF' }}><AiOutlineDatabase/> </h1>    
@@ -34,7 +37,7 @@ const SectionOneFeature = () => {
     <p className=' col-12 d-flex justify-content-center justify-content-lg-end container text-center text-lg-end  mb-4' style={{ color: '#FFFFFF' }}>Speak to Zema rather than type, and listen to the responses as voice</p>
         </div>
         <div className='col-lg-6 col-12'>
-<img src="https://24toolbox.com/assets/image/og/dummy-%C4%ABmage-generator-tool.jpg?ver=220114.01" style={{ width:'100%', height:'100%'}} alt="loading"/>
+<img src={f2} style={{ width:'100%', height:'100%'}} alt="loading"/>
         </div>
         <div className='col-lg-6 col-12 d-lg-none'>
         <h1 className=' col-12 d-flex justify-content-center justify-content-lg-end container text-center text-lg-end mt-4 mb-4' style={{ color: '#FFFFFF' }}><RiVoiceprintLine/> </h1>    
@@ -45,7 +48,7 @@ const SectionOneFeature = () => {
 
     <div className='row col-lg-10 col-12 my-5'>
         <div className='col-lg-6 col-12'>
-<img src="https://24toolbox.com/assets/image/og/dummy-%C4%ABmage-generator-tool.jpg?ver=220114.01" style={{ width:'100%', height:'100%'}} alt="loading"/>
+<img src={f3} style={{ width:'100%', height:'100%'}} alt="loading"/>
         </div>
         <div className='col-lg-6 col-12'>
         <h1 className=' col-12 d-flex justify-content-center justify-content-lg-start container text-center text-lg-start mt-4 mb-4' style={{ color: '#FFFFFF' }}><BsShare/> </h1>    

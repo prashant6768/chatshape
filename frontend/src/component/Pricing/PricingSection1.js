@@ -35,7 +35,7 @@ const PricingSection1 = () => {
             four: 'Limited Knowledge Base',
             five: '',
             six: '',
-            price: '0 USD/ ',
+            price: '0 USD/ month',
             month: 'month',
             key: ''
         },
@@ -48,7 +48,7 @@ const PricingSection1 = () => {
             four: 'Unlimited File Uploads',
             five: '',
             six: '',
-            price: '100 USD/ ',
+            price: '100 USD/ month',
             month: 'month',
             key: 'month-simple'
         },
@@ -61,7 +61,7 @@ const PricingSection1 = () => {
             four: 'Automated Integration',
             five: '',
             six: '',
-            price: '250 USD/ ',
+            price: '250 USD/ month',
             month: 'month',
             key: 'month-standard'
         },
@@ -91,7 +91,7 @@ const PricingSection1 = () => {
             four: 'Limited Knowledge Base',
             five: '',
             six: '',
-            price: '0 USD/ ',
+            price: '0 USD/ month',
             month: 'month',
             key: ''
         },
@@ -104,7 +104,7 @@ const PricingSection1 = () => {
             four: 'Unlimited File Uploads',
             five: '',
             six: '',
-            price: '80 USD/ ',
+            price: '80 USD/ month',
             month: 'month',
             key: 'year-simple'
         },
@@ -117,7 +117,7 @@ const PricingSection1 = () => {
             four: 'Automated Integration',
             five: '',
             six: '',
-            price: '200 USD/ ',
+            price: '200 USD/ month',
             month: 'month',
             key: 'year-standard'
         },
@@ -174,7 +174,7 @@ const PricingSection1 = () => {
 
                                     <Card.Body>
                                         <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >{x.priceTier}</Card.Title>
-                                        <Card.Text className='fw-bolder fs-4 col-12 d-flex justify-content-center container text-start mb-3' style={{ color: '#FFFFFF' }}>{x.price}<p className='fs-5 mt-3 mb-4 ' style={{ color: 'lightgrey', fontWeight: 'normal' }}>{x.month}</p></Card.Text>
+                                        <Card.Text className='fw-bolder fs-4 col-12 d-flex justify-content-center container text-start mb-3' style={{ color: '#FFFFFF' }}>{x.price}<p className='fs-5 mt-3 mb-4 ' style={{ color: 'lightgrey', fontWeight: 'normal', visibility:'hidden' }}>.</p></Card.Text>
                                         {/* {x.subscribe ? (<Button onClick={(e)=>handleSub(e.target.value)} value={x.key} className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">Subscribe</Button>) : (<Button disabled className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84', visibility: 'hidden' }} variant="primary">Subscribe</Button>)} */}
 
                                         {decoded && x.subscribe ? (
@@ -244,10 +244,10 @@ const PricingSection1 = () => {
 
                             dataCardsYear.map(x => (
                                 <div className=' px-0 my-2 d-flex justify-content-center'>
-                                    <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width: '270px' }} className='mx-1 ms-4   mt-5 rounded-4'>
-                                        <Card.Body>
+                                    <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width: '270px' }} className='mx-1 ms-4  mt-5 rounded-4'>
+                                        <Card.Body style={{ }}>
                                             <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >{x.priceTier}</Card.Title>
-                                            <Card.Text className='fw-bolder fs-4 col-12 d-flex justify-content-center container text-start mb-3' style={{ color: '#FFFFFF' }}>{x.price}<p className='fs-5 mt-3 mb-4' style={{ color: 'lightgrey', fontWeight: 'normal' }}>{x.month}</p></Card.Text>
+                                            <Card.Text className='fw-bolder fs-4 col-12 d-flex justify-content-center container text-start mb-3' style={{ color: '#FFFFFF' }}>{x.price}<p className='fs-5 mt-3 mb-4' style={{ color: 'lightgrey', fontWeight: 'normal', visibility:'hidden' }}>.</p></Card.Text>
                                             {/* {x.subscribe ? <Button  onClick={(e)=>handleSub(e.target.value)} value={x.key} className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">Subscribe</Button> : <Button disabled className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF', backgroundColor: '#620B84', visibility: 'hidden' }} variant="primary">Subscribe</Button>} */}
 
 
@@ -256,7 +256,7 @@ const PricingSection1 = () => {
                                                     onClick={(e) => handleSub(e.target.value)}
                                                     value={x.key}
                                                     className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mb-5'
-                                                    style={{ color: '#FFFFFF', backgroundColor: '#620B84' }}
+                                                    style={{ color: '#FFFFFF', backgroundColor: '#620B84'}}
                                                     variant="primary"
                                                 >
                                                     Subscribe

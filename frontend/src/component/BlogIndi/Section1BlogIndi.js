@@ -2,6 +2,7 @@ import {React,useState,useEffect} from 'react'
 import { useParams } from 'react-router-dom'
 import dental from '../../assets/dentalBlog.PNG'
 import businessAi from '../../assets/businessAi.PNG'
+import aibuss from '../../assets/aibuss.jpg'
 import ReactHtmlParser from 'react-html-parser';
 
 const Section1BlogIndi = () => {
@@ -146,7 +147,7 @@ const Section1BlogIndi = () => {
             </li>
           </ul>
           <p>While AI can bring many benefits, small businesses must also consider the potential challenges. These can include the cost of implementing AI solutions, the need for technical expertise, and issues around data privacy and security. It's also vital to consider AI's impact on jobs and provide training and support for employees as roles and tasks evolve.</p>
-        
+        <img src='${aibuss}' alt='aibuss' style='height:100% ; max-height:600px ; max-width:600px' >
           <h2>Pros of Implementing AI in Business Operations</h2>
           <ul style="list-style-type: none">
             <li>

@@ -16,6 +16,7 @@ import SuccessPage from './page/SuccessPage';
 import CancelPage from './page/CancelPage';
 import PaymentHistoryPage from './page/PaymentHistoryPage'
 import FeaturePage from './page/FeaturesPage'
+import ScrollToTop from './component/ScrollToTop'; 
 // import jwt from 'jsonwebtoken'
 import * as jose from 'jose'
 
@@ -54,6 +55,7 @@ const App = () => {
   return (
    <div>
      <BrowserRouter>
+     <ScrollToTop/>
            <Routes>
            <Route path='/' element={<Home/>}  />
            <Route path='/pricing' element={<PricingPage/>}/>

@@ -35,7 +35,7 @@ const PricingSection1 = () => {
             four: 'Limited Knowledge Base',
             five: '',
             six: '',
-            price: '0 USD/',
+            price: '0 USD/ ',
             month: 'month',
             key: ''
         },
@@ -48,7 +48,7 @@ const PricingSection1 = () => {
             four: 'Unlimited File Uploads',
             five: '',
             six: '',
-            price: '100 USD/',
+            price: '100 USD/ ',
             month: 'month',
             key: 'month-simple'
         },
@@ -61,7 +61,7 @@ const PricingSection1 = () => {
             four: 'Automated Integration',
             five: '',
             six: '',
-            price: '250 USD/',
+            price: '250 USD/ ',
             month: 'month',
             key: 'month-standard'
         },
@@ -91,7 +91,7 @@ const PricingSection1 = () => {
             four: 'Limited Knowledge Base',
             five: '',
             six: '',
-            price: '0 USD/',
+            price: '0 USD/ ',
             month: 'month',
             key: ''
         },
@@ -104,7 +104,7 @@ const PricingSection1 = () => {
             four: 'Unlimited File Uploads',
             five: '',
             six: '',
-            price: '80 USD/',
+            price: '80 USD/ ',
             month: 'month',
             key: 'year-simple'
         },
@@ -117,7 +117,7 @@ const PricingSection1 = () => {
             four: 'Automated Integration',
             five: '',
             six: '',
-            price: '200 USD/',
+            price: '200 USD/ ',
             month: 'month',
             key: 'year-standard'
         },

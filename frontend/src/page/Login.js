@@ -96,13 +96,13 @@ await axios.get(`${BACKEND}auth/googlelogin`,{
   return (
 
   <div style={{minWidth:'100vw'}}>
-     <ScriptLoaderHOC
+     {/* <ScriptLoaderHOC
         scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js"
         id="popup"
         cred="64d47c3004d7aebaeb5dbf04"
-      />
+      /> */}
   <NavbarC gradientC={gradientC}/>
-  <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'100px', backgroundColor: '#242439', minHeight: '1000px', height:'100%'}} >
+  <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'150px', backgroundColor: '#242439',  height:'100%'}} >
  
   <form action="#" className="mt-4 register-form rounded-3 p-3 mx-1 " style={{width:'330px', height:'465px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
   <div className="row">

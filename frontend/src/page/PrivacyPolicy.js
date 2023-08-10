@@ -10,11 +10,11 @@ const PrivacyPolicy = () => {
 
   return (
     <>
-     <ScriptLoaderHOC
+     {/* <ScriptLoaderHOC
         scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js"
         id="popup"
         cred="64d47c3004d7aebaeb5dbf04"
-      />
+      /> */}
       <NavbarC gradientC={gradientC} />
       <div className='pb-5' style={{ backgroundColor: '#242439', height: '100%', minHeight: '100vh', width: '100vw', wordBreak:'break-word' }}>
          <h1 className='fw-bolder col-12 d-flex justify-content-start container text-start pb-2 pt-5' style={{ color: '#FFFFFF' }}>Privacy Policy</h1>

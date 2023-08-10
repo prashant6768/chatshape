@@ -11,11 +11,11 @@ const BlogIndiPage = () => {
     
   return (
     <div>
-       <ScriptLoaderHOC
+       {/* <ScriptLoaderHOC
         scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js"
         id="popup"
         cred="64d47c3004d7aebaeb5dbf04"
-      />
+      /> */}
       <NavbarC gradientC={gradientC}/>
       <Section1BlogIndi/>
       <Footer/>

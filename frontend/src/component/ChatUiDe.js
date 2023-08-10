@@ -42,7 +42,7 @@ function TypingEffect({ text }) {
 const ChatUIDe = (botID) => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
-    const [chatbotMsg, setChatbotMsg] = useState('');
+    const [chatbotMsg, setChatbotMsg] = useState('Work in Progress');
     const [suggestedPrompt, setSPrompt] = useState([])
     const [spromptHide, setSpromptHide] = useState(false)
     const [plan, setPlan] = useState('')

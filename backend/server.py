@@ -95,8 +95,9 @@ import faiss
 from langchain.chains.question_answering import load_qa_chain
 from langchain import OpenAI
 from langchain.chat_models import ChatOpenAI
-from langchain.vectorstores import FAISS
+from langchain.vectorstores.faiss import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
+
 
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
@@ -563,8 +564,8 @@ def get_link_data():
     # print("username is ==", userData)
     # print("305-----------------",request.get_json()['exclude'])
     print("318-----------exclude----------",exclude)
-    a = get_data(urll,userData,botName,pdf,unique,exclude,datasub['plan-Info']['NoOfCharacters'])
-    print("-------------567----remove a = get_data() ",a)
+    get_data(urll,userData,botName,pdf,unique,exclude,datasub['plan-Info']['NoOfCharacters'])
+    # print("-------------567----remove a = get_data() ",a)
     if os.path.exists(pdf):
         print("os path -------568",pdf)
         os.remove(pdf)
@@ -614,17 +615,18 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
         print("______-----------------386")  
     print("------------410",type(urls))
 
-    # text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=10, length_function=len)
-    # docsPdf = text_splitter.split_documents(docs)
-    # docsUrl = text_splitter.split_documents(data)
-    # mainDoc = docsUrl + docsPdf
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+    docsPdf = text_splitter.split_documents(docs)
+    docsUrl = text_splitter.split_documents(data)
+    mainDoc = docsUrl + docsPdf
 
-    # embeddings = OpenAIEmbeddings()
-    # db = FAISS.from_documents(mainDoc, embeddings)
+    embeddings = OpenAIEmbeddings()
+    db = FAISS.from_documents(mainDoc, embeddings)
     # # db.save_local("faiss_index")
     # # new_db = FAISS.load_local("faiss_index", embeddings)
 
     # print("docs tyep---------------619----------",db.index_to_docstore_id[0])
+    print("docs tyep---------------619----------",db)
     
     
     users_collection = db['users_website_crawl_data']
@@ -666,6 +668,7 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
     print("dat stored hopefully = ")
     return "FOUND NO ERROR"
   except Exception as e:
+    print("error--------671--",str(e))
     return str(e)  
 
 

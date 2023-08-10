@@ -76,7 +76,7 @@ const ChatUI = (botID) => {
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0); console.log(res.data, " === from backend"); setLoading(false) } })
+      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(res.data, " === from backend"); setLoading(false) } })
 
   }
 
@@ -113,7 +113,7 @@ const ChatUI = (botID) => {
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(res.data, "=== backend www", res.data[0]); setUniqueCon(0); setLoading(false) } }).catch(err => console.log(err))
+      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else { setChatbotMsg(res.data[0]); console.log(res.data, "=== backend www", res.data[0]); setUniqueCon(0); setLoading(false) } }).catch(err => console.log(err))
   };
 
 
@@ -157,7 +157,7 @@ const ChatUI = (botID) => {
   }, [chatbotMsg])
 
   useEffect(() => {
-    if (plan === 'year-pro' || plan === 'month-pro' || plan === '') {
+    if  (plan === 'year-enterprise' || plan === 'month-enterprise' ) {
       setMark(false)
     } else {
       setMark(true)
@@ -184,7 +184,7 @@ const ChatUI = (botID) => {
   // },[])
   useEffect(() => {
     console.log("aaaaaaaaaaaa bot ", botID)
-    axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); console.log(res.data.initialMsg, "=font api init") }).catch(err => console.log(err))
+    axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setPlan(res.data.plan); setChatbotMsg(res.data.initialMsg);  console.log(res.data.initialMsg, "=font api init") }).catch(err => console.log(err))
     console.log(suggestedPrompt)
   }, [])
 
@@ -346,7 +346,10 @@ const ChatUI = (botID) => {
           placeholder="Type a message..."
         />
 
-<div className="me-2">
+{
+                        plan === 'year-enterprise' || plan === 'year-standard' || plan === 'month-enterprise' || plan === 'month-standard' ?
+                        <>
+                         <div className="me-2">
                             {
                                 speechTog === false ?
                                     <button onClick={handleToggleSpeech} type="button">
@@ -374,7 +377,9 @@ const ChatUI = (botID) => {
               <BsStopCircle />
             </button>
           ) : null}
-        </div>
+        </div> </>: ''
+        
+}
 
         <button type="submit" ><img src={sendIcon} alt='Send' style={{ height: '22px', width: '25px', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} /></button>
         {/* <button type="submit" ><img src="https://icons.veryicon.com/png/o/internet--web/iview-3-x-icons/ios-send.png" style={{ height:'25px', width:'40px', backgroundSize:'contain', backgroundRepeat:'no-repeat'}}/></button> */}

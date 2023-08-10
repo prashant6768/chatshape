@@ -113,7 +113,7 @@ const ChatUIDe = (botID) => {
             'Access-Control-Allow-Origin': '*'
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
-            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
     };
 
     useEffect(() => {
@@ -310,7 +310,7 @@ const ChatUIDe = (botID) => {
                             )}
                         </div>
                         {/* #######################3 suggested prompts */}
-                        <div style={{ position: 'absolute', left: '20px', bottom: '50px', width: '75%' }}>
+                        <div style={{ position: 'absolute', left: '20px', bottom: '50px', width: '75%', maxWidth:'350px' }}>
                             {suggestedPrompt === undefined || spromptHide === true ? '' : suggestedPrompt.map(x => (
                                 <div className='received message' onClick={() => { handleSubmitP(x) }} value={x} style={{ backgroundColor: fontData.cpuFontColor, fontSize: fontData.fontSize, color: fontData.cpuFontTextColor, fontFamily: fontData.font, width: '75%' }}  >{x}</div>
                             ))}

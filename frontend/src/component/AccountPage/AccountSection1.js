@@ -42,6 +42,10 @@ const AccountSection1 = () => {
         }).then(res => { setName(res.data.name); setPhone(res.data.phone); console.log(res.data, "profile") }).catch(err => console.log(err))
     }, [])
 
+    useEffect(()=>{
+     console.log("data = ",data,"  data2 = ",data2)
+    },[data, data2])
+
     const handleProfile = (e) => {
         e.preventDefault()
         setLoading(true)
@@ -89,7 +93,8 @@ const AccountSection1 = () => {
                     <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-start container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Expiry on: {data[3]}</Card.Text>
                     <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-start container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Bots left: {data2.NoOfBots}</Card.Text>
                     {/* <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-center container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Characters Left: {data2.NoOfCharacters}</Card.Text> */}
-                    <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-start container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Messages Left: {data2.NoOfMsg}</Card.Text>
+                    <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-start container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Tokens Left: {data2.tokens}</Card.Text>
+                    {/* <Card.Text className='s fs-5 col-sm-8 col-12 d-flex  justify-content-start container text-center me-auto mb-3' style={{ color: '#FFFFFF' }}>Messages Left: {data2.NoOfMsg}</Card.Text> */}
 
                     {/* <div className='row d-flex justify-content-between'>
                         <Link to='/pricing' style={{ textDecoration: 'none' }}><Button className='fw-bolder fs-4 col-sm-4 col-12 d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">Go Pro</Button></Link>

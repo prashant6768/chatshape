@@ -78,7 +78,7 @@ const ChatUIDemo = (botID) => {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
 
     }
 
@@ -113,7 +113,7 @@ const ChatUIDemo = (botID) => {
             'Access-Control-Allow-Origin': '*'
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
-            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
     };
 
     useEffect(() => {
@@ -129,7 +129,7 @@ const ChatUIDemo = (botID) => {
     }, [chatbotMsg])
 
     useEffect(() => {
-        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); console.log(res.data.initialMsg, "=font api init") }).catch(err => console.log(err))
+        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); setPlan(res.data.plan) ;console.log(res.data.initialMsg, "=font api init") }).catch(err => console.log(err))
         console.log(suggestedPrompt)
     }, [])
 
@@ -158,7 +158,7 @@ const ChatUIDemo = (botID) => {
     }, [chatbotMsg])
 
     useEffect(() => {
-        if (plan === 'year-pro' || plan === 'month-pro' || plan === '') {
+        if (plan === 'year-enterprise' || plan === 'month-enterprise' ) {
             setMark(false)
         } else {
             setMark(true)
@@ -465,6 +465,9 @@ const ChatUIDemo = (botID) => {
                             onChange={handleInputChange}
                             placeholder="Type a message..."
                         />
+                        {
+                        plan === 'year-enterprise' || plan === 'year-standard' || plan === 'mnth-enterprise' || plan === 'year-standard' ?
+                        <>
                         <div className="me-2">
                             {
                                 speechTog === false ?
@@ -494,7 +497,9 @@ const ChatUIDemo = (botID) => {
                                 </button>
                             ) : null}
                         </div>
+                        </> : ''
 
+                         }
                         <button type="submit" ><img src={sendIcon} alt='Send' style={{ height: '22px', width: '25px', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} /></button>
                         {/* <button type="submit" ><img src="https://icons.veryicon.com/png/o/internet--web/iview-3-x-icons/ios-send.png" style={{ height:'25px', width:'40px', backgroundSize:'contain', backgroundRepeat:'no-repeat'}}/></button> */}
                     </form>

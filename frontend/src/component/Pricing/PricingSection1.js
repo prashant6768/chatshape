@@ -50,7 +50,7 @@ const PricingSection1 = () => {
             six: '',
             price: '100 USD/',
             month: 'month',
-            key: 'month-hobby'
+            key: 'month-simple'
         },
         {
             priceTier: 'Standard',
@@ -92,7 +92,7 @@ const PricingSection1 = () => {
             five: '',
             six: '',
             price: '0 USD/',
-            month: 'year',
+            month: 'month',
             key: ''
         },
         {
@@ -104,9 +104,9 @@ const PricingSection1 = () => {
             four: 'Unlimited File Uploads',
             five: '',
             six: '',
-            price: '960 USD/',
-            month: 'year',
-            key: 'year-hobby'
+            price: '80 USD/',
+            month: 'month',
+            key: 'year-simple'
         },
         {
             priceTier: 'Standard',
@@ -117,8 +117,8 @@ const PricingSection1 = () => {
             four: 'Automated Integration',
             five: '',
             six: '',
-            price: '2400 USD/',
-            month: 'year',
+            price: '200 USD/',
+            month: 'month',
             key: 'year-standard'
         },
         {

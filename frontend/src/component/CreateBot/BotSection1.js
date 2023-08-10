@@ -68,8 +68,8 @@ const BotSection1 = () => {
   return (
     <div style={{ backgroundColor: '#242439', height: '100%', minHeight:'100vh', width:'100vw' }}>
      <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pb-5 pt-5' style={{ color: '#FFFFFF' }}>Create Chatbot</h1>
-        <p className='fs-4 col-12 d-flex justify-content-center container text-center pb-2 pt-3 mb-0' style={{ color: '#FFFFFF' }}>1. Enter the website you want to create a bot from.</p>
-        <p className='fs-4 col-12 d-flex justify-content-center container text-center mb-0 pb-2 pt-3' style={{ color: '#FFFFFF' }}>2. The website will be crawled and pages extracted.</p>
+        <p className='fs-4 col-12 d-flex justify-content-center container text-center pb-2 pt-3 mb-0' style={{ color: '#FFFFFF' }}>1. Enter the website / PDF you want to create a bot from.</p>
+        <p className='fs-4 col-12 d-flex justify-content-center container text-center mb-0 pb-2 pt-3' style={{ color: '#FFFFFF' }}>2. The website / PDF will be crawled and pages extracted.</p>
         <p className='fs-4 col-12 d-flex justify-content-center container text-center mb-0 pb-5 pt-3' style={{ color: '#FFFFFF' }}>3. Go to My Bots page, click on your Bot, and copy the scipt to add to your website.</p>
        
        <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-0 pb-5 pt-3' style={{ color: '#FFFFFF' }}>

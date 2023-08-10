@@ -21,6 +21,7 @@ import  pythoncom
 from langchain.document_loaders import SeleniumURLLoader
 from langchain.document_loaders import UnstructuredFileLoader
 from langchain.document_loaders import OnlinePDFLoader
+from langchain.callbacks import get_openai_callback
 
 import openai
 from pymongo import MongoClient
@@ -94,6 +95,12 @@ import faiss
 from langchain.chains.question_answering import load_qa_chain
 from langchain import OpenAI
 from langchain.chat_models import ChatOpenAI
+from langchain.vectorstores import FAISS
+from langchain.embeddings.openai import OpenAIEmbeddings
+
+from langchain.agents import initialize_agent
+from langchain.agents import AgentType
+
 
 ######### import for 2nd method finished ###########3
 
@@ -132,100 +139,103 @@ app.config['PDF'] = 'PDF'
 app.config['AUDIO']= 'AUDIO'
 
 dataOfSubs = {
-            "year-hobby": {
+            "year-simple": {
                 'amount': 20000,
                 'plan': 'Hobby',
-                'NoOfMsg': 500,
+                # 'NoOfMsg': 500,
                 'NoOfBots': 8,
                 'NoOfCharacters': 500000,
             },
             "year-standard": {
                 'amount': 40000,
                 'plan': 'Standard',
-                'NoOfMsg': 4000,
+                # 'NoOfMsg': 4000,
                 'NoOfBots': 23,
                 'NoOfCharacters': 5000000,
             },
-            "year-pro": {
-                'amount': 300000,
-                'plan': 'Professional',
-                'NoOfMsg': 30000,
-                'NoOfBots': 48,
-                'NoOfCharacters': 10000000,
-            },
-             "month-hobby": {
+            # "year-pro": {
+            #     'amount': 300000,
+            #     'plan': 'Professional',
+            #     'NoOfMsg': 30000,
+            #     'NoOfBots': 48,
+            #     'NoOfCharacters': 10000000,
+            # },
+             "month-simple": {
                 'amount': 1900,
                 'plan': 'Hobby',
-                'NoOfMsg': 500,
+                # 'NoOfMsg': 500,
                 'NoOfBots': 8,
                 'NoOfCharacters': 500000,
             },
             "month-standard": {
                 'amount': 3900,
                 'plan': 'Standard',
-                'NoOfMsg': 4000,
+                # 'NoOfMsg': 4000,
                 'NoOfBots': 23,
                 'NoOfCharacters': 5000000,
             },
-            "month-pro": {
-                'amount': 30000,
-                'plan': 'Professional',
-                'NoOfMsg': 30000,
-                'NoOfBots': 48,
-                'NoOfCharacters': 10000000,
-            },
+            # "month-pro": {
+            #     'amount': 30000,
+            #     'plan': 'Professional',
+            #     'NoOfMsg': 30000,
+            #     'NoOfBots': 48,
+            #     'NoOfCharacters': 10000000,
+            # },
            "free" :{
                 'amount': 0,
                 'plan': 'Free',
-                'NoOfMsg': 20,
+                # 'NoOfMsg': 20,
                 'NoOfBots': 2,
                 'NoOfCharacters': 20000,
             }
 }
 def choose_option(option):
-    if option == "year-hobby":
-       return {'amount':20000,
-    'plan':'Hobby',
-    'NoOfMsg':500,
-    'NoOfBots':10 ,
-    'NoOfCharacters':500000,}
+    if option == "year-simple":
+       return {'amount':96000,
+    'plan':'year-simple',
+    # 'NoOfMsg':500, 
+    'tokens':10000,
+    'NoOfCharacters':float('inf'),}
     elif option == "year-standard":
-       return {'amount':40000,
-    'plan':'Standard',
-    'NoOfMsg':4000,
-    'NoOfBots':25 ,
-    'NoOfCharacters':5000000,}
-    elif option == "year-pro":
-       return {'amount':300000,
-    'plan':'Professional',
-    'NoOfMsg':30000,
-    'NoOfBots':50 ,
-    'NoOfCharacters':10000000,}
-    elif option == "month-hobby":
-       return {'amount':1900,
-    'plan':'Hobby',
-    'NoOfMsg':500,
-    'NoOfBots':10,
-    'NoOfCharacters':500000,}
+       return {'amount':240000,
+    'plan':'year-standard',
+    # 'NoOfMsg':4000,
+    'tokens':100000,
+    'NoOfCharacters':float('inf'),}
+    # elif option == "year-pro":
+    #    return {'amount':300000,
+    # 'plan':'year-pro',
+    # 'NoOfMsg':30000,
+   
+    # 'NoOfCharacters':10000000,}
+    elif option == "month-simple":
+       return {'amount':10000,
+    'plan':'month-simple',
+    # 'NoOfMsg':500,
+   
+    'tokens':10000,
+    'NoOfCharacters':float('inf'),}
     elif option == "month-standard":
-       return {'amount':3900,
-    'plan':'Standard',
-    'NoOfMsg':4000,
-    'NoOfBots':25 ,
-    'NoOfCharacters':5000000,}
-    elif option == "month-pro":
-       return {'amount':30000,
-    'plan':'Professional',
-    'NoOfMsg':30000,
-    'NoOfBots':50,
-    'NoOfCharacters':10000000,}
+       return {'amount':25000,
+    'plan':'month-standard',
+    # 'NoOfMsg':4000,
+    'tokens':100000,
+  
+    'NoOfCharacters':float('inf'),}
+    # elif option == "month-pro":
+    #    return {'amount':30000,
+    # 'plan':'month-pro',
+    # 'NoOfMsg':30000,
+  
+    # 'NoOfCharacters':10000000,}
     else:
         return{
         'amount': 0,
         'plan': 'Free',
-        'NoOfMsg': 20,
-        'NoOfBots': 2,
-        'NoOfCharacters': 20000,
+        # 'NoOfMsg': 20,
+     
+        'tokens':100,
+        'NoOfCharacters': 10000,
     }
 
 
@@ -240,9 +250,10 @@ def monthly_task():
         plan = user_sub["plan-Info"]["plan"]
         print("187-------",plan)
         msg = choose_option(plan)
-        user_su.update_many({"username": username}, {"$set": {"plan-Info.NoOfMsg": msg['NoOfMsg']}})
+        # user_su.update_many({"username": username}, {"$set": {"plan-Info.NoOfMsg": msg['NoOfMsg']}})
+        user_su.update_many({"username": username}, {"$set": {"plan-Info.tokens": msg['tokens']}})
         user_crawl.update_many({"email": username}, {"$set": {"NoOfCharacters": NoOfCharacters}})
-        print("---------", msg['NoOfMsg'])
+        # print("---------", msg['NoOfMsg'])
     print("Monthly task completed.")
 
 scheduler.add_job(monthly_task, 'cron', day='1', hour='0', minute='0')  
@@ -254,14 +265,16 @@ def daily_task():
     dataCrawl = db['users_website_crawl_data']
     today_date = datetime.now().strftime("%Y-%m-%d")
     for x in dataCrawl.find():
-        NoOfCharacters = x['NoOfCharacters']
+        # NoOfCharacters = x['NoOfCharacters']
         username = x['email']
+        print("--268",username)
         subDb = db['user_subscription']
-        subData = subDb.find_one({'username':username})['plan-Info']['NoOfCharacters']
+        subData = subDb.find_one({'username':username})
         uniqueCon = x['UniqueCon']
-        todayUseChar = subData - NoOfCharacters
-        charData = {
-            'usage':todayUseChar,
+        print("--271",subData)
+        # todayUseChar = subData - NoOfCharacters
+        tokenData = {
+            'usage':subData['tokensUsed'],
             'date':today_date
         }
         ConData={
@@ -270,7 +283,7 @@ def daily_task():
         }
         dataCrawl.update_one(
             {'_id': x['_id']},
-            {'$push': {'charData': charData}}
+            {'$push': {'tokenData': tokenData}}
         )
         dataCrawl.update_one(
             {'_id': x['_id']}, 
@@ -280,7 +293,13 @@ def daily_task():
             {'_id': x['_id']}, 
             {'$set': {'UniqueCon': 0}}
         )
+        subDb.update_one(
+        {'username':username},
+        {'$set': {'tokensUsed': 0}}
+        )
+    print("daily task-------")    
 
+# scheduler.add_job(daily_task, 'interval', minutes=1)  
 scheduler.add_job(daily_task,'cron' , day='*', hour='0', minute='0')  
 
 
@@ -413,15 +432,19 @@ def start_ai(query,userData,uniqueCon):
 
     print("------237--------",text,"----------------237")
     
-    PROMPT = PromptTemplate(
+   
+    with get_openai_callback() as cb:
+      PROMPT = PromptTemplate(
     template=prompt, input_variables=["text", "query"]
 )
-    chain_type_kwargs = {"prompt": PROMPT}
-    qa_chain = load_qa_chain(ChatOpenAI(streaming=True, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-4",temperature=0.7), chain_type="map_reduce")
-    answer = qa_chain.run(input_documents= text, question=query)
-    print("---------279---------",answer,"-----------279-----------",PROMPT)
-    # users_collection.update_one({"_id":objId }, {"$push": {"History":{"HistoryChat":{"$each":['AI: '+answer]}}}})
-    return answer
+      chain_type_kwargs = {"prompt": PROMPT}
+      qa_chain = load_qa_chain(ChatOpenAI(streaming=False, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-4",temperature=0.7), chain_type="map_reduce")
+    
+      answer = qa_chain.run(input_documents= text, question=query)
+      print("---------279---------",answer,"-----------279-----------",cb)
+
+   
+    return [answer,cb.total_tokens]
 
   except Exception as e:
     return str(e)  
@@ -457,21 +480,28 @@ def user_msg():
     CharNo_2 = CharNo_1.find_one({'_id': ObjectId(userData)})
     print("133---------------------",CharNo_2['NoOfCharacters'])
     # print(datasub,"555555555555555555555555555555",datetime.strptime(datasub['expiration'], "%Y-%m-%d"),"WWW",datetime.now().date())
-    if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date() or plan_2['plan-Info']['NoOfMsg'] < 1 or CharNo_2['NoOfCharacters'] < 1:
+    # if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date() or plan_2['plan-Info']['NoOfMsg'] < 1 or CharNo_2['NoOfCharacters'] < 1 or plan_2['plan-Info']['tokens'] < 1:
+    if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date()  or CharNo_2['NoOfCharacters'] < 1 or plan_2['plan-Info']['tokens'] < 1:
         print("EXpire---------------------------------------")
         return "SubE"
 
     # print("user msg ////////////////////////",userData)
-    summaries = start_ai(data,userData,uniqueCon)
+    summariesCb = start_ai(data,userData,uniqueCon)
+    summaries = summariesCb[0]
+    cb = summariesCb[1]
+    print("-------479 ", summaries, int(cb))
     
     users_collection = db['users_website_crawl_data']
     plan_info_1 = db['user_subscription']
-    plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.NoOfMsg":-1}})
+    # plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.NoOfMsg":-1}})
+    plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.tokens":-cb}})
+    plan_info_1.update_one({"username": userName}, {"$inc": {"tokensUsed":cb}})
 
     users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
     users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"UniqueCon": uniqueCon}})
 
-    print("143-----------------------------",str(summaries),"---",len(str(summaries)))
+    # print("143-----------------------------",str(summaries),"---",len(str(summaries)))
+    print("-------502-------",planname)
  
     # print("X ==",Gsummary)
     return [summaries, planname,uniqueCon]
@@ -521,7 +551,7 @@ def get_link_data():
       'expiration':datasub_i.get('expiration'),
       'plan-Info':{
        'NoOfBots':datasub_i.get('plan-Info').get('NoOfBots'),
-       'NoOfCharacters': datasub_i.get('plan-Info').get('NoOfCharacters')
+       'NoOfCharacters': datasub_i.get('plan-Info').get('NoOfCharacters'),
        }
     }
     # print(datasub,"555555555555555555555555555555",datetime.strptime(datasub['expiration'], "%Y-%m-%d"),"WWW",datetime.now().date())
@@ -533,9 +563,10 @@ def get_link_data():
     # print("username is ==", userData)
     # print("305-----------------",request.get_json()['exclude'])
     print("318-----------exclude----------",exclude)
-    get_data(urll,userData,botName,pdf,unique,exclude,datasub['plan-Info']['NoOfCharacters'])
+    a = get_data(urll,userData,botName,pdf,unique,exclude,datasub['plan-Info']['NoOfCharacters'])
+    print("-------------567----remove a = get_data() ",a)
     if os.path.exists(pdf):
-        print("os path -------532",pdf)
+        print("os path -------568",pdf)
         os.remove(pdf)
     return urll
 
@@ -582,20 +613,34 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
         docs = ''  
         print("______-----------------386")  
     print("------------410",type(urls))
+
+    # text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=10, length_function=len)
+    # docsPdf = text_splitter.split_documents(docs)
+    # docsUrl = text_splitter.split_documents(data)
+    # mainDoc = docsUrl + docsPdf
+
+    # embeddings = OpenAIEmbeddings()
+    # db = FAISS.from_documents(mainDoc, embeddings)
+    # # db.save_local("faiss_index")
+    # # new_db = FAISS.load_local("faiss_index", embeddings)
+
+    # print("docs tyep---------------619----------",db.index_to_docstore_id[0])
+    
     
     users_collection = db['users_website_crawl_data']
     user_sub = db['user_subscription']
+    print("hhhh")
     user_data = {
         'NoOfCharacters': NoOfCharacters,
         'crawldata': str(data),
         'crawldataPdf':str(docs),
-        # 'crawl':str(data1),
+        # 'crawl':db.index_to_docstore_id[0],
         'email': userData,
         'botname':botName,
         'url':urls,
         'pdf':unique,
         'initialMsg':'Ask me what you want to know',
-        'suggestedPrompt':['What is the Chatbot About','Tell me About the webpage','Summarize the basic  topic of the webpage'],
+        'suggestedPrompt':['What is the article About','Tell me About the webpage','Summarize the basic topic of the webpage in 30 words'],
         'FontData':{
             'font': 'arial',
             'userFontColor': '#0070DA',
@@ -605,12 +650,12 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
             'backgroundColor': '#242439',
             'fontSize': '12px',
         },
-        'charData':[],
+        'tokenData':[],
         'UniqueCon':0,
         'UniqueConData':[],
-        'History':[],
         'prompt':" You are a world class analyst.You are having a conversation with the user about the  text and you have to answer the users questions. Please follow these rules: 1. Make it engaging and informative. 2. Should address the {query} very well. 3. Don't repeat your sentences and information 4. Always mention name of things or people you talk about. 5.Don't mention your name when answering, go straight to the answer   {text}  Human: {query} "             
     } 
+    print("docs tyep---------------654----------",db)
     try:
        users_collection.insert_one(user_data)
         #  print(user_sub.find_one({"username":userData}),"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
@@ -618,7 +663,7 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
        print("Data stored successfully!")
     except Exception as e:
        print("Error storing data:============", str(e),"===========================")
-    # print("dat stored hopefully = ")
+    print("dat stored hopefully = ")
     return "FOUND NO ERROR"
   except Exception as e:
     return str(e)  
@@ -678,7 +723,7 @@ def retrain(id):
     print("593-----------exclude----------",exclude)
     get_data_retrain(urll,userData,objId,pdf,unique,exclude,NoOfCharacters)
     if os.path.exists(pdf):
-        print("os path -------532",pdf)
+        print("os path -------721",pdf)
         os.remove(pdf)
     return urll
 
@@ -746,13 +791,13 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude, NoOfCharacters):
     return str(e)  
 
 ##########################################################################3  char graph date
-@app.route('/api/chartChar/<id>',methods=['POST'])
-def getchardate(id):
+@app.route('/api/chartToken/<id>',methods=['POST'])
+def gettokendate(id):
     objId= ObjectId(id)
     users_collection = db['users_website_crawl_data']
     dataDb_i = users_collection.find_one({'_id':objId})
     time = request.get_json()['selectedTime']
-    dataDb = [d for d in dataDb_i.get('charData') if d['date'].startswith(time)]
+    dataDb = [d for d in dataDb_i.get('tokenData') if d['date'].startswith(time)]
     if dataDb == []:
         return "nodata"
     print("--------693------",dataDb)
@@ -791,7 +836,7 @@ def getupdatebot(id):
         'pdf':dataDb_i.get('pdf'),
         'initialMsg':dataDb_i.get('initialMsg'),
         'suggestedPrompt':dataDb_i.get('suggestedPrompt'),
-        'charData':[d for d in dataDb_i.get('charData') if d['date'].startswith(current_month)],
+        'tokenData':[d for d in dataDb_i.get('tokenData') if d['date'].startswith(current_month)],
         'UniqueConData':[d for d in dataDb_i.get('UniqueConData') if d['date'].startswith(current_month)]
     }
     data={
@@ -802,7 +847,7 @@ def getupdatebot(id):
         'pdf':dataDb['pdf'],
         'initialMsg':dataDb['initialMsg'],
         'sPrompt':dataDb['suggestedPrompt'],
-        'charData':dataDb['charData'],
+        'tokenData':dataDb['tokenData'],
         'UniqueConData':dataDb['UniqueConData']
 
     }
@@ -813,10 +858,13 @@ def getupdatebot(id):
 @app.route('/api/fontdata/<id>',methods=['GET'])
 def getfontdata(id):
     users_collection = db['users_website_crawl_data']
+    user_sub = db['user_subscription']
     objId= ObjectId(id)
     dataDb_i = users_collection.find_one({'_id':objId})['FontData'] 
     iMsg =  users_collection.find_one({'_id':objId})['initialMsg']  
     sPrompt = users_collection.find_one({'_id':objId})['suggestedPrompt']
+    email = users_collection.find_one({'_id':objId})['email']
+    plan = user_sub.find_one({'username':email})['plan-Info']['plan']
     dataDb = {
         'font':dataDb_i.get('font'),
         'userFontColor':dataDb_i.get('userFontColor'),
@@ -826,10 +874,11 @@ def getfontdata(id):
         'backgroundColor':dataDb_i.get('backgroundColor'),
         'fontSize':dataDb_i.get('fontSize'),
         'initialMsg':iMsg,
-        'sPrompt':sPrompt
+        'sPrompt':sPrompt,
+        'plan':plan
         
     }
-    print(dataDb_i.get('font'))
+    print("plan-----------863--",plan)
     return dataDb
 
 ###################################################################### Update chatbot ui fontdata
@@ -905,8 +954,12 @@ def get_mybots():
 
     dataDb =[] 
     for x in users_collection.find({'email':data}):
-        dataDb.append({'email': x['email'],'name':x['botname'], 'id': str(x['_id']), 'NoOfCharacters': x['NoOfCharacters']})  
 
+        if(x['NoOfCharacters'] == float('inf')):
+           dataDb.append({'email': x['email'],'name':x['botname'], 'id': str(x['_id']), 'NoOfCharacters': 'Infinity'})  
+           print("yosh-----------910")
+        else:
+           dataDb.append({'email': x['email'],'name':x['botname'], 'id': str(x['_id']) , 'NoOfCharacters': x['NoOfCharacters']})  
     # print("dataDb =",dataDb)
     return dataDb
 
@@ -962,12 +1015,16 @@ def subdata():
         'plan-Info':{
             'amount':datasub_i.get('plan-Info').get('amount'),
             'plan':datasub_i.get('plan-Info').get('plan'),
-            'NoOfMsg':datasub_i.get('plan-Info').get('NoOfMsg'),
+            # 'NoOfMsg':datasub_i.get('plan-Info').get('NoOfMsg'),
             'NoOfBots':datasub_i.get('plan-Info').get('NoOfBots') ,
+            'tokens':datasub_i.get('plan-Info').get('tokens') ,
             'NoOfCharacters':datasub_i.get('plan-Info').get('NoOfCharacters'),      
         }
     }
     print(datasub," MMMMMMMM")
+    if datasub['plan-Info']['NoOfCharacters'] == float('inf'):
+        datasub['plan-Info']['NoOfCharacters'] = 'Infinity' 
+        print("-----995")
 
     # print("dataDb =",dataDb)
     return [datasub['plan-Info'],datasub['username'],datasub['created'],datasub['expiration']]

@@ -35,6 +35,8 @@ const MyChatbotSection1 = () => {
 
 
 
+
+
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh',width:'100vw' }}>
       <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>My Chatbots</h1>
@@ -42,23 +44,16 @@ const MyChatbotSection1 = () => {
       <Link to='/create' style={{ textDecoration: 'none' }}><button className='btn btn-primary mb-5 col-xl-2 col-lg-4 col-6  d-flex justify-content-center container text-center ' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} >Create Chatbots</button></Link>
       <div className='d-flex justify-content-center  flex-wrap  '>
         {dataArr.map(x => (
-          // <div  className=' mx-2 my-2' style={{ width: '300px' }}>
-          //   <Card  style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%' }} className='mx-xxl-0 mx-1 mt-5 rounded-4'>
-          //     <Card.Body>
-          //       <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >{x.name}</Card.Title>
-          //       <Link to={`/managebots/${x.id}`} style={{ textDecoration: 'none' }}><Button value={x.id} onClick={(e)=>setBotId(e.target.value)}  className='fw-bolder col-sm-8 col-12 d-flex justify-content-center container text-center mt-5' style={{ color: '#FFFFFF', backgroundColor:'#620B84' }}  variant="primary">Details</Button></Link>
-          //     </Card.Body>
-          //   </Card>
-          // </div>
           <div className='d-flex my-2'  style={{ minHeight:'240px' }}>
   <Card style={{ backgroundColor: '#212529', border: '1px solid #FFE459',width:'270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
     <Card.Body className="d-flex flex-column" style={{}}>
       <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{x.name}</Card.Title>
-      {/* <div className=' col-12 d-flex justify-content-center container text-center mb-2 mt-5 fs-5 text-break' style={{ color: '#FFFFFF' }}>Characters Left: {x.NoOfCharacters}</div> */}
-      
       <div className="mt-auto">
-      <div className=' col-12 d-flex justify-content-center container text-center mb-3 mt-5 fs-5 text-break' style={{ color: '#FFFFFF' }}>Characters Left: {x.NoOfCharacters}</div>
-
+        {
+          x.NoOfCharacters === 'Infinity' ?
+          '' :
+      <div className=' col-12 d-flex justify-content-center container text-center mb-3  mt-5 fs-5 text-break' style={{ color: '#FFFFFF' }}>Characters Left: {x.NoOfCharacters} </div> 
+    }
         <Link to={`/managebots/${x.id}`} style={{ textDecoration: 'none' }}>
           <Button
             value={x.id}

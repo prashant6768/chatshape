@@ -64,7 +64,7 @@ const messageStyleRec = {
   const [prompt, setPrompt] = useState('')
   const [url, setUrl] = useState('None')
   const [pdf, setPdf] = useState('None')
-  const [charDataGraph, setCharDataGraph] = useState('')
+  const [tokenDataGraph, setTokenDataGraph] = useState('')
   const [conDataGraph, setConDataGraph] = useState('')
 
   const [loading, setLoading] = useState(false);
@@ -89,11 +89,11 @@ const messageStyleRec = {
 
   const handleCreateGraph = () => {
     console.log(selectedTime)
-    axios.post(`${BACKEND}api/chartChar/${id.id}`, { selectedTime }, {
+    axios.post(`${BACKEND}api/chartToken/${id.id}`, { selectedTime }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date ") } else { console.log(res.data); setCharDataGraph(res.data) } }).catch(err => console.log(err))
+    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date ") } else { console.log(res.data); setTokenDataGraph(res.data) } }).catch(err => console.log(err))
   }
   const handleCreateGraphCon = () => {
     console.log(selectedTimeCon)
@@ -121,16 +121,16 @@ const messageStyleRec = {
     setPdf(dataArr.pdf)
     setSPrompt(dataArr.sPrompt)
     setInitialMsg(dataArr.initialMsg)
-    setCharDataGraph(dataArr.charData)
+    setTokenDataGraph(dataArr.tokenData)
     setConDataGraph(dataArr.UniqueConData)
-    console.log(dataArr.charData, "------", dataArr.UniqueConData)
+    console.log(dataArr.tokenData, "------", dataArr.UniqueConData)
     //   setUrl(dataArr.url)
   }, [dataArr])
 
   useEffect(() => {
-    console.log("char", charDataGraph)
+    console.log("token", tokenDataGraph)
     console.log("con", conDataGraph)
-  }, [charDataGraph, conDataGraph])
+  }, [tokenDataGraph, conDataGraph])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -407,10 +407,10 @@ const messageStyleRec = {
             </div>
 
           </div>
-          <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
-            {charDataGraph.length === 0 ? '' :
+           <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
+            {tokenDataGraph.length === 0 ? '' :
               <ResponsiveContainer width="99%" aspect={3}>
-                <LineChart width={1000} height={500} data={charDataGraph} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
+                <LineChart width={1000} height={500} data={tokenDataGraph} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
                   <Line type="monotone" dataKey="usage" stroke="#8884d8" />
                   <XAxis dataKey="date"
                     minTickGap={10}
@@ -421,7 +421,7 @@ const messageStyleRec = {
                 </LineChart>
               </ResponsiveContainer>
             }
-          </div>
+          </div> 
 
           <label className='fs-4 d-flex justify-content-center container text-center mt-5 mb-5' style={{ height: '100%', color: '#FFFFFF' }} >Unique Conversations</label>
           <div className='fs-4 d-flex justify-content-center  text-center mt-1 mb-5'>
@@ -451,7 +451,7 @@ const messageStyleRec = {
           <div className='fs-4 col-12 row d-flex justify-content-center text-center  mb-5 mt-3 mx-1 ' style={{ color: '#FFFFFF' }}>
             <label className='fs-4 d-flex justify-content-center  col-11 text-center mt-5 mb-5 mx-2' style={{ height: '100%', color: '#FFFFFF' }}>Chat History</label>
           {history === '' ? '':
-          history.map(x =>
+          history.sort((a, b) => new Date(b.time) - new Date(a.time)).map(x =>
             <Accordion alwaysOpen='false' className='col-11 my-2 custom-accordion' >
               <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }} >
                 <Accordion.Header >{x.time}</Accordion.Header>

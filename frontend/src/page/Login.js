@@ -99,7 +99,7 @@ await axios.get(`${BACKEND}auth/googlelogin`,{
      <ScriptLoaderHOC
         scriptUrl="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js"
         id="popup"
-        cred="64ca2d70c6e8de9e5d052d56"
+        cred="64d47c3004d7aebaeb5dbf04"
       />
   <NavbarC gradientC={gradientC}/>
   <div className='d-flex justify-content-center col-12' style={{paddingTop:'100px',paddingBottom:'100px', backgroundColor: '#242439', minHeight: '1000px', height:'100%'}} >

@@ -71,9 +71,10 @@ from google.oauth2 import id_token
 default_sub = {
     'amount':0,
     'plan':'Free',
-    'NoOfMsg':20,
-    'NoOfBots':2,
-    'NoOfCharacters':20000,
+    # 'NoOfMsg':20,
+    'NoOfBots':1,
+    'tokens':100,
+    'NoOfCharacters':10000,
 }
 
 @auth.route("/googlelogin")
@@ -272,6 +273,7 @@ def getOTP():
             'plan-Info':default_sub,
             'username':user_data['username'],
             'created':created,
+            'tokensUsed':0,
             'expiration':expired ,
         }
         

@@ -41,13 +41,13 @@ data = [
     {
         'price_data': {
             'currency': 'usd',
-             'unit_amount': 1900,
+             'unit_amount': 10000,
             'recurring': {
                 'interval': 'month',
                 'interval_count': 1,       
             },
             'product_data': {
-                'name': 'month-hobby',
+                'name': 'month-simple',
             },
         },
         'quantity': 1,
@@ -55,7 +55,7 @@ data = [
     {
         'price_data': {
             'currency': 'usd',
-             'unit_amount': 3900,
+             'unit_amount': 25000,
             'recurring': {
                 'interval': 'month',
                 'interval_count': 1,        
@@ -66,30 +66,30 @@ data = [
         },
         'quantity': 1,
     },
+    # {
+    #     'price_data': {
+    #         'currency': 'usd',
+    #         'unit_amount': 30000,
+    #         'recurring':{
+    #             'interval': 'month',
+    #             'interval_count': 1,               
+    #         },
+    #         'product_data': {
+    #             'name': 'month-pro',
+    #         },
+    #     },
+    #     'quantity': 1,
+    # },
     {
         'price_data': {
             'currency': 'usd',
-            'unit_amount': 30000,
-            'recurring':{
-                'interval': 'month',
-                'interval_count': 1,               
-            },
-            'product_data': {
-                'name': 'month-pro',
-            },
-        },
-        'quantity': 1,
-    },
-    {
-        'price_data': {
-            'currency': 'usd',
-            'unit_amount': 20000,
+            'unit_amount': 96000,
             'recurring':{
                 'interval': 'year',
                 'interval_count': 1,              
             },
             'product_data': {
-                'name': 'year-hobby',
+                'name': 'year-simple',
             },
         },
         'quantity': 1,
@@ -97,7 +97,7 @@ data = [
     {
         'price_data': {
             'currency': 'usd',
-            'unit_amount': 40000,
+            'unit_amount': 240000,
             'recurring': {
                 'interval': 'year',
                 'interval_count': 1,               
@@ -108,24 +108,24 @@ data = [
         },
         'quantity': 1,
     },
-    {
-        'price_data': {
-            'currency': 'usd',
-            'unit_amount': 300000,
-            'recurring':{
-                'interval': 'year',
-                'interval_count': 1,         
-            },
-            'product_data': {
-                'name': 'year-pro',
-            },
-        },
-        'quantity': 1,
-    },
+    # {
+    #     'price_data': {
+    #         'currency': 'usd',
+    #         'unit_amount': 300000,
+    #         'recurring':{
+    #             'interval': 'year',
+    #             'interval_count': 1,         
+    #         },
+    #         'product_data': {
+    #             'name': 'year-pro',
+    #         },
+    #     },
+    #     'quantity': 1,
+    # },
 ]
 
-gSession_id = None
-gProduct = None
+# gSession_id = None
+# gProduct = None
 # gUser = None
 
 users_temp = db['users_temp']
@@ -138,48 +138,53 @@ users_temp.create_index("gUser", unique=True)
 subscriptionData = {
     'amount':0,
     'plan':'Free',
-    'NoOfMsg':20,
-    'NoOfBots':2,
-    'NoOfCharacters':20000,
+    # 'NoOfMsg':20,
+    'NoOfBots':1,
+    'tokens':100,
+    'NoOfCharacters':10000,
 }
 
 def choose_option(option,bot_2):
-    if option == "year-hobby":
-       return {'amount':20000,
-    'plan':'year-hobby',
-    'NoOfMsg':500,
-    'NoOfBots':10 - bot_2,
-    'NoOfCharacters':500000,}
+    if option == "year-simple":
+       return {'amount':96000,
+    'plan':'year-simple',
+    # 'NoOfMsg':500,
+    'NoOfBots':2 - bot_2,
+    'tokens':10000,
+    'NoOfCharacters':float('inf'),}
     elif option == "year-standard":
-       return {'amount':40000,
+       return {'amount':240000,
     'plan':'year-standard',
-    'NoOfMsg':4000,
-    'NoOfBots':25 - bot_2,
-    'NoOfCharacters':5000000,}
-    elif option == "year-pro":
-       return {'amount':300000,
-    'plan':'year-pro',
-    'NoOfMsg':30000,
-    'NoOfBots':50 - bot_2,
-    'NoOfCharacters':10000000,}
-    elif option == "month-hobby":
-       return {'amount':1900,
-    'plan':'month-hobby',
-    'NoOfMsg':500,
+    # 'NoOfMsg':4000,
     'NoOfBots':10 - bot_2,
-    'NoOfCharacters':500000,}
+    'tokens':100000,
+    'NoOfCharacters':float('inf'),}
+    # elif option == "year-pro":
+    #    return {'amount':300000,
+    # 'plan':'year-pro',
+    # 'NoOfMsg':30000,
+    # 'NoOfBots':50 - bot_2,
+    # 'NoOfCharacters':10000000,}
+    elif option == "month-simple":
+       return {'amount':10000,
+    'plan':'month-simple',
+    # 'NoOfMsg':500,
+    'NoOfBots':2 - bot_2,
+    'tokens':10000,
+    'NoOfCharacters':float('inf'),}
     elif option == "month-standard":
-       return {'amount':3900,
+       return {'amount':25000,
     'plan':'month-standard',
-    'NoOfMsg':4000,
-    'NoOfBots':25 - bot_2,
-    'NoOfCharacters':5000000,}
-    elif option == "month-pro":
-       return {'amount':30000,
-    'plan':'month-pro',
-    'NoOfMsg':30000,
-    'NoOfBots':50 - bot_2,
-    'NoOfCharacters':10000000,}
+    # 'NoOfMsg':4000,
+    'NoOfBots':10 - bot_2,
+    'tokens':100000,
+    'NoOfCharacters':float('inf'),}
+    # elif option == "month-pro":
+    #    return {'amount':30000,
+    # 'plan':'month-pro',
+    # 'NoOfMsg':30000,
+    # 'NoOfBots':50 - bot_2,
+    # 'NoOfCharacters':10000000,}
     else:
         # Code for other cases
         print("Invalid option")
@@ -192,11 +197,13 @@ def choose_option(option,bot_2):
 def create_checkout_session():
     try:
         key = request.get_json()['key']
+        
         decoded = request.get_json()['decoded']
         # gUser = decoded
+        print("key is ------------200 ",decoded)
         users_temp.insert_one({'gUser':decoded})
 
-        print("key is ",key)
+       
         print(decoded)
         line={}
 
@@ -330,7 +337,7 @@ def order_success():
         #   print("TTTTTTTTTTTTTTTTTTTt",pay_data['product']['product_id'])
         #   print("LLLLLLLLLLLLLLLLLMMMMMMMMMMMMm",sub_type)
           created = datetime.now().date().strftime("%Y-%m-%d")
-          if pay_data['product']['product_id'] == 'year-hobby' or pay_data['product']['product_id'] == 'year-standard' or pay_data['product']['product_id'] == 'year-pro':
+          if pay_data['product']['product_id'] == 'year-simple' or pay_data['product']['product_id'] == 'year-standard' :
             expire = datetime.now().date()+relativedelta(years=1)
           else:
             expire = datetime.now().date()+relativedelta(months=1)  

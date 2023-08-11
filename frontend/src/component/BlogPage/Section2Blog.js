@@ -89,14 +89,10 @@ const Section2Blog = () => {
   return (
     <div className='pb-5 mx-0 d-flex row justify-content-center ' style={{ backgroundColor: '#242439', height: '100%',width:'100vw' }}>
        { dataArray.map(x =>(
-        <Link to={`/blog/${x.id}`} className=' row d-flex justify-content-center col-lg-5 col-sm-10 col-11  mx-xxl-5 mx-2 my-5 ' style={{textDecoration:'none'}}>
-         <div id={x.id} className=' row px-0  d-flex hovertran justify-content-center ' style={{ height: '450px', borderRadius:'10%' }}>
-          <div className='col-sm-8 flex-wrap px-0 py-3 hovercolor brt' style={{}}>
-            <h1 style={{color:'white', backgroundColor:'#CE98E8'}} className=' py-2 mx-3 mb-0 mt-4 px-1 fw-bold  text-uppercase '>{x.imageHeading}</h1>
-            <h3 style={{color:'black', backgroundColor:'#F6BDFF'}} className=' py-2 mx-3  px-1   text-uppercase '>{x.imageSubheading}</h3>
-            {/* <p className=' pt-2 pb-0 mb-0 mx-3  px-1 ' style={{color:'black'}}>{x.company}</p> */}
-          </div>
-          <div className='col-sm-4 px-0 flex-wrap' style={{ }}>
+        <Link to={`/blog/${x.id}`} className=' row d-flex justify-content-center col-lg-5 col-sm-10 col-11  mx-xxl-2 mx-2 my-5 ' style={{textDecoration:'none'}}>
+         <div id={x.id} className=' row px-0  d-flex hovertran justify-content-center ' style={{  height: '450px', borderRadius:'10%' }}>
+
+         <div className='col-sm-5  px-0 flex-wrap' style={{ }}>
             <img
               style={{ width: '100%', height: '100%' }}
               className='px-0 bri'
@@ -104,6 +100,13 @@ const Section2Blog = () => {
               src={x.imageSource}
             />
           </div>
+
+          <div className='col-sm-7  flex-wrap px-0 py-3 hovercolor brt' style={{backgroundColor: '#171725', border:'1px solid white'}}>
+            <h1 style={{color:'white'}} className=' py-2 mx-3 mb-0 mt-4 text-sm-start text-center px-1 fw-bold   '>{x.imageHeading}</h1>
+            <h4 style={{color:'white'}} className=' py-2 mx-3  px-1  text-sm-start text-center  '>{x.imageSubheading}</h4>
+            {/* <p className=' pt-2 pb-0 mb-0 mx-3  px-1 ' style={{color:'black'}}>{x.company}</p> */}
+          </div>
+          
         </div>
         </Link>
         ))}

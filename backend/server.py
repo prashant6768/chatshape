@@ -29,6 +29,7 @@ from urllib.parse import quote_plus
 
 load_dotenv(find_dotenv())
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# os.environ['OPENAI_API_KEY'] = getpass.getpass('OpenAI API Key:')
 MONGO = os.getenv("MONGO")
 
 from flask_bcrypt import Bcrypt
@@ -95,7 +96,10 @@ import faiss
 from langchain.chains.question_answering import load_qa_chain
 from langchain import OpenAI
 from langchain.chat_models import ChatOpenAI
-from langchain.vectorstores.faiss import FAISS
+# from langchain.vectorstores import FAISS
+# import faiss
+from langchain.vectorstores import Chroma
+import getpass
 from langchain.embeddings.openai import OpenAIEmbeddings
 
 
@@ -428,7 +432,7 @@ def start_ai(query,userData,uniqueCon):
     data = dataDb['crawldata']
     dataPdf = dataDb['crawldataPdf']
     prompt = str(dataDb['prompt'])
-    text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=10, length_function=len)
+    text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=200, length_function=len)
     text = text_splitter.create_documents([dataPdf,data])
 
     print("------237--------",text,"----------------237")
@@ -615,18 +619,25 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
         print("______-----------------386")  
     print("------------410",type(urls))
 
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
-    docsPdf = text_splitter.split_documents(docs)
-    docsUrl = text_splitter.split_documents(data)
-    mainDoc = docsUrl + docsPdf
+    # text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+    # docsPdf = text_splitter.split_documents(docs)
+    # docsUrl = text_splitter.split_documents(data)
+    # mainDoc = docsUrl + docsPdf
 
-    embeddings = OpenAIEmbeddings()
-    db = FAISS.from_documents(mainDoc, embeddings)
+    # embeddings = OpenAIEmbeddings()
+
+    # # embeddin = embeddings.embed_documents(
+    # # [
+    # #     "Hi",
+    # # ]
+    # # )
+    # # print("-----635----",embeddin)
+    # db = Chroma.from_documents(mainDoc, embeddings)
     # # db.save_local("faiss_index")
     # # new_db = FAISS.load_local("faiss_index", embeddings)
 
     # print("docs tyep---------------619----------",db.index_to_docstore_id[0])
-    print("docs tyep---------------619----------",db)
+    # print("docs tyep---------------619----------",db)
     
     
     users_collection = db['users_website_crawl_data']

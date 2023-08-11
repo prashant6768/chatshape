@@ -170,7 +170,7 @@ const PricingSection1 = () => {
                     <div className='d-flex  justify-content-center flex-wrap flex-row sectionwidth ' style={{}}>
                         {selectedOption === 'B' ? dataCardsMonth.map(x => (
                             <div className=' px-0 my-2 d-flex justify-content-center'>
-                                <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width: '270px' }} className='mx-1 ms-4   mt-5 rounded-4'>
+                                <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width: '273px' }} className='mx-1 ms-4   mt-5 rounded-4'>
 
                                     <Card.Body>
                                         <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >{x.priceTier}</Card.Title>
@@ -244,7 +244,7 @@ const PricingSection1 = () => {
 
                             dataCardsYear.map(x => (
                                 <div className=' px-0 my-2 d-flex justify-content-center'>
-                                    <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width: '270px' }} className='mx-1 ms-4  mt-5 rounded-4'>
+                                    <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0', height: '100%', width: '273px' }} className='mx-1 ms-4  mt-5 rounded-4'>
                                         <Card.Body style={{ }}>
                                             <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-3 mt-3 fs-3' style={{ color: '#FFFFFF' }} >{x.priceTier}</Card.Title>
                                             <Card.Text className='fw-bolder fs-4 col-12 d-flex justify-content-center container text-start mb-3' style={{ color: '#FFFFFF' }}>{x.price}<p className='fs-5 mt-3 mb-4' style={{ color: 'lightgrey', fontWeight: 'normal', visibility:'hidden' }}>.</p></Card.Text>

@@ -6,9 +6,9 @@ import {BiCustomize} from 'react-icons/bi'
 import {MdOutlineIntegrationInstructions , MdOutlinePrivacyTip , MdSentimentVerySatisfied} from 'react-icons/md'
 import {MdLanguage} from 'react-icons/md'
 import Card from 'react-bootstrap/Card';
-import f1 from '../../assets/feature1.PNG'
-import f2 from '../../assets/feature2.PNG'
-import f3 from '../../assets/feature3.PNG'
+import f1 from '../../assets/feature1z.PNG'
+import f2 from '../../assets/feature2z.PNG'
+import f3 from '../../assets/feature3z.PNG'
 
 const SectionOneFeature = () => {
   return (

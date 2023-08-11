@@ -53,7 +53,7 @@ const SectionTwoHome = () => {
       <h2 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-2' style={{ color: '#FFFFFF' }}>This chatbot's trained to answer questions about Zema.
 Ask a question to get started.</h2>
 
-          <ChatUIDe botID={'64d47c3004d7aebaeb5dbf04...'} />
+          <ChatUIDe botID={'64d3821e75a48e9178d49106..'} />
 
 
         <h2 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF' }}>TRUSTED CUSTOMERS</h2>
@@ -120,7 +120,7 @@ Ask a question to get started.</h2>
             className='col-11 my-3 custom-accordion '
           >
             <Accordion.Item eventKey={x.key} className='accordhov' style={{ backgroundColor: '#212529', border: 'none' }}>
-              <Accordion.Header>
+              <Accordion.Header className=''>
                 <h4>{x.question}</h4>
                 <span style={{
                   color: '#FFE459',
@@ -133,7 +133,7 @@ Ask a question to get started.</h2>
                   {activeKey === x.key ? '-' : '+'}
                 </span>
               </Accordion.Header>
-              <Accordion.Body style={{ color: 'white' }}>
+              <Accordion.Body className='' style={{ color: 'white' }}>
                 <p style={{ color: 'white' }} className="my-1">
                   {x.answer}
                 </p>

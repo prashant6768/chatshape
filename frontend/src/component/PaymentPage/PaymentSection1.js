@@ -3,6 +3,8 @@ import Card from 'react-bootstrap/Card';
 import axios from 'axios'
 import * as jose from 'jose';
 import Cookies from 'js-cookie';
+import Accordion from 'react-bootstrap/Accordion';
+
 
 const PaymentSection1 = () => {
 
@@ -27,22 +29,64 @@ const PaymentSection1 = () => {
       console.log(dataArr)
   },[dataArr])
 
-  return (
-    <div div className='pb-5 px-3 ' style={{ backgroundColor: '#242439', height: '100%',minHeight:'100vh',width:'100vw' }}>
-      <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Payments History</h1>
-     {dataArr.sort((a, b) => new Date(b.created) - new Date(a.created)).map(x=>(
-      <Card style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0',width:'96%' }} className='mx-xxl-2 mx-1 my-2  d-flex justify-content-center rounded-4'>
-      <Card.Body className='d-flex justify-content-center flex-wrap'>
-      <p className=' col-12 col-xl-4 col-md-6 d-flex flex-wrap justify-content-center container fs-5 text-center mb-2' style={{ color: '#FFFFFF', wordBreak:'break-all' }}>Username: {x.username}</p>
-      <p className=' col-12 col-xl-4 col-md-6 d-flex flex-wrap justify-content-center container fs-5 text-center mb-2' style={{ color: '#FFFFFF' }}>Plan: {x.product.product_id}</p>
-      <p className=' col-12 col-xl-4 col-md-6 d-flex flex-wrap justify-content-center container fs-5 text-center mb-2' style={{ color: '#FFFFFF' }}>Price paid: {x.product.amount/100} {x.payment.currency}</p>
-      <p className=' col-12 col-xl-4 col-md-6 d-flex flex-wrap justify-content-center container fs-5 text-center mb-2' style={{ color: '#FFFFFF' }}>Name: {x.payment.name}</p>
-      <p className=' col-12 col-xl-4 col-md-6 d-flex flex-wrap justify-content-center container fs-5 text-center mb-2' style={{ color: '#FFFFFF' }}>Id: {x.payment.id}</p>
-      <p className=' col-12 col-xl-4 col-md-6 d-flex flex-wrap justify-content-center container fs-5 text-center mb-2' style={{ color: '#FFFFFF' }}>Date: {x.created}</p>
+  const [activeKey, setActiveKey] = useState(null);
 
-    </Card.Body>
-  </Card>
+  const handleAccordionChange = (eventKey) => {
+    setActiveKey(activeKey === eventKey ? null : eventKey);
+  };
+
+  return (
+    <div div className='pb-5 px-3 ' style={{ backgroundColor: '#242439', height: '100%',minHeight:'100%',width:'100vw' }}>
+      <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pt-5 mb-4' style={{ color: '#FFFFFF' }}>Payments History</h1>
+     {dataArr.sort((a, b) => new Date(b.created) - new Date(a.created)).map(x=>(
+
+<Accordion
+key={x.payment.id}
+activeKey={activeKey}
+onSelect={handleAccordionChange}
+className='col-12 col-lg-11 my-3  mx-auto custom-accordion '
+style={{marginRight:'0px'}}
+>
+<Accordion.Item eventKey={x.payment.id} className='accordhov' style={{ backgroundColor: '#212529', border: 'none' }}>
+  <Accordion.Header className=''>
+  <div className='row col-11'>
+      <h6 className='col-lg-4 d-lg-block d-none'>{x.created}</h6>
+      <h6 className='col-lg-4 col-6'>{x.product.product_id}</h6>
+     <h6 className='col-lg-4 col-6'>{x.product.amount/100} {x.payment.currency}</h6>
+      {/* <h5 className='col-4'>{x.payment.id}</h5> */}
+     </div>
+    <span style={{
+      color: '#FFE459',
+      position: 'absolute',
+      right: '25px', // Adjust this value to fine-tune the position
+      top: '50%',
+      fontSize: '34px',
+      transform: 'translateY(-50%)',
+    }}>
+      {activeKey === x.payment.id ? '-' : '+'}
+    </span>
+  </Accordion.Header>
+  <Accordion.Body className='row col-sm-11 col-12' style={{ color: 'white' }}>
+  <p style={{ color: 'white' }} className="my-1  col-lg-4 col-sm-8 text-break">
+         {x.username}
+       </p>
+       <p style={{ color: 'white' }} className="my-1  col-lg-4 col-sm-4">
+         {x.payment.name}
+       </p>
+       <p style={{ color: 'white' }} className="my-1 col-lg-4 col-sm-8 text-break">
+         {x.payment.id}
+       </p>
+       <p style={{ color: 'white' }} className="my-1 d-lg-none d-block col-lg-4 col-sm-4 text-break">
+         {x.created}
+       </p>
+       
+  </Accordion.Body>
+</Accordion.Item>
+</Accordion>
+
+
 ))}
+
 
     </div>
   )

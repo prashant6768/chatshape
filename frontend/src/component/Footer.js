@@ -21,8 +21,8 @@ const Footer = () => {
             <div  className='fw-bolder col-10 d-flex justify-content-lg-end justify-content-center container pt-3' style={{ color: '#FFFFFF' }}>
                 <ul style={{ listStyle:'none' }} className='text-center text-lg-end px-0'>
                     <h3 className='my-4'>Get a Chatbot for your Website</h3>
-                   <h4 >@company | All Rights Reserved</h4>
-                   <Link to='/create' style={{textDecoration:'none'}}><button type="button" style={{color:'red', backgroundColor:'white'}} className="btn fw-bold mt-3  btn-lg rounded-pill px-5">Get Chatbot</button></Link>
+                   <h4 >@Zema | All Rights Reserved</h4>
+                   <Link to='/create' style={{textDecoration:'none'}}><button type="button" style={{color:'red', backgroundColor:'white'}} className="btn fw-bold mt-3  btn-lg rounded-pill px-5">Try Zema</button></Link>
                     {/* <Link to='/privacy' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Privacy Policy</h4></Nav.Link></Link>
                   <Link to='/terms' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Terms of Service</h4></Nav.Link></Link> */}
                      

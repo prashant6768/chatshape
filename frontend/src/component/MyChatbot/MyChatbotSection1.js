@@ -42,7 +42,7 @@ const MyChatbotSection1 = () => {
       <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>My Chatbots</h1>
       <p className=' col-12 fs-5 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF' }}>Manage your Chatbots</p>
       <Link to='/create' style={{ textDecoration: 'none' }}><button className='btn btn-primary mb-5 col-xl-2 col-lg-4 col-6  d-flex justify-content-center container text-center ' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} >Create Chatbots</button></Link>
-      <div className='d-flex justify-content-center  flex-wrap  '>
+      <div className='d-flex justify-content-center  flex-wrap  mx-5'>
         {dataArr.map(x => (
           <div className='d-flex my-2'  style={{ minHeight:'240px' }}>
   <Card style={{ backgroundColor: '#212529', border: '1px solid #FFE459',width:'270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>

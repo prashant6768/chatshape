@@ -63,6 +63,7 @@ const ChatUIDemo = (botID) => {
         if (x.trim() === '') {
             return;
         }
+        
         setSpromptHide(true)
 
         const newMessage = {
@@ -74,12 +75,13 @@ const ChatUIDemo = (botID) => {
         console.log(spromptHide)
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
+        scrollToBottom()
         axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
         }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
-
+        scrollToBottom()
     }
 
 
@@ -93,7 +95,7 @@ const ChatUIDemo = (botID) => {
         if (e) {
             e.preventDefault();
         }
-
+        
         setSpromptHide(true)
         if (inputValue.trim() === '') {
             return;
@@ -107,6 +109,7 @@ const ChatUIDemo = (botID) => {
 
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
+        scrollToBottom()
         axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
@@ -114,7 +117,8 @@ const ChatUIDemo = (botID) => {
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
             .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
-    };
+            scrollToBottom()
+        };
 
     useEffect(() => {
         console.log("111111==", messages)
@@ -154,6 +158,7 @@ const ChatUIDemo = (botID) => {
         }
         setInputValue('');
         setChatbotMsg('')
+        scrollToBottom()
 
     }, [chatbotMsg])
 
@@ -192,6 +197,7 @@ const ChatUIDemo = (botID) => {
 
     const handleFontSubmit = (event) => {
         event.preventDefault();
+        
         setLoading(true);
         axios.put(`${BACKEND}api/fontdata/${botID.botID}`, { fontData }, {
             'Content-type': 'application/json',
@@ -292,7 +298,7 @@ const ChatUIDemo = (botID) => {
             for (let pair of formData.entries()) {
                 console.log(pair[0] + ', ' + pair[1]);
             }
-
+            scrollToBottom()
             axios.post(`${BACKEND}api/audio`, formData, {
                 'Content-type': 'application/json',
                 'Accept': 'application/json',
@@ -314,6 +320,13 @@ const ChatUIDemo = (botID) => {
         console.log("sppppppppppppech ", speechTog)
     };
 
+    const chatContainerRef = useRef(null);
+    const scrollToBottom = () => {
+        setTimeout(() => {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        console.log(chatContainerRef.current.scrollHeight ,"chatContainerRef.current.scrollHeight")
+    }, 10);
+      };
 
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
@@ -430,7 +443,7 @@ const ChatUIDemo = (botID) => {
                         mark ?
                             <h1 className='bg-primary mx-3' style={{ position: 'absolute', opacity: '15%', left: '20px', bottom: '50px' }}>Powered by Zema</h1> : <p></p>
                     }
-                    <div className="chat-container px-0" style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '540px', minWidth: '240px', width: '100%', borderWidth: '0px' }}>
+                    <div className="chat-container px-0"  ref={chatContainerRef} style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '540px', minWidth: '240px', width: '100%', borderWidth: '0px' }}>
                         <div className="chat-messages " >
                             {messages.map((message) => (
                                 message.text === '' || null || undefined ? '' :

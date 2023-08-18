@@ -106,8 +106,8 @@ const AccountSection1 = () => {
                             <Card.Text className='fs-5  d-flex  justify-content-center container text-center' style={{ color: '#FFFFFF' }}>Bots left:<br/> {data2.NoOfBots}</Card.Text>
                         </Card>
                         {data2.tokens > 1 ?
-                            <Card style={{ backgroundColor: '#242439', height: '100%', border: 'none' }} className=' mt-4 p-2 me-auto col-sm-5 col-12'>
-                                <Card.Text className='fs-5  d-flex  justify-content-center container text-center ' style={{ color: '#FFFFFF', backgroundColor: 'black' }}>Tokens Left:<br/> {data2.tokens}</Card.Text>
+                            <Card style={{ backgroundColor: '#242439', height: '100%', border: 'none' }} className=' mt-4 p-2 ms-auto col-sm-5 col-12'>
+                                <Card.Text className='fs-5  d-flex  justify-content-center container text-center ' style={{ color: '#FFFFFF'}}>Tokens Left:<br/> {data2.tokens}</Card.Text>
                             </Card>
                             :
                             <Card style={{ backgroundColor: '#242439', height: '100%', border: 'none' }} className=' mt-4 p-2 ms-auto col-sm-5 col-12'>

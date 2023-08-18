@@ -71,13 +71,14 @@ const ChatUI = (botID) => {
     console.log(spromptHide)
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setLoading(true);
+    scrollToBottom()
     axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
       .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(res.data, " === from backend"); setLoading(false) } })
-
+      scrollToBottom()
   }
 
   const handleInputChange = async (e) => {
@@ -108,13 +109,15 @@ const ChatUI = (botID) => {
 
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setLoading(true);
+    scrollToBottom()
     axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
       .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else { setChatbotMsg(res.data[0]); console.log(res.data, "=== backend www", res.data[0]); setUniqueCon(0); setLoading(false) } }).catch(err => console.log(err))
-  };
+      scrollToBottom()
+    };
 
 
 
@@ -280,13 +283,14 @@ const ChatUI = (botID) => {
           for (let pair of formData.entries()) {
               console.log(pair[0] + ', ' + pair[1]);
           }
-
+          scrollToBottom()
           axios.post(`${BACKEND}api/audio`, formData, {
               'Content-type': 'application/json',
               'Accept': 'application/json',
               'Access-Control-Allow-Origin': '*'
           }).then(res => { console.log(res.data); setInputValue(res.data); setAudioSub(true); setAudio(null) }).catch(err => console.log(err))
       }
+      scrollToBottom()
   }, [audio])
 
   useEffect(() => {
@@ -302,6 +306,12 @@ const ChatUI = (botID) => {
     console.log("sppppppppppppech ", speechTog)
 };
 
+const chatContainerRef = useRef(null);
+const scrollToBottom = () => {
+  setTimeout(() => {
+    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+  }, 10);
+  };
 
 
   return (
@@ -310,7 +320,7 @@ const ChatUI = (botID) => {
         mark ?
           <h1 className='bg-primary mx-3' style={{ position: 'absolute', opacity: '15%', left: '20px', bottom: '50px' }}>Powered by Zema</h1> : <p></p>
       }
-      <div className="chat-container" style={{ backgroundColor: fontData.backgroundColor, height: '95vh', paddingBottom: '100px', maxWidth: '540px', width: '100%', borderWidth: '0px' }}>
+      <div className="chat-container" ref={chatContainerRef} style={{ backgroundColor: fontData.backgroundColor, height: '95vh', paddingBottom: '100px', maxWidth: '540px', width: '100%', borderWidth: '0px' }}>
         <div className="chat-messages " >
           {messages.map((message) => (
             message.text === '' || null || undefined ? '' :

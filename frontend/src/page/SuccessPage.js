@@ -2,6 +2,10 @@ import React,{useState,useEffect} from 'react'
 import axios from 'axios'
 import env from 'react-dotenv'
 import Cookies from 'js-cookie';
+import NavbarC from '../component/NavbarC';
+import Footer from '../component/Footer';
+import Button from 'react-bootstrap/Button';
+import { Link } from 'react-router-dom'
 
 const SuccessPage = () => {
 
@@ -39,24 +43,32 @@ useEffect(()=>{
 
 },[data])
 
+const gradientC = true
+
   return (
-    <div className='d-flex justify-content-center mt-5'>
-      <div className="card" style={{width: '18rem', backgroundColor:'whitesmoke'}}>
-  <div className="card-body">
+    <div style={{width:'100vw'}}>
+      <NavbarC gradientC={gradientC}/>
+    <div className='d-flex justify-content-center ' style={{paddingTop:'100px', paddingBottom:'150px', backgroundColor: '#242439', height:'100%'}}>
+      <div className="card" style={{width: '17rem', backgroundColor:'#171725'}}>
+  <div className="card-body" style={{color:'white'}}>
     <h1>Zema</h1>
     <h5 className="card-title mb-3"> Payment was Successful</h5>
-    <p>Zema User: {user}</p>
-    <p>Payment made at: {time}</p>
-    <p>Payment made at: {date}</p>
-    <p>Email: {data.email}</p>
-    <p>Name: {data.name}</p>
-    <p>ID: {data.id}</p>
-    <p>Plan: {product.product_id}</p>
-    <p>Price: {product.amount/100} {product.currency}</p>
-    <button type="button" className="btn btn-primary"><a href='http://localhost:3000/' style={{textDecoration:'none', color:'white'}} className="card-link">Back to Home page</a></button>
+    <p><strong>Zema User: </strong>{user}</p>
+    <p><strong>Payment made at: </strong>{time}</p>
+    <p><strong>Payment made at: </strong>{date}</p>
+    <p><strong>Email: </strong>{data.email}</p>
+    <p><strong>Name: </strong>{data.name}</p>
+    <p><strong>ID: </strong>{data.id}</p>
+    <p><strong>Plan: </strong>{product.product_id}</p>
+    <p><strong>Price: </strong>{product.amount/100} {product.currency}</p>
+    {/* <button type="button" className="btn btn-outline-warning"><a href='http://localhost:3000/' style={{textDecoration:'none', color:'white'}} className="card-link">Back to Home page</a></button> */}
+    <Link className='col-sm-5 ms-sm-auto col-11 my-2' to='/' style={{ textDecoration: 'none' }}><Button className='fw-bolder fs-5 rounded-3  d-flex justify-content-center container text-center  mb-1' style={{ color: '#FFFFFF', backgroundColor: '#242439', borderColor: '#FFFFFF', borderWidth: '2px' }} variant="primary">Zema</Button></Link>
+   
   
   </div>
 </div>  
+    </div>
+    <Footer/>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import time
 from flask import Blueprint, abort
 import ast
+from flask import Flask, Response
 import tiktoken
 from bson import ObjectId
 from auth import auth
@@ -94,8 +95,10 @@ import faiss
 
 
 # from langchain.chains import RetrievalQAwithSourcesChain
-# from langchain.chains import RetrievalQA
+from langchain.chains import RetrievalQA
 from langchain.chains.question_answering import load_qa_chain
+from langchain.chains import LLMChain
+from langchain import PromptTemplate, OpenAI, LLMChain
 from langchain import OpenAI
 from langchain.chat_models import ChatOpenAI
 from langchain.vectorstores import FAISS
@@ -113,6 +116,12 @@ from chromadb.utils import embedding_functions
 
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
+
+from langchain.callbacks.base import AsyncCallbackHandler
+
+from langchain.schema import (
+    HumanMessage,
+)
 
 
 ######### import for 2nd method finished ###########3
@@ -216,6 +225,7 @@ import soundfile as sf
 
 # ######################### get tokens used end
 
+
 ffmpeg_path = r'C:/ffmpeg/ffmpeg-6.0-full_build/bin'
 os.environ['PATH'] = f'{ffmpeg_path};' + os.environ['PATH']
 
@@ -241,6 +251,149 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  ###############################
 
 app.config['PDF'] = 'PDF'
 app.config['AUDIO']= 'AUDIO'
+
+
+#######################################################3  stream custom code
+import sys
+from typing import Any, Dict, List, Union
+
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain.schema import AgentAction, AgentFinish, LLMResult
+from flask_socketio import SocketIO , send , emit , join_room , leave_room
+
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+
+###################################  socket io 
+ 
+
+@socketio.on('join')
+def on_join(data):
+    room = data['room']
+    join_room(room)
+    print(f'A user joined room {room}',type(room))
+    socketio.emit('welcome_message', {'message': f'Welcome to room from backend {room}'}, room=room)
+
+@socketio.on('leave')
+def on_leave(data):
+    room = data['room']
+    leave_room(room)
+    print(f'A user left room {room}')
+
+# @socketio.on('message-chat')
+# def handle_message(data):
+#     room = data['room']
+#     message = data['msg']
+#     print("Received message:", message, "from room:", room)
+#     socketio.emit('message-chat', {'message': message}, room=room)
+
+def handle_message(data):
+    roomID = data['room']
+    print("  room-------292- ",roomID)
+    message = data['msg']
+    socketio.emit('message-chat',{'message':message,'time':datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')},room=str(roomID))
+
+    # socketio.emit('welcome_message', {'message': f'Welcome to----------- room {room}!'}, room=room)
+
+   
+
+##################################3  socket io end
+
+
+# # @app.route('/api/stream')
+class StreamingHandle(BaseCallbackHandler):
+    """Callback handler for streaming. Only works with LLMs that support streaming."""
+
+    def __init__(self, objId):
+        super().__init__()
+        self.objId = objId
+
+    def on_llm_start(
+        self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any
+    ) -> None:
+        """Run when LLM starts running."""
+
+
+    def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
+        sys.stdout.write(token)
+        handle_message({'msg':token, 'room':self.objId})
+        sys.stdout.flush()  
+    
+    # def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
+    #        """Run on new LLM token. Only available when streaming is enabled."""
+    #        sys.stdout.write(token)
+    #        sys.stdout.flush()
+       
+   
+    
+
+    def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
+        """Run when LLM ends running."""
+
+    def on_llm_error(
+        self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any
+    ) -> None:
+        """Run when LLM errors."""
+
+    def on_chain_start(
+        self, serialized: Dict[str, Any], inputs: Dict[str, Any], **kwargs: Any
+    ) -> None:
+        """Run when chain starts running."""
+
+    def on_chain_end(self, outputs: Dict[str, Any], **kwargs: Any) -> None:
+        """Run when chain ends running."""
+
+    def on_chain_error(
+        self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any
+    ) -> None:
+        """Run when chain errors."""
+
+    def on_tool_start(
+        self, serialized: Dict[str, Any], input_str: str, **kwargs: Any
+    ) -> None:
+        """Run when tool starts running."""
+
+    def on_agent_action(self, action: AgentAction, **kwargs: Any) -> Any:
+        """Run on agent action."""
+        pass
+
+    def on_tool_end(self, output: str, **kwargs: Any) -> None:
+        """Run when tool ends running."""
+
+    def on_tool_error(
+        self, error: Union[Exception, KeyboardInterrupt], **kwargs: Any
+    ) -> None:
+        """Run when tool errors."""
+
+    def on_text(self, text: str, **kwargs: Any) -> None:
+        """Run on arbitrary text."""
+
+    def on_agent_finish(self, finish: AgentFinish, **kwargs: Any) -> None:
+        """Run on agent end."""
+
+
+
+
+# class StreamingHandle(BaseCallbackHandler):
+#     def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
+#         """Run on new LLM token. Only available when streaming is enabled."""
+#         while True:   
+#            sys.stdout.write(token)
+#            sys.stdout.flush()
+        #    yield token
+
+# streaming_handle = StreamingHandle()
+
+# def generate_tokens():
+#     for token in streaming_handle.on_llm_new_token():  
+#         print("++",token)
+#         yield token
+
+# @app.route('/api/stream')
+# def stream_endpoint():
+#     return Response(generate_tokens(), mimetype='text/event-stream')
+
+#####################################################   stream custom code end
 
 dataOfSubs = {
             "year-simple": {
@@ -493,7 +646,7 @@ def historyget(id):
     user_history = db['user_history']
     hist = []
     for x in user_history.find({'botID':str(id)}):
-        print(x['chatHistory'])
+        # print(x['chatHistory'])
         if len(x['chatHistory']) <= 1:
             user_history.delete_one({'_id': x['_id']})
     for x in user_history.find({'botID':str(id)}):
@@ -509,6 +662,7 @@ def historyget(id):
 
 ######################################### LLM Code  #####  STREAM
 # import asyncio
+
 def start_ai(query,userData,uniqueCon):
   try:  
     users_collection = db['users_website_crawl_data']
@@ -549,7 +703,7 @@ def start_ai(query,userData,uniqueCon):
     try:
       results = collectionX.query(
       query_texts=[query],
-      n_results=1
+      n_results=2
 )
       clientX.delete_collection(name="collection_name_zema")
     except Exception as e:
@@ -563,64 +717,47 @@ def start_ai(query,userData,uniqueCon):
     text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=200, length_function=len)
     text = text_splitter.create_documents(resultText)
 
-    print("------237--------",str(text),"----------------237")
-    # content = str(text)
+    content = str(text)
 
-    # matches = re.findall(r'page_content=\'(.*?)\'', content)
-    # extracted_text = ' '.join(matches)
-    # extracted_text = extracted_text.replace('\n', ' ')
-    # extracted_text = extracted_text.replace('\n\n', ' ')
-    # extracted_text = re.sub(r'\n\n', ' ', extracted_text)
-
-    # print(extracted_text,"-----------575")
-    
     with get_openai_callback() as cb:
       PROMPT = PromptTemplate(
-      template=prompt, input_variables=["text", "query"]
-  ) 
-    #   print("prompt------571---",parse_with_prompt(PROMPT.template))
-      
+        template=prompt, input_variables=["text", "query"]
+      ) 
+
+      input_string = prompt
+      placeholder_q = "{query}"
+      replacement_q = query
+      input_string = input_string.replace(placeholder_q, replacement_q)
+      placeholder_r = "{text}"
+      replacement_r = content
+      input_string_F = input_string.replace(placeholder_r, replacement_r)
+
       chain_type_kwargs = {"prompt": PROMPT}
-    #   token_cost_process =  TokenCostProcess()
+
       try:
-          
-           qa_chain = load_qa_chain(ChatOpenAI(streaming=False, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-4",temperature=0), chain_type="stuff")
-        #   qa_chain = load_qa_chain(ChatOpenAI(streaming=True, callbacks=[CostCalcAsyncHandler( "gpt-4", token_cost_process )],model_name="gpt-4",temperature=0), chain_type="stuff")
+          llm = ChatOpenAI(model_name="gpt-4",temperature=0, streaming=True,callbacks=[StreamingHandle(objId)])
+          template=prompt
+          prompt_template = PromptTemplate(input_variables=["text","query"],template=template)
+          summarize_chain = LLMChain(llm=llm, prompt=prompt_template,verbose=False)
+          print("-----741-----",text,"------741-------")
+
       except Exception as e:
           print("-----453-----",str(e))
-    #   print("--------------443--------------",qa_chain,"--------------443--------------")
-      answer = qa_chain.run(input_documents= text, question=query)
-      
-    #   input_string = prompt
-    #   placeholder_q = "{query}"
-    #   replacement_q = query
-    #   input_string = input_string.replace(placeholder_q, replacement_q)
-    # #   placeholder_r = "{text}"
-    # #   replacement_r = text.page_content
-    # #   input_string = input_string.replace(placeholder_r, replacement_r)
 
+      answer = summarize_chain.predict(text=text,query=query)
 
-      
-
-    #   print(input_string,"--------------594")
+    #   print("--------748------",cb)
       encoding = tiktoken.get_encoding("cl100k_base")
-    #   print(PROMPTL,"-------587-----prompt-",len(encoding.encode(PROMPTL)))
-      print("-------587-----answer-",len(encoding.encode(answer)))
-    #   print(token_cost_process.get_cost_summary( "gpt-4" ) )
-
-      print("---------279---------",answer,"-----------279-----------",cb)
-
-      return [answer,cb.total_tokens]
+      return [answer, len(encoding.encode(input_string_F + "Human: "))+5+len(encoding.encode(answer))]
 
   except Exception as e:
     return str(e)  
-# asyncio.run(start_ai(query,userData,uniqueCon))    
+   
 
 ############################################### get message from users chatbot and send data back after getting response from LLM
 @app.route('/api/msg',methods=['POST'])
 def user_msg():
   try:  
-    # userName = request.get_json()['decoded']['username']
     data = request.get_json()['inputValue']
     userData = request.get_json()['botID']['botID']
     uniqueCon = request.get_json()['uniqueCon']
@@ -631,7 +768,6 @@ def user_msg():
             return "noid"
     except:
         return "noid"    
-    # print("241----------",getid_2)
     userName = getid_2['email']
 
     #EXpiartion code
@@ -646,13 +782,10 @@ def user_msg():
     CharNo_1 = db['users_website_crawl_data']
     CharNo_2 = CharNo_1.find_one({'_id': ObjectId(userData)})
     print("133---------------------",CharNo_2['NoOfCharacters'])
-    # print(datasub,"555555555555555555555555555555",datetime.strptime(datasub['expiration'], "%Y-%m-%d"),"WWW",datetime.now().date())
-    # if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date() or plan_2['plan-Info']['NoOfMsg'] < 1 or CharNo_2['NoOfCharacters'] < 1 or plan_2['plan-Info']['tokens'] < 1:
     if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date()  or CharNo_2['NoOfCharacters'] < 1 or plan_2['plan-Info']['tokens'] < 1:
         print("EXpire---------------------------------------")
         return "SubE"
 
-    # print("user msg ////////////////////////",userData)
     summariesCb = start_ai(data,userData,uniqueCon)
     summaries = summariesCb[0]
     cb = summariesCb[1]
@@ -666,11 +799,8 @@ def user_msg():
 
     users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
     users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"UniqueCon": uniqueCon}})
+    print("-------502-------", planname)
 
-    # print("143-----------------------------",str(summaries),"---",len(str(summaries)))
-    print("-------502-------",planname)
- 
-    # print("X ==",Gsummary)
     return [summaries, planname,uniqueCon]
   except Exception as e:
     print("-----482-------",str(e))
@@ -678,7 +808,9 @@ def user_msg():
 
 
 
-######################################### LLM Code
+
+# ######################################### LLM Code  #####  STREAM backup before trying streaming, token used when stream=True working here
+# # import asyncio
 # def start_ai(query,userData,uniqueCon):
 #   try:  
 #     users_collection = db['users_website_crawl_data']
@@ -697,21 +829,15 @@ def user_msg():
 #     }
 #     print("=-------------284",str(type([query])))
 
-#     # data = dataDb['crawldata']
-#     # dataPdf = dataDb['crawldataPdf']
 #     dataEmb = dataDb['crawl']
-
 
 #     print("----------442-------")
 #     collectionX = None
 #     try:
-#       clientX = chromadb.Client()
-#     #   embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-#       # collectionX = clientX.create_collection("yt_demo1")  
+#       clientX = chromadb.Client() 
 #       collectionX = clientX.create_collection(
 #           name="collection_name_zema",
 #           metadata={"hnsw:space": "cosine"}, # l2 is the default, cosine, ip
-#         #   embedding_function = embeddings
 #       )
 #       print("----------------------------452------------")
 #       collectionX.add(
@@ -720,16 +846,8 @@ def user_msg():
 #       embeddings=dataEmb['embeddings'],
 #       ids=dataEmb['ids']
 # )     
-
-#     #   print("-------458-------",dataEmb['embeddings'][:5]) 
-#     #   return
-  
 #     except Exception as e:
 #         print("-------457-------",str(e)) 
-# # text-embedding-ada-002
-#     # embeddings_model = OpenAIEmbeddings()
-#     # embedded_query = embeddings_model.embed_query(query)
-#     # print("=---------463-------",query,embedded_query[:5])
 #     try:
 #       results = collectionX.query(
 #       query_texts=[query],
@@ -738,59 +856,101 @@ def user_msg():
 #       clientX.delete_collection(name="collection_name_zema")
 #     except Exception as e:
 #         print("-------464-------------",str(e))
-#     # results= collectionX.similarity_search(query)
 #     print("----------457---------",results['distances'],"--------457")
 #     print("----------457---------",results['metadatas'],"--------457")
 
 #     resultText = [item for sublist in results['documents'] for item in sublist]
-    
-#     # print("--------459----------",resultText,"---------459") 
- 
-
-#     # db = Chroma(persist_directory='./db',embedding_function = OpenAIEmbeddings())
-#     # results = dataEmb[0].query(
-#     #     query_texts=["Forest in India"],
-#     #     n_results=1
-#     # )
-#     # print(dataEmb[0]['documents'],"----------444")
-#     # print("----------444-----4",results,"-------445-------")
 
 #     prompt = str(dataDb['prompt'])
 #     text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=200, length_function=len)
 #     text = text_splitter.create_documents(resultText)
 
-#     print("------237--------",text,"----------------237")
-    
+#     # print("------237--------",str(text),"----------------237")
+#     content = str(text)
 
-    
+#     # matches = re.findall(r'page_content=\'(.*?)\'', content)
+#     # # extracted_text = ' '.join(matches)
+#     # cleaned_list_i = [string.replace('\\n\\n', ' ') for string in matches]
+#     # cleaned_list = [string.replace('\\n', ' ') for string in cleaned_list_i]
+#     # extracted_text = ' '.join(cleaned_list)
+#     # # print("-----------574",cleaned_list,"------------")
+#     # # print("-----------571",extracted_text)
+   
+#     # # extracted_text = extracted_text.replace('\n', ' ')
+#     # # converted_string = extracted_text.replace("\n\n", " ")
+
+#     # # print(prompt,"=============581")
+
 #     with get_openai_callback() as cb:
 #       PROMPT = PromptTemplate(
-#       template=prompt, input_variables=["text", "query"]
-#   )
-#       # print("--------------448--------------",dataEmb[0]['documents'],"----448")
-#       # docsE = dataEmb[0]['documents'].similarity_search(query)
-#       # print("--------------450--------------",docsE)
+#         template=prompt, input_variables=["text", "query"]
+#       ) 
+# #       PROMPT_SELECTOR = ConditionalPromptSelector(
+# #         default_prompt=PROMPT
+# # )
+     
 
+#     #   print("prompt------571---",prompt)
 
+#       input_string = prompt
+#       placeholder_q = "{query}"
+#       replacement_q = query
+#       input_string = input_string.replace(placeholder_q, replacement_q)
+#       placeholder_r = "{text}"
+#       replacement_r = content
+#       input_string_F = input_string.replace(placeholder_r, replacement_r)
+#     #   print("---------601----------input string F----",extracted_text,"------")
+#     #   print("---------608----------input string F----",PROMPT)
+#     #   return
+
+      
 #       chain_type_kwargs = {"prompt": PROMPT}
-#     #   token_cost_process = TokenCostProcess()
+#     #   token_cost_process =  TokenCostProcess()
 #       try:
-          
-#         #   qa_chain = load_qa_chain(ChatOpenAI(streaming=True, callbacks=[CostCalcAsyncHandler( "gpt-4", token_cost_process )],model_name="gpt-4",temperature=0), chain_type="stuff")
-#         #   print( token_cost_process.get_cost_summary( "gpt-4" ))
+#           llm = ChatOpenAI(model_name="gpt-4",temperature=0.7, streaming=True,callbacks=[StreamingHandle()])
+#           template=prompt
+#           prompt_template = PromptTemplate(input_variables=["text","query"],template=template)
+#         # memory = ConversationBufferMemory( input_key="query")
+#           summarize_chain = LLMChain(llm=llm, prompt=prompt_template,verbose=False)
+#         #   summary = summarize_chain.predict(text=text,query=query)
          
-#           qa_chain = load_qa_chain(ChatOpenAI(streaming=False, callbacks=[StreamingStdOutCallbackHandler(),],model_name="gpt-4",temperature=0), chain_type="stuff")
+#         #   return
+#         # summaries= []
+#         # for chunk in enumerate(text):
+#         #     summary = summarize_chain.predict(text=chunk,query=query)
+          
+#         #   qa_chain =  LLMChain(ChatOpenAI(streaming=False, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-4",temperature=0),prompt=PROMPT)
+       
+#         # qa_chain = load_qa_chain(ChatOpenAI(streaming=False, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-4",temperature=0),chain_type="stuff")
+#         #   qa_chain = load_qa_chain(ChatOpenAI(streaming=True, callbacks=[CostCalcAsyncHandler( "gpt-4", token_cost_process )],model_name="gpt-4",temperature=0), chain_type="stuff")
 #       except Exception as e:
 #           print("-----453-----",str(e))
-#       print("--------------443--------------")
-#       answer = qa_chain.run(input_documents= text, question=query)
+#     #   print("--------------443--------------",qa_chain,"--------------443--------------")
+     
+#       answer = summarize_chain.predict(text=text,query=query)
+
+#     #   process_points(), {"Content-Type": "application/x-ndjson"}
+      
+#     #   return Response(StreamingHandle(),mimetype='text/event-stream')
+      
+#       print("llllllllllll--------616-----",answer)
+#     #   answer = qa_chain.run(input_documents= text, question=query ) 
+
+#     #   print(input_string,"--------------594")
+#       encoding = tiktoken.get_encoding("cl100k_base")
+#       print("-------587-----prompt-",len(encoding.encode(input_string_F + "Human: "))+5)
+#     #   print("-------587-----content--",input_string_F)
+#     #   print("-------587-----prompt without text-",len(encoding.encode(input_string_F)))
+#       print("-------587-----answer-",len(encoding.encode(answer)))
 
 #       print("---------279---------",answer,"-----------279-----------",cb)
 
-#       return [answer,cb.total_tokens]
+#       return [answer, len(encoding.encode(input_string_F + "Human: "))+5+len(encoding.encode(answer))]
+#     #   return [answer,cb.total_tokens]
 
 #   except Exception as e:
 #     return str(e)  
+   
 
 # ############################################### get message from users chatbot and send data back after getting response from LLM
 # @app.route('/api/msg',methods=['POST'])
@@ -847,10 +1007,12 @@ def user_msg():
 #     print("-------502-------",planname)
  
 #     # print("X ==",Gsummary)
+   
 #     return [summaries, planname,uniqueCon]
 #   except Exception as e:
 #     print("-----482-------",str(e))
 #     return["Some Error Occured !!!!"]  
+
 
 ##################################################### create bot api start and expiration code original  pdf using upload multipart formdata format
 @app.route('/api/sendLinkData',methods=['POST'])
@@ -1496,6 +1658,8 @@ def profileupdate():
 
 
 
+# if __name__ == '__main__':
+#     app.run(debug=True)
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)
    

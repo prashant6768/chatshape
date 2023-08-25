@@ -16,26 +16,26 @@ import lamejs from 'lamejs';
 
 import * as jose from 'jose';
 import env from 'react-dotenv'
-
+import socketIO from 'socket.io-client';
 
 function TypingEffect({ text }) {
-    const delay = 20;
+    // const delay = 20;
 
-    const [displayedText, setDisplayedText] = useState('');
-    const [currentIndex, setCurrentIndex] = useState(0);
+    // const [displayedText, setDisplayedText] = useState('');
+    // const [currentIndex, setCurrentIndex] = useState(0);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (currentIndex < text.length) {
-                setDisplayedText(prevText => prevText + text.charAt(currentIndex));
-                setCurrentIndex(prevIndex => prevIndex + 1);
-            }
-        }, delay);
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         if (currentIndex < text.length) {
+    //             setDisplayedText(prevText => prevText + text.charAt(currentIndex));
+    //             setCurrentIndex(prevIndex => prevIndex + 1);
+    //         }
+    //     }, delay);
 
-        return () => clearTimeout(timer);
-    }, [currentIndex, text]);
+    //     return () => clearTimeout(timer);
+    // }, [currentIndex, text]);
 
-    return <div>{displayedText}</div>;
+    return <div>{text}</div>;
 }
 
 
@@ -51,6 +51,9 @@ const ChatUIDe = (botID) => {
     const [audioSub, setAudioSub] = useState(false)
     const [uniqueCon, setUniqueCon] = useState(1)
     const [now, setNow] = useState('')
+    const[chkk,setChkk] = useState([])
+    const[ck,setCk]=useState([])
+
     const BACKEND = 'http://localhost:5000/'
     // const BACKEND = 'http://3.19.246.7/'
 
@@ -58,12 +61,76 @@ const ChatUIDe = (botID) => {
         await setInputValue(e.target.value)
     };
 
+
+    const [socket, setSocket] = useState(null);
+    const [room, setRoom] = useState('');
+   
+  
+    useEffect(() => {
+        const newSocket = socketIO.connect('http://localhost:5000/');
+  
+    
+        setSocket(newSocket);
+    
+        return () => {
+          newSocket.disconnect();
+        };
+      }, []);
+    
+      const joinRoom = (roomName) => {
+        if (socket) {
+          socket.emit('join', { room: roomName });
+          setRoom(roomName);
+        }
+      };
+    
+      const leaveRoom = () => {
+        if (socket) {
+          socket.emit('leave', { room });
+          setRoom('');
+          setI(1)
+          
+        }
+      };
+    
+      const sendMessage = (message) => {
+        if (socket) {
+          socket.emit('message', { room, msg: message });
+        }else{
+            console.log("no room joined")
+        }
+      };
+  
+      socket?.on('welcome_message', (data) => {
+        console.log('Received welcome message:', data.message);
+      });
+      
+      const[i,setI]=useState(1)
+      var t = 0
+  
+      socket?.on('message-chat', data => {  
+        setI(prevI => prevI + 1);    
+        if (i === 1) {    
+            setI(prevI => prevI + 1);         
+           setCk(data.message)          
+        }else{
+        }
+        if(ck !== ''){
+            setChkk(prevChkk => [...prevChkk, ck])
+        }else{
+            setChkk(ck)
+        }  
+      });
+  
+
+
     const handleSubmitP = (x) => {
 
         if (x.trim() === '') {
             return;
         }
         setSpromptHide(true)
+        joinRoom(botID.botID)
 
         const newMessage = {
             id: messages.length + 1,
@@ -74,12 +141,13 @@ const ChatUIDe = (botID) => {
         console.log(spromptHide)
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
+        scrollToBottom()
         axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
         }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
-
+        scrollToBottom()
     }
 
 
@@ -93,6 +161,8 @@ const ChatUIDe = (botID) => {
         if (e) {
             e.preventDefault();
         }
+        joinRoom(botID.botID)
+        
 
         setSpromptHide(true)
         if (inputValue.trim() === '') {
@@ -107,6 +177,7 @@ const ChatUIDe = (botID) => {
 
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
+        scrollToBottom()
         axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
@@ -114,7 +185,8 @@ const ChatUIDe = (botID) => {
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
             .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
-    };
+            scrollToBottom()
+        };
 
     useEffect(() => {
         console.log("111111==", messages)
@@ -135,6 +207,8 @@ const ChatUIDe = (botID) => {
 
 
     useEffect(() => {
+        setChkk([])
+
         const newMessage = {
             id: messages.length + 1,
             text: chatbotMsg,
@@ -154,6 +228,8 @@ const ChatUIDe = (botID) => {
         }
         setInputValue('');
         setChatbotMsg('')
+        leaveRoom()
+        scrollToBottom()
 
     }, [chatbotMsg])
 
@@ -274,6 +350,12 @@ const ChatUIDe = (botID) => {
         console.log("sppppppppppppech ", speechTog)
     };
 
+    const chatContainerRef = useRef(null);
+const scrollToBottom = () => {
+  setTimeout(() => {
+    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+  }, 10);
+  };
 
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
@@ -289,7 +371,7 @@ const ChatUIDe = (botID) => {
                         mark ?
                             <h1 className='bg-primary mx-3' style={{ position: 'absolute', opacity: '15%', left: '20px', bottom: '50px' }}>Powered by Zema</h1> : <p></p>
                     }
-                    <div className="chat-container rounded-4 px-0" style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '90vw', minWidth: '240px', width: '100%', borderWidth: '0px' }}>
+                    <div className="chat-container rounded-4 px-0" ref={chatContainerRef}  style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '90vw', minWidth: '240px', width: '100%', borderWidth: '0px' }}>
                         <div className="chat-messages " >
                             {messages.map((message) => (
                                 message.text === '' || null || undefined ? '' :
@@ -302,6 +384,9 @@ const ChatUIDe = (botID) => {
                                         <TypingEffect id="text-container" className="message-content " text={message.text} />
                                     </div>
                             ))}
+                             {
+                                chkk.length == 0 ? '':<p style={ messageStyleRec} className="message  received" >{chkk}</p>
+           }
                             {loading ? (
                                 <ThreeDots type="Oval" position="top-center" color="#3D4648" height={50} width={50} />
 

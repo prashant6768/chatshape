@@ -10,26 +10,27 @@ import {HiSpeakerWave, HiSpeakerXMark} from 'react-icons/hi2'
 import { ToastContainer, toast } from 'react-toastify';
 import * as jose from 'jose';
 import env from 'react-dotenv'
+import socketIO from 'socket.io-client';
 
 
 function TypingEffect({ text }) {
-  const delay = 20;
+  // const delay = 20;
 
-  const [displayedText, setDisplayedText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // const [displayedText, setDisplayedText] = useState('');
+  // const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (currentIndex < text.length) {
-        setDisplayedText(prevText => prevText + text.charAt(currentIndex));
-        setCurrentIndex(prevIndex => prevIndex + 1);
-      }
-    }, delay);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     if (currentIndex < text.length) {
+  //       setDisplayedText(prevText => prevText + text.charAt(currentIndex));
+  //       setCurrentIndex(prevIndex => prevIndex + 1);
+  //     }
+  //   }, delay);
 
-    return () => clearTimeout(timer);
-  }, [currentIndex, text]);
+  //   return () => clearTimeout(timer);
+  // }, [currentIndex, text]);
 
-  return <div>{displayedText}</div>;
+  return <div>{text}</div>;
 }
 
 
@@ -49,11 +50,75 @@ const ChatUI = (botID) => {
   const [loading, setLoading] = useState(false);
   const [uniqueCon, setUniqueCon] = useState(1)
   const [now, setNow] = useState('')
+  const[chkk,setChkk] = useState([])
+  const[ck,setCk]=useState([])
+
   const BACKEND = 'http://localhost:5000/'
   // const BACKEND = 'http://3.19.246.7/'
 
   // const token = document.cookie.split('=')[1]
   // const decoded = jose.decodeJwt(token,'notmysecretkey');
+
+  const [socket, setSocket] = useState(null);
+  const [room, setRoom] = useState('');
+ 
+
+  useEffect(() => {
+      const newSocket = socketIO.connect('http://localhost:5000/');
+
+  
+      setSocket(newSocket);
+  
+      return () => {
+        newSocket.disconnect();
+      };
+    }, []);
+  
+    const joinRoom = (roomName) => {
+      if (socket) {
+        socket.emit('join', { room: roomName });
+        setRoom(roomName);
+      }
+    };
+  
+    const leaveRoom = () => {
+      if (socket) {
+        socket.emit('leave', { room });
+        setRoom('');
+        setI(1)
+        
+      }
+    };
+  
+    const sendMessage = (message) => {
+      if (socket) {
+        socket.emit('message', { room, msg: message });
+      }else{
+          console.log("no room joined")
+      }
+    };
+
+    socket?.on('welcome_message', (data) => {
+      console.log('Received welcome message:', data.message);
+    });
+    
+    const[i,setI]=useState(1)
+    var t = 0
+
+    socket?.on('message-chat', data => {  
+      setI(prevI => prevI + 1);    
+      if (i === 1) {    
+          setI(prevI => prevI + 1);         
+         setCk(data.message)          
+      }else{
+      }
+      if(ck !== ''){
+          setChkk(prevChkk => [...prevChkk, ck])
+      }else{
+          setChkk(ck)
+      }  
+    });
+
 
   const handleSubmitP = (x) => {
 
@@ -61,6 +126,7 @@ const ChatUI = (botID) => {
       return;
     }
     setSpromptHide(true)
+    joinRoom(botID.botID)
 
     const newMessage = {
       id: messages.length + 1,
@@ -95,6 +161,7 @@ const ChatUI = (botID) => {
     if(e){
       e.preventDefault();
     }
+    joinRoom(botID.botID)
     
     setSpromptHide(true)
     if (inputValue.trim() === '') {
@@ -119,8 +186,6 @@ const ChatUI = (botID) => {
       scrollToBottom()
     };
 
-
-
   useEffect(() => {
     if (chatbotMsg !== '') {
       console.log("111111==", messages)
@@ -137,6 +202,8 @@ const ChatUI = (botID) => {
 
 
   useEffect(() => {
+    setChkk([])
+
     const newMessage = {
       id: messages.length + 1,
       text: chatbotMsg,
@@ -156,6 +223,8 @@ const ChatUI = (botID) => {
     }
     setInputValue('');
     setChatbotMsg('')
+    leaveRoom()
+    scrollToBottom()
 
   }, [chatbotMsg])
 
@@ -333,6 +402,9 @@ const scrollToBottom = () => {
                 <TypingEffect id="text-container" className="message-content " text={message.text} />
               </div>
           ))}
+           {
+                                chkk.length == 0 ? '':<p style={ messageStyleRec} className="message  received" >{chkk}</p>
+           }
           {loading ? (
             <ThreeDots type="Oval" position="top-center" color="#3D4648" height={50} width={50} />
 

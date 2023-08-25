@@ -304,7 +304,7 @@ const messageStyleRec = {
                 <input className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3' value={initialMsg} placeholder='Initial message on starting the chat' onChange={(e) => { setInitialMsg(e.target.value); }} />
               </div>
               <div className="form-group">
-                <label>Suggested Prompts from the Chatbot</label>
+                <label>Suggested Queries from the Chatbot</label>
                 <textarea id='textareasug' className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3' value={suggestedPrompt} placeholder='Suggested Prompts (seperate each with ",")' onChange={(e) => { setSPrompt(e.target.value.split(",")); }} />
               </div>
               <div className="form-group">
@@ -398,7 +398,7 @@ const messageStyleRec = {
       {vis === 'Bot Analytics' ?
         <div >
           {/* <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }} >Analytics</label> */}
-          <label className='fs-4 d-flex justify-content-center container text-center mt-5 mb-5' style={{ height: '100%', color: '#FFFFFF' }} >Characters used</label>
+          <label className='fs-4 d-flex justify-content-center container text-center mt-5 mb-5' style={{ height: '100%', color: '#FFFFFF' }} >Tokens used</label>
           <div className='fs-4 d-flex justify-content-center  text-center mt-1 mb-5'>
 
             <div className="input-group mb-3 mx-2 " style={{ width: '400px' }}>

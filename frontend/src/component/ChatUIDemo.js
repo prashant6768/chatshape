@@ -16,26 +16,28 @@ import lamejs from 'lamejs';
 
 import * as jose from 'jose';
 import env from 'react-dotenv'
+import socketIO from 'socket.io-client';
+
 
 
 function TypingEffect({ text }) {
-    const delay = 20;
+    // const delay = 20;
 
-    const [displayedText, setDisplayedText] = useState('');
-    const [currentIndex, setCurrentIndex] = useState(0);
+    // const [displayedText, setDisplayedText] = useState('');
+    // const [currentIndex, setCurrentIndex] = useState(0);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (currentIndex < text.length) {
-                setDisplayedText(prevText => prevText + text.charAt(currentIndex));
-                setCurrentIndex(prevIndex => prevIndex + 1);
-            }
-        }, delay);
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         if (currentIndex < text.length) {
+    //             setDisplayedText(prevText => prevText + text.charAt(currentIndex));
+    //             setCurrentIndex(prevIndex => prevIndex + 1);
+    //         }
+    //     }, delay);
 
-        return () => clearTimeout(timer);
-    }, [currentIndex, text]);
+    //     return () => clearTimeout(timer);
+    // }, [currentIndex, text]);
 
-    return <div>{displayedText}</div>;
+    return <div>{text}</div>;
 }
 
 
@@ -51,8 +53,154 @@ const ChatUIDemo = (botID) => {
     const [audioSub, setAudioSub] = useState(false)
     const [uniqueCon, setUniqueCon] = useState(1)
     const [now, setNow] = useState('')
+    const[chkk,setChkk] = useState([])
+    const[ck,setCk]=useState([])
+   
+    
+
     const BACKEND = 'http://localhost:5000/'
     // const BACKEND = 'http://3.19.246.7/'
+
+    // const [streamData, setStreamData] = useState([]);
+
+    // useEffect(() => {
+    //     try{
+    //         const eventSource = new EventSource('http://localhost:5000/api/stream');
+
+    //         eventSource.addEventListener('error', (error) => {
+    //             console.error('EventSource failed:', error);
+    //           });
+    
+    //         eventSource.onmessage = (event) => {
+    //           const newData = JSON.parse(event.data);
+    //           setStreamData((prevData) => [...prevData, newData]);
+    //         };
+        
+    //         eventSource.onerror = (error) => {
+    //           console.error('EventSource failed-------:', error);
+    //           eventSource.close();
+    //         };
+    //         console.log("STREAM---------",streamData)
+        
+    //         return () => {
+    //           eventSource.close();
+    //         };
+    //     }catch(error){
+    //         console.log(error,"stream error")
+    //     }
+       
+    //   }, [chatbotMsg]);
+    
+    // const socket = socketIO.connect('http://localhost:5000/');
+    // const[room,setRoom]=useState('')
+
+    // function leaveRoom(botID){
+    //     socket.emit('leave',{'room':botID})
+    // }
+    // function joinRoom(botID){
+    //     socket.emit('join',{'room':botID})
+    // }
+
+    // socket.on('connect', () => {
+    //     console.log(`⚡:  user just connected!`);
+    //     socket.send("Finaaly, THE CONNECTION")
+    //  socket.on('disconnect', () => {
+    //       console.log('🔥: A user disconnected');
+    //     });
+    // });
+
+    // socket.on('message',data=>{
+    //     socket.send({"msg":"message from room ",'room':botID})
+    //     console.log(`message from backend is ==== ${data}`)
+    // })
+
+    // socket.on('Event-1',data=>{
+    //     console.log("Event --",data)
+    // })
+
+    const [socket, setSocket] = useState(null);
+    const [room, setRoom] = useState('');
+   
+
+    useEffect(() => {
+        const newSocket = socketIO.connect('http://localhost:5000/');
+
+    
+        setSocket(newSocket);
+    
+        return () => {
+          newSocket.disconnect();
+        };
+      }, []);
+    
+      const joinRoom = (roomName) => {
+        if (socket) {
+          socket.emit('join', { room: roomName });
+          setRoom(roomName);
+        }
+      };
+    
+      const leaveRoom = () => {
+        if (socket) {
+          socket.emit('leave', { room });
+          setRoom('');
+          setI(1)
+          console.log("Left the room")
+        }
+      };
+    
+      const sendMessage = (message) => {
+        if (socket) {
+          socket.emit('message', { room, msg: message });
+        }else{
+            console.log("no room joined")
+        }
+      };
+
+      socket?.on('welcome_message', (data) => {
+        console.log('Received welcome message:', data.message);
+      });
+      
+      const[i,setI]=useState(1)
+      const [prevI, setPrevI] = useState(0)
+
+    var t = 0
+
+///////////////////////////////////////////////////DONT DELETE////////////////////////  works but not properly , missing tokens error V
+    //   socket?.on('message-chat', data => {  
+    //     setI(prevI => prevI + 1);     
+    //     if (i === 1) {  
+    //         setI(prevI => prevI + 1);
+    //         console.log(i,"--",data.message)
+    //        setCk(data.message)     
+    //     }else{
+    //     }
+    //     if(ck !== ''){
+    //         setChkk(prevChkk => [...prevChkk, ck])
+    //         // console.log(ck ," ==ck")
+    //     }else{
+    //         setChkk([])
+    //         // console.log("M-T",ck)
+    //     }    
+    //   });
+ ///////////////////////////////////////////////////////////////////////////  works but not properly , missing tokens error A 
+  
+ //////////////////////////////////////////////////////////////// works but could potentially skip same token repated twice, thinking they are duplicates
+  
+ 
+ 
+ socket?.on('message-chat', data => {
+        if (i === 1) {  
+           if(chkk[chkk.length -1] !== data.message){
+            chkk.push(data.message)
+           }          
+        }else{
+        }
+        setI(prevI => prevI + 1);   
+      });
+ //////////////////////////////////////////////////////////////// works but could potentially skip same token repated twice, thinking they are duplicates
+
+
 
     const handleInputChange = async (e) => {
         await setInputValue(e.target.value)
@@ -65,7 +213,7 @@ const ChatUIDemo = (botID) => {
         }
         
         setSpromptHide(true)
-
+        joinRoom(botID.botID)
         const newMessage = {
             id: messages.length + 1,
             text: x,
@@ -82,6 +230,7 @@ const ChatUIDemo = (botID) => {
             'Access-Control-Allow-Origin': '*'
         }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
         scrollToBottom()
+        
     }
 
 
@@ -95,7 +244,7 @@ const ChatUIDemo = (botID) => {
         if (e) {
             e.preventDefault();
         }
-        
+        joinRoom(botID.botID)
         setSpromptHide(true)
         if (inputValue.trim() === '') {
             return;
@@ -118,6 +267,7 @@ const ChatUIDemo = (botID) => {
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
             .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
             scrollToBottom()
+            
         };
 
     useEffect(() => {
@@ -139,6 +289,7 @@ const ChatUIDemo = (botID) => {
 
 
     useEffect(() => {
+        setChkk([])
         const newMessage = {
             id: messages.length + 1,
             text: chatbotMsg,
@@ -158,9 +309,12 @@ const ChatUIDemo = (botID) => {
         }
         setInputValue('');
         setChatbotMsg('')
+        console.log("lllllllllllll")
+        leaveRoom()
         scrollToBottom()
 
     }, [chatbotMsg])
+
 
     useEffect(() => {
         if (plan === 'year-enterprise' || plan === 'month-enterprise' ) {
@@ -331,7 +485,8 @@ const ChatUIDemo = (botID) => {
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
 
-            {/*  ############################### Font select form */}
+            {/*  ############################### Font select form */}    
+            {/* <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >{receivedMessages}</label>  */}
 
             <div style={{ backgroundColor: '#212529' }} className=' rounded-4 my-5 col-lg-5 col-10 d-flex justify-content-center '>
                 <form className='d-flex row justify-content-around mt-3 ' onSubmit={handleFontSubmit}>
@@ -446,7 +601,7 @@ const ChatUIDemo = (botID) => {
                     <div className="chat-container px-0"  ref={chatContainerRef} style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '540px', minWidth: '240px', width: '100%', borderWidth: '0px' }}>
                         <div className="chat-messages " >
                             {messages.map((message) => (
-                                message.text === '' || null || undefined ? '' :
+                                message.text === '' || null || undefined ? "":<>
                                     <div
                                         key={message.id}
                                         className={`message ${message.sender === 'me' ? 'sent' : 'received'}`}
@@ -454,8 +609,17 @@ const ChatUIDemo = (botID) => {
                                     >
                                         {/* <div id="text-container" className="message-content typing">{message.text}</div> */}
                                         <TypingEffect id="text-container" className="message-content " text={message.text} />
+                                        {/* <p  id="text-container" className="message-content ">{message.text}</p> */}
+                                        
                                     </div>
+                                     </>
                             ))}
+                            {
+                                chkk.length == 0 ? '':<p style={ messageStyleRec} className="message  received" >{chkk}</p>
+                            }
+                             
+            {/* <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >{chkk}</label>           */}
+
                             {loading ? (
                                 <ThreeDots type="Oval" position="top-center" color="#3D4648" height={50} width={50} />
 

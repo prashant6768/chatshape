@@ -53,7 +53,7 @@ const SectionTwoHome = () => {
       <h2 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-2' style={{ color: '#FFFFFF' }}>This chatbot's trained to answer questions about Zema.
 Ask a question to get started.</h2>
 
-          <ChatUIDe botID={'64d3821e75a48e9178d49106..'} />
+          <ChatUIDe botID={'64de180c5b480f1407874b45..'} />
 
 
         <h2 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF' }}>TRUSTED CUSTOMERS</h2>

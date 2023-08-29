@@ -18,8 +18,8 @@ const PricingSection1 = () => {
     const decoded = Cookies.get('accessToken');
 
     const [selectedOption, setSelectedOption] = useState('A');
-    const BACKEND = 'http://localhost:5000/'
-    // const BACKEND = 'http://3.19.246.7/'
+    // const BACKEND = 'http://localhost:5000/'
+    const BACKEND = 'http://3.138.169.250/'
     const handleOptionClick = (option) => {
         setSelectedOption(option);
     };

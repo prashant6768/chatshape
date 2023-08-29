@@ -52,9 +52,11 @@ const ChatUI = (botID) => {
   const [now, setNow] = useState('')
   const[chkk,setChkk] = useState([])
   const[ck,setCk]=useState([])
+  const[consecFail,setConsecFail]=useState(0)
+  const[consecFailMsg,setConsecFailMsg]=useState([])
 
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.19.246.7/'
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'http://3.138.169.250/'
 
   // const token = document.cookie.split('=')[1]
   // const decoded = jose.decodeJwt(token,'notmysecretkey');
@@ -143,7 +145,7 @@ const ChatUI = (botID) => {
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(res.data, " === from backend"); setLoading(false) } })
+      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(res.data, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
       scrollToBottom()
   }
 
@@ -182,9 +184,27 @@ const ChatUI = (botID) => {
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else { setChatbotMsg(res.data[0]); console.log(res.data, "=== backend www", res.data[0]); setUniqueCon(0); setLoading(false) } }).catch(err => console.log(err))
+      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); console.log(res.data, "=== backend www", res.data[0]); setUniqueCon(0); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
       scrollToBottom()
     };
+
+    useEffect(()=>{
+      console.log("Consecutive failure",consecFail)
+      if(consecFail >= 5 && messages[messages.length -1]['sender'] == '' ){
+        console.log("AAAAAAAAAAAAAAAALLLLLLLEEEEEEEERRRRRRRTTTTTTTTT")
+         const failmsg = messages.filter(message => message.text !== '').slice(-10)
+         const consecFailMsgF = consecFailMsg.slice(-5)
+        // console.log("------------",messages.filter(message => message.text !== ''))
+        console.log("-----10message-------",messages.filter(message => message.text !== '').slice(-10))
+        axios.post(`${BACKEND}api/consecFailure`, { botID , failmsg ,consecFailMsgF}, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        })
+            .then(res =>{setConsecFailMsg([]); setConsecFail(0); console.log(res.data," === from backend ")}).catch(err => console.log(err))
+            // .then()
+      }
+    },[ messages])
 
   useEffect(() => {
     if (chatbotMsg !== '') {

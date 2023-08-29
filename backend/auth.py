@@ -210,7 +210,11 @@ def signup():
         port = 587  # For starttls
         sender_email = "thedummydog@gmail.com"
         password = EMAILPASS
+        email_headers = f"Subject: Zema Signup OTP\r\n"
+        email_headers += f"From: {sender_email}\r\n"
+        email_headers += "\r\n"
         message = "Your OTP for Zemo signup is "+str(otp)
+        email_message = email_headers + message
 
         # Create a secure SSL context
         context = ssl.create_default_context()
@@ -222,7 +226,7 @@ def signup():
             server.starttls(context=context) # Secure the connection
             server.ehlo() # Can be omitted
             server.login(sender_email, password)
-            server.sendmail(sender_email, username, message)
+            server.sendmail(sender_email, username, email_message)
             # TODO: Send email here
         except Exception as e:
             # Print any error messages to stdout

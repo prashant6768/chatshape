@@ -9,12 +9,15 @@ import {BsGoogle} from 'react-icons/bs'
 
 import env from 'react-dotenv'
 import ScriptLoaderHOC from '../component/ScriptLoaderHOC';
+import { useNavigate } from 'react-router-dom';
 
 
 const Signup = () => {
 
-  // const BACKEND = 'http://3.19.246.7/'
-  const BACKEND = 'http://localhost:5000/'
+  const navigate = useNavigate();
+
+  const BACKEND = 'http://3.138.169.250/'
+  // const BACKEND = 'http://localhost:5000/'
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -57,7 +60,7 @@ const Signup = () => {
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
-  }).then((res)=>{console.log("signup = ",res); if(res.data === "NO"){toast.error("User Already Exists");setLoading2(false);}else if(res.data == "Verification Failed"){toast.error("Verification Failed");setLoading2(false);} else{toast.success("Profile created Successfully");setLoading2(false);}}).catch(err => {console.log(err);setLoading2(false);{toast.error("Some Error Occured")}})
+  }).then((res)=>{console.log("signup = ",res); if(res.data === "NO"){toast.error("User Already Exists");setLoading2(false);}else if(res.data == "Verification Failed"){toast.error("Verification Failed");setLoading2(false);} else{toast.success("Profile created Successfully");setLoading2(false);setTimeout(() => { navigate('/login') }, 2000) }}).catch(err => {console.log(err);setLoading2(false);{toast.error("Some Error Occured")}})
     }
 
     useEffect(()=>{

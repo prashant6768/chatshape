@@ -7,16 +7,19 @@ import {ThreeDots} from 'react-loader-spinner';
 import env from 'react-dotenv'
 import Cookies from 'js-cookie';
 import '../CreateBot/createbotcss.css'
+import { useNavigate } from 'react-router-dom';
 
 const BotSection1 = () => {
+
+  const navigate = useNavigate();
 
   // const token = document.cookie.split('=')[1]
   // const decoded = jose.decodeJwt(token,'notmysecretkey');
   // const decoded = document.cookie.split('=')[1]
   const decoded = Cookies.get('accessToken');
   console.log("------------decoded",decoded)
-  const BACKEND = 'http://localhost:5000/'
-//  const BACKEND = 'http://3.19.246.7/'
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'http://3.138.169.250/'
 
   const[sendLink,setSendLink]= useState('')
   const[botName,setBot]=useState('')
@@ -57,7 +60,7 @@ const BotSection1 = () => {
         'Access-Control-Allow-Origin':'*',
     })
     // .then(res =>console.log("FROM BACKEND = ",res.data)).catch(err => console.log(err))
-    .then(res=>{if(res.data == 'BotF'){ toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoading(false);}else if(res.data == 'FillOne'){ toast.error('Atleast fill one of these, PDF or website URL'); setLoading(false);}else if(res.data == 'SubE'){ toast.error('Your Subscription has Expired, renew subscription for more'); setLoading(false);}else if(res.data == 'noname'){ toast.error('Botname is compulsary'); setLoading(false);}else{toast.success('Stored successfully!'); console.log(res.data,"CHKKKKKKKKKKKK"); setLoading(false);}}).catch(err => {console.log("error  botsection 1 ",err); toast.error('API request failed!'); setLoading(false);})
+    .then(res=>{if(res.data == 'BotF'){ toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoading(false);}else if(res.data == 'FillOne'){ toast.error('Atleast fill one of these, PDF or website URL'); setLoading(false);}else if(res.data == 'SubE'){ toast.error('Your Subscription has Expired, renew subscription for more'); setLoading(false);}else if(res.data == 'noname'){ toast.error('Botname is compulsary'); setLoading(false);}else if(res.data === 'ok'){toast.success('Stored successfully!'); console.log(res.data,"CHKKKKKKKKKKKK"); setLoading(false);setTimeout(() => { navigate('/mychatbots') }, 2000)}else{toast.error('Some Error Occured!!'); console.log(res.data,"CHKKKKKKKKKKKK"); setLoading(false)}}).catch(err => {console.log("error  botsection 1 ",err); toast.error('API request failed!'); setLoading(false);})
     console.log(formData)
     }
 

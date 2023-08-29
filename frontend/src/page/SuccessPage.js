@@ -9,8 +9,8 @@ import { Link } from 'react-router-dom'
 
 const SuccessPage = () => {
 
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.19.246.7/'
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'http://3.138.169.250/'
   const[data,setData]=useState('')
   const[product,setProduct]=useState('')
   const[user,setUser]=useState('')

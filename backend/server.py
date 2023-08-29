@@ -17,11 +17,10 @@ import json
 import os
 from langchain import OpenAI, LLMChain, PromptTemplate
 from langchain.chat_models import ChatOpenAI 
-import  pythoncom
+
 import re
 
 from langchain.document_loaders import SeleniumURLLoader
-from langchain.document_loaders import UnstructuredFileLoader
 from langchain.document_loaders import OnlinePDFLoader
 from langchain.callbacks import get_openai_callback
 
@@ -37,7 +36,7 @@ MONGO = os.getenv("MONGO")
 
 from flask_bcrypt import Bcrypt
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+# from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import TokenTextSplitter
 
 from langchain.document_loaders import Docx2txtLoader
@@ -90,9 +89,7 @@ from langchain.document_loaders import SeleniumURLLoader
 # from langchain.text_splitter import CharacterTextSplitter
 from langchain.text_splitter import TokenTextSplitter
 
-import pickle
-import faiss
-
+# import pickle
 
 # from langchain.chains import RetrievalQAwithSourcesChain
 from langchain.chains import RetrievalQA
@@ -101,13 +98,14 @@ from langchain.chains import LLMChain
 from langchain import PromptTemplate, OpenAI, LLMChain
 from langchain import OpenAI
 from langchain.chat_models import ChatOpenAI
-from langchain.vectorstores import FAISS
-import faiss
 from langchain.chains import VectorDBQA
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from sentence_transformers import SentenceTransformer
 from langchain.embeddings import OpenAIEmbeddings
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import chromadb
 from chromadb.config import Settings
 from langchain.vectorstores import Chroma
@@ -123,113 +121,31 @@ from langchain.schema import (
     HumanMessage,
 )
 
+from flask_mail import Mail, Message
+import random
+import smtplib, ssl
+
+# from langchain.evaluation import load_evaluator
+# evaluator = load_evaluator("criteria", criteria="conciseness")
+# # This is equivalent to loading using the enum
+# from langchain.evaluation import EvaluatorType
+# evaluator = load_evaluator(EvaluatorType.CRITERIA, criteria="conciseness")
+# from langchain.evaluation import load_evaluator, EvaluatorType
 
 ######### import for 2nd method finished ###########3
 
 import speech_recognition as sr
 from pydub import AudioSegment
-AudioSegment
-import pyttsx3
+# import pyttsx3
 import ffmpeg
-import io
-import tempfile
-import wave
-import soundfile as sf
-
-
-# #######################33  get tokens used
-
-# from langchain.callbacks.base import AsyncCallbackHandler
-# from langchain.schema import LLMResult
-# from typing import Any, Dict, List
-# import tiktoken
-
-# MODEL_COST_PER_1K_TOKENS = {
-#     "gpt-4": 0.03,
-#     "gpt-4-0314": 0.03,
-#     "gpt-4-completion": 0.06,
-#     "gpt-4-0314-completion": 0.06,
-#     "gpt-4-32k": 0.06,
-#     "gpt-4-32k-0314": 0.06,
-#     "gpt-4-32k-completion": 0.12,
-#     "gpt-4-32k-0314-completion": 0.12,
-#     "gpt-3.5-turbo": 0.002,
-#     "gpt-3.5-turbo-0301": 0.002,
-#     "text-ada-001": 0.0004,
-#     "ada": 0.0004,
-#     "text-babbage-001": 0.0005,
-#     "babbage": 0.0005,
-#     "text-curie-001": 0.002,
-#     "curie": 0.002,
-#     "text-davinci-003": 0.02,
-#     "text-davinci-002": 0.02,
-#     "code-davinci-002": 0.02,
-# }
-
-# class TokenCostProcess:
-#     total_tokens: int = 0
-#     prompt_tokens: int = 0
-#     completion_tokens: int = 0
-#     successful_requests: int = 0
-
-#     def sum_prompt_tokens( self, tokens: int ):
-#       self.prompt_tokens = self.prompt_tokens + tokens
-#       self.total_tokens = self.total_tokens + tokens
-
-#     def sum_completion_tokens( self, tokens: int ):
-#       self.completion_tokens = self.completion_tokens + tokens
-#       self.total_tokens = self.total_tokens + tokens
-
-#     def sum_successful_requests( self, requests: int ):
-#       self.successful_requests = self.successful_requests + requests
-
-#     def get_openai_total_cost_for_model( self, model: str ) -> float:
-#        return MODEL_COST_PER_1K_TOKENS[model] * self.total_tokens / 1000
-    
-#     def get_cost_summary(self, model:str) -> str:
-#         cost = self.get_openai_total_cost_for_model(model)
-
-#         return (
-#             f"Total Tokens Used: {self.total_tokens}\n"
-#             f"\tPrompt Tokens: {self.prompt_tokens}\n"
-#             f"\tCompletion Tokens: {self.completion_tokens}\n"
-#             f"Successful Requests: {self.successful_requests}\n"
-#             f"Total Cost (USD): {cost}"
-#         )
-
-# class CostCalcAsyncHandler(AsyncCallbackHandler):
-#     model: str = ""
-#     socketprint = None
-#     websocketaction: str = "appendtext"
-#     token_cost_process: TokenCostProcess
-
-#     def __init__( self, model, token_cost_process ):
-#        self.model = model
-#        self.token_cost_process = token_cost_process
-
-#     async def on_llm_start( self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any) -> None:
-#        encoding = tiktoken.encoding_for_model( self.model )
-
-#        if self.token_cost_process == None: return
-
-#        for prompt in prompts:
-#          await  self.token_cost_process.sum_prompt_tokens( len(encoding.encode(prompt)) )
-
-#     async def on_llm_new_token(self, token: str, **kwargs) -> None:
-#       print( token )
-
-#       await  self.token_cost_process.sum_completion_tokens( 1 )
-
-#     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
-#       self.token_cost_process.sum_successful_requests( 1 )
-
-# ######################### get tokens used end
+# import io
+# import tempfile
+# import wave
+# import soundfile as sf
 
 
 ffmpeg_path = r'C:/ffmpeg/ffmpeg-6.0-full_build/bin'
 os.environ['PATH'] = f'{ffmpeg_path};' + os.environ['PATH']
-
-# default_ef = embedding_functions.DefaultEmbeddingFunction()
 
 
 scheduler = BackgroundScheduler()
@@ -280,18 +196,12 @@ def on_leave(data):
     leave_room(room)
     print(f'A user left room {room}')
 
-# @socketio.on('message-chat')
-# def handle_message(data):
-#     room = data['room']
-#     message = data['msg']
-#     print("Received message:", message, "from room:", room)
-#     socketio.emit('message-chat', {'message': message}, room=room)
 
 def handle_message(data):
     roomID = data['room']
     print("  room-------292- ",roomID)
     message = data['msg']
-    socketio.emit('message-chat',{'message':message,'time':datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')},room=str(roomID))
+    socketio.emit('message-chat',{'message':message},room=str(roomID))
 
     # socketio.emit('welcome_message', {'message': f'Welcome to----------- room {room}!'}, room=room)
 
@@ -318,13 +228,6 @@ class StreamingHandle(BaseCallbackHandler):
         sys.stdout.write(token)
         handle_message({'msg':token, 'room':self.objId})
         sys.stdout.flush()  
-    
-    # def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
-    #        """Run on new LLM token. Only available when streaming is enabled."""
-    #        sys.stdout.write(token)
-    #        sys.stdout.flush()
-       
-   
     
 
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
@@ -371,27 +274,6 @@ class StreamingHandle(BaseCallbackHandler):
     def on_agent_finish(self, finish: AgentFinish, **kwargs: Any) -> None:
         """Run on agent end."""
 
-
-
-
-# class StreamingHandle(BaseCallbackHandler):
-#     def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
-#         """Run on new LLM token. Only available when streaming is enabled."""
-#         while True:   
-#            sys.stdout.write(token)
-#            sys.stdout.flush()
-        #    yield token
-
-# streaming_handle = StreamingHandle()
-
-# def generate_tokens():
-#     for token in streaming_handle.on_llm_new_token():  
-#         print("++",token)
-#         yield token
-
-# @app.route('/api/stream')
-# def stream_endpoint():
-#     return Response(generate_tokens(), mimetype='text/event-stream')
 
 #####################################################   stream custom code end
 
@@ -745,9 +627,15 @@ def start_ai(query,userData,uniqueCon):
           print("-----453-----",str(e))
 
       answer = summarize_chain.predict(text=text,query=query)
-
+      print(type(answer),"==answer")
     #   print("--------748------",cb)
       encoding = tiktoken.get_encoding("cl100k_base")
+      if answer == "Relevant Data not found.":
+        print("-------634---------could work--------")
+        return "RDNF"
+      if "Relevant Data not found." in answer:
+        print("-------634---------could work--------")
+        return "RDNF"
       return [answer, len(encoding.encode(input_string_F + "Human: "))+5+len(encoding.encode(answer))]
 
   except Exception as e:
@@ -787,6 +675,9 @@ def user_msg():
         return "SubE"
 
     summariesCb = start_ai(data,userData,uniqueCon)
+    if summariesCb == 'RDNF':
+        print("---------676--could work------")
+        return 'RDNF'
     summaries = summariesCb[0]
     cb = summariesCb[1]
     print("-------479 ", summaries,"----tokens--" ,int(cb))
@@ -804,219 +695,13 @@ def user_msg():
     return [summaries, planname,uniqueCon]
   except Exception as e:
     print("-----482-------",str(e))
-    return["Some Error Occured !!!!"]  
-
-
-
-
-# ######################################### LLM Code  #####  STREAM backup before trying streaming, token used when stream=True working here
-# # import asyncio
-# def start_ai(query,userData,uniqueCon):
-#   try:  
-#     users_collection = db['users_website_crawl_data']
-#     objId= ObjectId(userData)
-#     dataDb_i = users_collection.find_one({'_id':objId})
-#     # return "this is a fake answer"
-
-#     dataDb = {
-#         'crawldata':dataDb_i.get('crawldata'),
-#         'crawldataPdf':dataDb_i.get('crawldataPdf'),
-#         'crawl':dataDb_i.get('crawl'),
-#         'email':dataDb_i.get('email'),
-#         'botname':dataDb_i.get('botname'),
-#         'url':dataDb_i.get('url'),
-#         'prompt':dataDb_i.get('prompt')
-#     }
-#     print("=-------------284",str(type([query])))
-
-#     dataEmb = dataDb['crawl']
-
-#     print("----------442-------")
-#     collectionX = None
-#     try:
-#       clientX = chromadb.Client() 
-#       collectionX = clientX.create_collection(
-#           name="collection_name_zema",
-#           metadata={"hnsw:space": "cosine"}, # l2 is the default, cosine, ip
-#       )
-#       print("----------------------------452------------")
-#       collectionX.add(
-#       documents=dataEmb['documents'],
-#       metadatas=dataEmb['metadatas'],
-#       embeddings=dataEmb['embeddings'],
-#       ids=dataEmb['ids']
-# )     
-#     except Exception as e:
-#         print("-------457-------",str(e)) 
-#     try:
-#       results = collectionX.query(
-#       query_texts=[query],
-#       n_results=1
-# )
-#       clientX.delete_collection(name="collection_name_zema")
-#     except Exception as e:
-#         print("-------464-------------",str(e))
-#     print("----------457---------",results['distances'],"--------457")
-#     print("----------457---------",results['metadatas'],"--------457")
-
-#     resultText = [item for sublist in results['documents'] for item in sublist]
-
-#     prompt = str(dataDb['prompt'])
-#     text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=200, length_function=len)
-#     text = text_splitter.create_documents(resultText)
-
-#     # print("------237--------",str(text),"----------------237")
-#     content = str(text)
-
-#     # matches = re.findall(r'page_content=\'(.*?)\'', content)
-#     # # extracted_text = ' '.join(matches)
-#     # cleaned_list_i = [string.replace('\\n\\n', ' ') for string in matches]
-#     # cleaned_list = [string.replace('\\n', ' ') for string in cleaned_list_i]
-#     # extracted_text = ' '.join(cleaned_list)
-#     # # print("-----------574",cleaned_list,"------------")
-#     # # print("-----------571",extracted_text)
-   
-#     # # extracted_text = extracted_text.replace('\n', ' ')
-#     # # converted_string = extracted_text.replace("\n\n", " ")
-
-#     # # print(prompt,"=============581")
-
-#     with get_openai_callback() as cb:
-#       PROMPT = PromptTemplate(
-#         template=prompt, input_variables=["text", "query"]
-#       ) 
-# #       PROMPT_SELECTOR = ConditionalPromptSelector(
-# #         default_prompt=PROMPT
-# # )
-     
-
-#     #   print("prompt------571---",prompt)
-
-#       input_string = prompt
-#       placeholder_q = "{query}"
-#       replacement_q = query
-#       input_string = input_string.replace(placeholder_q, replacement_q)
-#       placeholder_r = "{text}"
-#       replacement_r = content
-#       input_string_F = input_string.replace(placeholder_r, replacement_r)
-#     #   print("---------601----------input string F----",extracted_text,"------")
-#     #   print("---------608----------input string F----",PROMPT)
-#     #   return
-
-      
-#       chain_type_kwargs = {"prompt": PROMPT}
-#     #   token_cost_process =  TokenCostProcess()
-#       try:
-#           llm = ChatOpenAI(model_name="gpt-4",temperature=0.7, streaming=True,callbacks=[StreamingHandle()])
-#           template=prompt
-#           prompt_template = PromptTemplate(input_variables=["text","query"],template=template)
-#         # memory = ConversationBufferMemory( input_key="query")
-#           summarize_chain = LLMChain(llm=llm, prompt=prompt_template,verbose=False)
-#         #   summary = summarize_chain.predict(text=text,query=query)
-         
-#         #   return
-#         # summaries= []
-#         # for chunk in enumerate(text):
-#         #     summary = summarize_chain.predict(text=chunk,query=query)
-          
-#         #   qa_chain =  LLMChain(ChatOpenAI(streaming=False, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-4",temperature=0),prompt=PROMPT)
-       
-#         # qa_chain = load_qa_chain(ChatOpenAI(streaming=False, callbacks=[StreamingStdOutCallbackHandler()],model_name="gpt-4",temperature=0),chain_type="stuff")
-#         #   qa_chain = load_qa_chain(ChatOpenAI(streaming=True, callbacks=[CostCalcAsyncHandler( "gpt-4", token_cost_process )],model_name="gpt-4",temperature=0), chain_type="stuff")
-#       except Exception as e:
-#           print("-----453-----",str(e))
-#     #   print("--------------443--------------",qa_chain,"--------------443--------------")
-     
-#       answer = summarize_chain.predict(text=text,query=query)
-
-#     #   process_points(), {"Content-Type": "application/x-ndjson"}
-      
-#     #   return Response(StreamingHandle(),mimetype='text/event-stream')
-      
-#       print("llllllllllll--------616-----",answer)
-#     #   answer = qa_chain.run(input_documents= text, question=query ) 
-
-#     #   print(input_string,"--------------594")
-#       encoding = tiktoken.get_encoding("cl100k_base")
-#       print("-------587-----prompt-",len(encoding.encode(input_string_F + "Human: "))+5)
-#     #   print("-------587-----content--",input_string_F)
-#     #   print("-------587-----prompt without text-",len(encoding.encode(input_string_F)))
-#       print("-------587-----answer-",len(encoding.encode(answer)))
-
-#       print("---------279---------",answer,"-----------279-----------",cb)
-
-#       return [answer, len(encoding.encode(input_string_F + "Human: "))+5+len(encoding.encode(answer))]
-#     #   return [answer,cb.total_tokens]
-
-#   except Exception as e:
-#     return str(e)  
-   
-
-# ############################################### get message from users chatbot and send data back after getting response from LLM
-# @app.route('/api/msg',methods=['POST'])
-# def user_msg():
-#   try:  
-#     # userName = request.get_json()['decoded']['username']
-#     data = request.get_json()['inputValue']
-#     userData = request.get_json()['botID']['botID']
-#     uniqueCon = request.get_json()['uniqueCon']
-#     getid_1  = db['users_website_crawl_data']
-#     try:
-#         getid_2 = getid_1.find_one({'_id': ObjectId(userData)})
-#         if getid_2 == None:
-#             return "noid"
-#     except:
-#         return "noid"    
-#     # print("241----------",getid_2)
-#     userName = getid_2['email']
-
-#     #EXpiartion code
-#     sub = db['user_subscription'] 
-#     datasub_i = sub.find_one({'username':userName})
-#     plan_1 = db['user_subscription']
-#     plan_2 = plan_1.find_one({"username": userName})
-#     planname = plan_2['plan-Info']['plan']
-#     datasub={
-#       'expiration':datasub_i.get('expiration'),
-#     }
-#     CharNo_1 = db['users_website_crawl_data']
-#     CharNo_2 = CharNo_1.find_one({'_id': ObjectId(userData)})
-#     print("133---------------------",CharNo_2['NoOfCharacters'])
-#     # print(datasub,"555555555555555555555555555555",datetime.strptime(datasub['expiration'], "%Y-%m-%d"),"WWW",datetime.now().date())
-#     # if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date() or plan_2['plan-Info']['NoOfMsg'] < 1 or CharNo_2['NoOfCharacters'] < 1 or plan_2['plan-Info']['tokens'] < 1:
-#     if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date()  or CharNo_2['NoOfCharacters'] < 1 or plan_2['plan-Info']['tokens'] < 1:
-#         print("EXpire---------------------------------------")
-#         return "SubE"
-
-#     # print("user msg ////////////////////////",userData)
-#     summariesCb = start_ai(data,userData,uniqueCon)
-#     summaries = summariesCb[0]
-#     cb = summariesCb[1]
-#     print("-------479 ", summaries,"----tokens--" ,int(cb))
-    
-#     users_collection = db['users_website_crawl_data']
-#     plan_info_1 = db['user_subscription']
-#     # plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.NoOfMsg":-1}})
-#     plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.tokens":-cb}})
-#     plan_info_1.update_one({"username": userName}, {"$inc": {"tokensUsed":cb}})
-
-#     users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
-#     users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"UniqueCon": uniqueCon}})
-
-#     # print("143-----------------------------",str(summaries),"---",len(str(summaries)))
-#     print("-------502-------",planname)
- 
-#     # print("X ==",Gsummary)
-   
-#     return [summaries, planname,uniqueCon]
-#   except Exception as e:
-#     print("-----482-------",str(e))
-#     return["Some Error Occured !!!!"]  
+    return["Some Error Occured !!!!",str(e)]  
 
 
 ##################################################### create bot api start and expiration code original  pdf using upload multipart formdata format
 @app.route('/api/sendLinkData',methods=['POST'])
 def get_link_data():
+  try:  
     # print("INSide get the link data")
     urll = request.form.get('sendLink')
     exclude = request.form.get('exclude')
@@ -1073,7 +758,9 @@ def get_link_data():
     if os.path.exists(pdf):
         print("os path -------568",pdf)
         os.remove(pdf)
-    return urll
+    return "ok"
+  except Exception as e:
+    return str(e)  
 
 
 
@@ -1124,53 +811,15 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
     docsUrl = text_splitter.split_documents(data)
     mainDoc = docsUrl + docsPdf
 
-    
-    
-    # vectordb = Chroma.from_documents(mainDoc, OpenAIEmbeddings())
-    # path='./db'
-    # settings = Settings(
-    #         persist_directory=path,
-    #         anonymized_telemetry=False
-    # )
+
     embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    # embeddings = OpenAIEmbeddings()
-
-    # client = chromadb.PersistentClient(settings=settings , path=path)
-    # print("docs tyep---------------645----------")
-    # db = Chroma.from_documents(
-    #                 client=client,
-    #                 documents=mainDoc,
-    #                 embedding=embeddings,
-    #             )
-    # dbF = FAISS.from_documents(documents=mainDoc, embedding=embeddings)
     dba = Chroma.from_documents(documents=mainDoc, embedding=embeddings)
-#     clientZ = chromadb.Client()
-#     collectionZ = clientZ.create_collection("yt_demo1")  
-#     collectionZ.add(
-#     documents=db.get()['documents'],
-#     metadatas=db.get()['metadatas'],
-#     # embeddings=db.get(include=['embeddings'])['embeddings'],
-#     ids=db.get()['ids']
-# )    
-#     results = collectionZ.query(
-#     query_texts=["Forest in India"],
-#     n_results=1
-# )
-#     print(results)      
-                    
 
-#     print("docs tyep---------------619----------",results)
-    # print("docs tyep---------------645----------",dbF.get())
-
-    
-    
     users_collection = db['users_website_crawl_data']
     user_sub = db['user_subscription']
     print("hhhh")
     user_data = {
         'NoOfCharacters': NoOfCharacters,
-        # 'crawldata': str(data),
-        # 'crawldataPdf':str(docs),
         'crawl':dba.get(include=['embeddings','metadatas','documents']),
         'email': userData,
         'botname':botName,
@@ -1190,7 +839,7 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
         'tokenData':[],
         'UniqueCon':0,
         'UniqueConData':[],
-        'prompt':" You are a world class analyst.You are having a conversation with the user about the  text and you have to answer the users questions. Please follow these rules: 1. Make it engaging and informative. 2. Should address the {query} very well. 3. Don't repeat your sentences and information 4. Always mention name of things or people you talk about. 5.Don't mention your name when answering, go straight to the answer   {text}  Human: {query} "             
+        'prompt':" You are a world class analyst.You are having a conversation with the user about the  text and you have to answer the users questions. Please follow these rules: 1. Make it engaging and informative. 2. Should address the {query} very well. 3. Don't repeat your sentences and information 4. Always mention name of things or people you talk about. 5.Don't mention your name when answering, go straight to the answer . If you can't find an answer just say 'Relevant Data not found'  {text}  Human: {query} "             
     } 
     print("docs tyep---------------654--44--------","----------654--4---")
     try:
@@ -1210,6 +859,7 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
 ######################################################################3  Retrain your chatbots sources 
 @app.route('/api/updateLinkData/<id>',methods=['POST'])
 def retrain(id):
+  try:  
     objId= ObjectId(id)
     urll = request.form.get('sendLink')
     exclude = request.form.get('exclude')
@@ -1263,8 +913,10 @@ def retrain(id):
     if os.path.exists(pdf):
         print("os path -------721",pdf)
         os.remove(pdf)
-    return urll
-
+    return "ok"
+  except Exception as e:
+    return str(e)
+ 
 ################################################################## retrain data part 2 - exclude links and store data from links in db
 def get_data_retrain(urls,userData,objId,pdf,unique,exclude, NoOfCharacters):
   try:  
@@ -1331,6 +983,7 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude, NoOfCharacters):
 ##########################################################################3  char graph date
 @app.route('/api/chartToken/<id>',methods=['POST'])
 def gettokendate(id):
+  try:  
     objId= ObjectId(id)
     users_collection = db['users_website_crawl_data']
     dataDb_i = users_collection.find_one({'_id':objId})
@@ -1340,9 +993,12 @@ def gettokendate(id):
         return "nodata"
     print("--------693------",dataDb)
     return dataDb
+  except Exception as e:
+    return ["error",str(e)]  
 
 @app.route('/api/chartCon/<id>',methods=['POST'])
 def getcondate(id):
+  try:  
     objId= ObjectId(id)
     users_collection = db['users_website_crawl_data']
     dataDb_i = users_collection.find_one({'_id':objId})
@@ -1352,6 +1008,8 @@ def getcondate(id):
         return "nodata"
     print("--------693------",dataDb)
     return dataDb
+  except Exception as e:
+    return ["error",str(e)] 
 
 
 
@@ -1576,22 +1234,7 @@ def paymentdata():
     print("319------",data)
     users_collection = db['user_payment']
     dataDb =[] 
-    # datasub={
-    #     'username':datasub_i.get('username'),
-    #     'created':datasub_i.get('created'),
-    #     'payment':{
-    #         'currency':datasub_i.get('payment').get('currency'),
-    #         'name':datasub_i.get('payment').get('name'),
-    #         'id':datasub_i.get('payment').get('id'),
-    #         'name':datasub_i.get('payment').get('name'),
-    #     },
-    #     'product':{
-    #         'amount':datasub_i.get('product').get('amount'),
-    #         'product_id':datasub_i.get('product').get('product_id')
 
-    #     }
-        
-    # }
     for datasub_i in users_collection.find({'username':data}):
         datasub={
         'username':datasub_i.get('username'),
@@ -1653,8 +1296,62 @@ def profileupdate():
     except Exception as e:
         print(e)
         return "Couldn't Update"     
-    
 
+#################################################################  Failure 5 consecutive msg , email super admins     
+@app.route('/api/consecFailure',methods=['POST'])
+def consecFailure():
+    BotID =  request.get_json()['botID']['botID']
+    FailMsg = request.get_json()['failmsg']
+    ErrorMsg = request.get_json()['consecFailMsgF']
+    try:
+       print(str(BotID),"---1274--",FailMsg,"----",ErrorMsg)
+
+       user_collection = db['users_website_crawl_data']
+       user_data = user_collection.find_one({'_id': ObjectId(str(BotID))})
+       user_email = user_data['email'],
+       user_bot = user_data['botname']
+       print("----------1285--",user_email[0])
+    except Exception as e:   
+        print("-----1286-----",str(e))
+
+    EMAILPASS = os.getenv("EMAILPASS")
+    smtp_server = "smtp.gmail.com"
+    port = 587  
+    sender_email = "thedummydog@gmail.com"
+    password = EMAILPASS
+    formatted_error_msg = "\n\n".join(
+    str(ErrorMsg[i]) + " => \n " +
+    (' "'+"Zema"+'"' if FailMsg[i * 2]['sender'] == '' else ' "'+ FailMsg[i * 2]['sender']+'"') +
+    ": " + str(FailMsg[i * 2]['text']) + ", " +
+    (' "'+"Zema"+'"' if FailMsg[i * 2 + 1]['sender'] == '' else ' "'+ FailMsg[i * 2 + 1]['sender']+'"') +
+    ": " + str(FailMsg[i * 2 + 1]['text'])
+    for i in range(len(ErrorMsg))
+)
+
+    email_headers = f"Subject: Zema Chatbot Failure Report\r\n"
+    email_headers += f"From: {sender_email}\r\n"
+    email_headers += f"To: aniketshival007@gmail.com\r\n"
+    email_headers += f"Cc: aniket@dshgsonic.com\r\n"
+    email_headers += "\r\n"
+
+    message = f'Failure in chatbot ="{user_bot}", \n id ="{str(BotID)}", \n user ="{user_email[0]}",\n error = \n{formatted_error_msg}  .'
+    email_message = email_headers + message
+    context = ssl.create_default_context()
+
+    try:
+        server = smtplib.SMTP(smtp_server,port)
+        server.ehlo() 
+        server.starttls(context=context) 
+        server.ehlo() 
+        server.login(sender_email, password)
+        server.sendmail(sender_email, ["aniketshival007@gmail.com","aniket@dshgsonic.com"], email_message)
+        # TODO: Send email here
+    except Exception as e:
+        print(e)
+    finally:
+        server.quit() 
+
+    return "HELLO FROM CONSEC FAIL BACKEND"
 
 
 

@@ -73,8 +73,8 @@ const messageStyleRec = {
   const [togDel, setTogDel] = useState(false)
   const [vis, setVis] = useState('Bot Properties')
   const [resizer, setResizer] = useState(true)
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.19.246.7/'
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'http://3.138.169.250/'
 
 
   const [sendLink, setSendLink] = useState('')
@@ -93,7 +93,7 @@ const messageStyleRec = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date ") } else { console.log(res.data); setTokenDataGraph(res.data) } }).catch(err => console.log(err))
+    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date ") }else if(res.data[0] == 'error'){console.log(res.data[1]);toast.error("Error Fetching data");} else { console.log(res.data); setTokenDataGraph(res.data) } }).catch(err => console.log(err))
   }
   const handleCreateGraphCon = () => {
     console.log(selectedTimeCon)
@@ -101,7 +101,7 @@ const messageStyleRec = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date "); } else { console.log(res.data); setConDataGraph(res.data) } }).catch(err => console.log(err))
+    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date "); }else if(res.data[0] == 'error'){console.log(res.data[1]);toast.error("Error Fetching data ");} else { console.log(res.data); setConDataGraph(res.data) } }).catch(err => console.log(err))
   }
 
 
@@ -235,7 +235,7 @@ const messageStyleRec = {
         'Access-Control-Allow-Origin': '*',
       })
         // .then(res =>console.log("FROM BACKEND = ",res.data)).catch(err => console.log(err))
-        .then(res => { if (res.data == 'BotF') { toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoadingre(false); } else if (res.data == 'FillOne') { toast.error('Atleast fill one of these, PDF or website URL'); console.log("ressssssssssssss", res.data); setLoadingre(false); } else if (res.data == 'SubE') { toast.error('Your Subscription has Expired, renew subscription for more'); setLoadingre(false); } else if (res.data == 'noname') { toast.error('Botname is compulsary'); setLoadingre(false); } else { toast.success('Bot Retrained successfully!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoadingre(false); setTimeout(() => { window.location.reload(true) }, 2000) } })
+        .then(res => { if (res.data == 'BotF') { toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoadingre(false); } else if (res.data == 'FillOne') { toast.error('Atleast fill one of these, PDF or website URL'); console.log("ressssssssssssss", res.data); setLoadingre(false); } else if (res.data == 'SubE') { toast.error('Your Subscription has Expired, renew subscription for more'); setLoadingre(false); } else if (res.data == 'noname') { toast.error('Botname is compulsary'); setLoadingre(false); } else if(res.data === 'ok'){ toast.success('Bot Retrained successfully!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoadingre(false); setTimeout(() => { window.location.reload(true) }, 2000) }else { toast.error('Some Error Occured!!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoading(false);  } })
         .catch(err => { console.log("error  botsection 1 ", err); toast.error('API request failed!'); setLoadingre(false); })
       console.log(formData)
     }

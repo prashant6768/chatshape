@@ -7,7 +7,7 @@ import axios from 'axios'
 import { ThreeDots } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa'
-import {HiSpeakerWave, HiSpeakerXMark} from 'react-icons/hi2'
+import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2'
 // import {} from 'react-icons/hi2'
 import { BsStopCircle } from 'react-icons/bs'
 import sendIcon from '../assets/send.png'
@@ -53,152 +53,69 @@ const ChatUIDemo = (botID) => {
     const [audioSub, setAudioSub] = useState(false)
     const [uniqueCon, setUniqueCon] = useState(1)
     const [now, setNow] = useState('')
-    const[chkk,setChkk] = useState([])
-    const[ck,setCk]=useState([])
-   
-    
+    const [chkk, setChkk] = useState([])
+    const [consecFail, setConsecFail] = useState(0)
+    const [consecFailMsg, setConsecFailMsg] = useState([])
 
-    const BACKEND = 'http://localhost:5000/'
-    // const BACKEND = 'http://3.19.246.7/'
 
-    // const [streamData, setStreamData] = useState([]);
 
-    // useEffect(() => {
-    //     try{
-    //         const eventSource = new EventSource('http://localhost:5000/api/stream');
 
-    //         eventSource.addEventListener('error', (error) => {
-    //             console.error('EventSource failed:', error);
-    //           });
-    
-    //         eventSource.onmessage = (event) => {
-    //           const newData = JSON.parse(event.data);
-    //           setStreamData((prevData) => [...prevData, newData]);
-    //         };
-        
-    //         eventSource.onerror = (error) => {
-    //           console.error('EventSource failed-------:', error);
-    //           eventSource.close();
-    //         };
-    //         console.log("STREAM---------",streamData)
-        
-    //         return () => {
-    //           eventSource.close();
-    //         };
-    //     }catch(error){
-    //         console.log(error,"stream error")
-    //     }
-       
-    //   }, [chatbotMsg]);
-    
-    // const socket = socketIO.connect('http://localhost:5000/');
-    // const[room,setRoom]=useState('')
+    // const BACKEND = 'http://localhost:5000/'
+    const BACKEND = 'http://3.138.169.250/'
 
-    // function leaveRoom(botID){
-    //     socket.emit('leave',{'room':botID})
-    // }
-    // function joinRoom(botID){
-    //     socket.emit('join',{'room':botID})
-    // }
-
-    // socket.on('connect', () => {
-    //     console.log(`⚡:  user just connected!`);
-    //     socket.send("Finaaly, THE CONNECTION")
-    //  socket.on('disconnect', () => {
-    //       console.log('🔥: A user disconnected');
-    //     });
-    // });
-
-    // socket.on('message',data=>{
-    //     socket.send({"msg":"message from room ",'room':botID})
-    //     console.log(`message from backend is ==== ${data}`)
-    // })
-
-    // socket.on('Event-1',data=>{
-    //     console.log("Event --",data)
-    // })
 
     const [socket, setSocket] = useState(null);
     const [room, setRoom] = useState('');
-   
+
 
     useEffect(() => {
-        const newSocket = socketIO.connect('http://localhost:5000/');
+        const newSocket = socketIO.connect(BACKEND);
 
-    
+
         setSocket(newSocket);
-    
+
         return () => {
-          newSocket.disconnect();
+            newSocket.disconnect();
         };
-      }, []);
-    
-      const joinRoom = (roomName) => {
+    }, []);
+
+    const joinRoom = (roomName) => {
         if (socket) {
-          socket.emit('join', { room: roomName });
-          setRoom(roomName);
+            socket.emit('join', { room: roomName });
+            setRoom(roomName);
         }
-      };
-    
-      const leaveRoom = () => {
+    };
+
+    const leaveRoom = () => {
         if (socket) {
-          socket.emit('leave', { room });
-          setRoom('');
-          setI(1)
-          console.log("Left the room")
+            socket.emit('leave', { room });
+            setRoom('');
+            console.log("Left the room")
         }
-      };
-    
-      const sendMessage = (message) => {
+    };
+
+    const sendMessage = (message) => {
         if (socket) {
-          socket.emit('message', { room, msg: message });
-        }else{
+            socket.emit('message', { room, msg: message });
+        } else {
             console.log("no room joined")
         }
-      };
+    };
 
-      socket?.on('welcome_message', (data) => {
-        console.log('Received welcome message:', data.message);
-      });
-      
-      const[i,setI]=useState(1)
-      const [prevI, setPrevI] = useState(0)
+    useEffect(() => {
+        socket?.on('welcome_message', (data) => {
+            console.log('Received welcome message:', data.message);
+        });
+    }, [socket])
 
-    var t = 0
-
-///////////////////////////////////////////////////DONT DELETE////////////////////////  works but not properly , missing tokens error V
-    //   socket?.on('message-chat', data => {  
-    //     setI(prevI => prevI + 1);     
-    //     if (i === 1) {  
-    //         setI(prevI => prevI + 1);
-    //         console.log(i,"--",data.message)
-    //        setCk(data.message)     
-    //     }else{
-    //     }
-    //     if(ck !== ''){
-    //         setChkk(prevChkk => [...prevChkk, ck])
-    //         // console.log(ck ," ==ck")
-    //     }else{
-    //         setChkk([])
-    //         // console.log("M-T",ck)
-    //     }    
-    //   });
- ///////////////////////////////////////////////////////////////////////////  works but not properly , missing tokens error A 
-  
- //////////////////////////////////////////////////////////////// works but could potentially skip same token repated twice, thinking they are duplicates
-  
- 
- 
- socket?.on('message-chat', data => {
-        if (i === 1) {  
-           if(chkk[chkk.length -1] !== data.message){
-            chkk.push(data.message)
-           }          
-        }else{
-        }
-        setI(prevI => prevI + 1);   
-      });
- //////////////////////////////////////////////////////////////// works but could potentially skip same token repated twice, thinking they are duplicates
+    //////////////////////////////////////////////////////////////// works but could potentially skip same token repated twice, thinking they are duplicates
+    useEffect(() => {
+        socket?.on('message-chat', data => {
+            setChkk(prevChkk => [...prevChkk, data.message])
+            console.log(data.message)
+        });
+    }, [socket])
+    //////////////////////////////////////////////////////////////// works but could potentially skip same token repated twice, thinking they are duplicates
 
 
 
@@ -211,7 +128,7 @@ const ChatUIDemo = (botID) => {
         if (x.trim() === '') {
             return;
         }
-        
+
         setSpromptHide(true)
         joinRoom(botID.botID)
         const newMessage = {
@@ -228,9 +145,14 @@ const ChatUIDemo = (botID) => {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") }
+         else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } 
+         else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) } 
+         else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+         else { setChatbotMsg(res.data[0]); setConsecFail(0); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } })
+         .catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
         scrollToBottom()
-        
+
     }
 
 
@@ -265,10 +187,29 @@ const ChatUIDemo = (botID) => {
             'Access-Control-Allow-Origin': '*'
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
-            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]);  console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
-            scrollToBottom()
-            
-        };
+            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, res.data[1]]) } else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, "Relevant Data Not Found"]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); setConsecFail(0); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); setConsecFail(consecFail + 1); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! "); setConsecFailMsg(prev => [...prev, err]) })
+        scrollToBottom()
+
+    };
+
+    useEffect(() => {
+        console.log("Consecutive failure", consecFail)
+        if (consecFail >= 5 && messages[messages.length - 1]['sender'] == '') {
+            console.log("AAAAAAAAAAAAAAAALLLLLLLEEEEEEEERRRRRRRTTTTTTTTT")
+            const failmsg = messages.filter(message => message.text !== '').slice(-10)
+            const consecFailMsgF = consecFailMsg.slice(-5)
+            setConsecFail(0);
+            // console.log("------------",messages.filter(message => message.text !== ''))
+            console.log("-----10message-------", messages.filter(message => message.text !== '').slice(-10))
+            axios.post(`${BACKEND}api/consecFailure`, { botID, failmsg, consecFailMsgF }, {
+                'Content-type': 'application/json',
+                'Accept': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            })
+                .then(res => { setConsecFailMsg([]);   console.log(res.data, " === from backend ") }).catch(err => console.log(err))
+            // .then()
+        }
+    }, [messages])
 
     useEffect(() => {
         console.log("111111==", messages)
@@ -283,7 +224,7 @@ const ChatUIDemo = (botID) => {
     }, [chatbotMsg])
 
     useEffect(() => {
-        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); setPlan(res.data.plan) ;console.log(res.data.initialMsg, "=font api init") }).catch(err => console.log(err))
+        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); setPlan(res.data.plan); console.log(res.data.initialMsg, "=font api init") }).catch(err => console.log(err))
         console.log(suggestedPrompt)
     }, [])
 
@@ -304,7 +245,7 @@ const ChatUIDemo = (botID) => {
                 const utterance = new SpeechSynthesisUtterance(chatbotMsg);
                 speechSynthesis.speak(utterance);
             }
-            console.log("speech tog  is set to ",speechTog)
+            console.log("speech tog  is set to ", speechTog)
 
         }
         setInputValue('');
@@ -317,7 +258,7 @@ const ChatUIDemo = (botID) => {
 
 
     useEffect(() => {
-        if (plan === 'year-enterprise' || plan === 'month-enterprise' ) {
+        if (plan === 'year-enterprise' || plan === 'month-enterprise') {
             setMark(false)
         } else {
             setMark(true)
@@ -351,7 +292,7 @@ const ChatUIDemo = (botID) => {
 
     const handleFontSubmit = (event) => {
         event.preventDefault();
-        
+
         setLoading(true);
         axios.put(`${BACKEND}api/fontdata/${botID.botID}`, { fontData }, {
             'Content-type': 'application/json',
@@ -477,21 +418,21 @@ const ChatUIDemo = (botID) => {
     const chatContainerRef = useRef(null);
     const scrollToBottom = () => {
         setTimeout(() => {
-        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        console.log(chatContainerRef.current.scrollHeight ,"chatContainerRef.current.scrollHeight")
-    }, 10);
-      };
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            console.log(chatContainerRef.current.scrollHeight, "chatContainerRef.current.scrollHeight")
+        }, 10);
+    };
 
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
 
-            {/*  ############################### Font select form */}    
+            {/*  ############################### Font select form */}
             {/* <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >{receivedMessages}</label>  */}
 
             <div style={{ backgroundColor: '#212529' }} className=' rounded-4 my-5 col-lg-5 col-10 d-flex justify-content-center '>
                 <form className='d-flex row justify-content-around mt-3 ' onSubmit={handleFontSubmit}>
-                <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
-                <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >Update how your Chatbot looks</label>          
+                    <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
+                        <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >Update how your Chatbot looks</label>
                     </div>
                     <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <Form.Label>Font:</Form.Label>
@@ -593,15 +534,15 @@ const ChatUIDemo = (botID) => {
 
             <div className='d-flex justify-content-center my-5 col-lg-5 col-11'>
 
-                <div className='d-flex  ' style={{ position: 'relative', height: '600px', minWidth: '240px', maxWidth: '540px', width: '100%', marginTop:'100px' }}>
+                <div className='d-flex  ' style={{ position: 'relative', height: '600px', minWidth: '240px', maxWidth: '540px', width: '100%', marginTop: '100px' }}>
                     {
                         mark ?
                             <h1 className='bg-primary mx-3' style={{ position: 'absolute', opacity: '15%', left: '20px', bottom: '50px' }}>Powered by Zema</h1> : <p></p>
                     }
-                    <div className="chat-container px-0"  ref={chatContainerRef} style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '540px', minWidth: '240px', width: '100%', borderWidth: '0px' }}>
+                    <div className="chat-container px-0" ref={chatContainerRef} style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '540px', minWidth: '240px', width: '100%', borderWidth: '0px' }}>
                         <div className="chat-messages " >
                             {messages.map((message) => (
-                                message.text === '' || null || undefined ? "":<>
+                                message.text === '' || null || undefined ? "" : <>
                                     <div
                                         key={message.id}
                                         className={`message ${message.sender === 'me' ? 'sent' : 'received'}`}
@@ -610,15 +551,15 @@ const ChatUIDemo = (botID) => {
                                         {/* <div id="text-container" className="message-content typing">{message.text}</div> */}
                                         <TypingEffect id="text-container" className="message-content " text={message.text} />
                                         {/* <p  id="text-container" className="message-content ">{message.text}</p> */}
-                                        
+
                                     </div>
-                                     </>
+                                </>
                             ))}
                             {
-                                chkk.length == 0 ? '':<p style={ messageStyleRec} className="message  received" >{chkk}</p>
+                                chkk.length == 0 ? '' : <p style={messageStyleRec} className="message  received" >{chkk}</p>
                             }
-                             
-            {/* <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >{chkk}</label>           */}
+
+                            {/* <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >{chkk}</label>           */}
 
                             {loading ? (
                                 <ThreeDots type="Oval" position="top-center" color="#3D4648" height={50} width={50} />
@@ -643,40 +584,40 @@ const ChatUIDemo = (botID) => {
                             placeholder="Type a message..."
                         />
                         {
-                        plan === 'year-enterprise' || plan === 'year-standard' || plan === 'mnth-enterprise' || plan === 'year-standard' ?
-                        <>
-                        <div className="me-2">
-                            {
-                                speechTog === false ?
-                                    <button onClick={handleToggleSpeech} type="button">
-                                        <HiSpeakerXMark />
-                                    </button> :
-                                    <button onClick={handleToggleSpeech} type="button">
-                                        <HiSpeakerWave />
-                                    </button>
-                            }
-                        </div>
+                            plan === 'year-enterprise' || plan === 'year-standard' || plan === 'mnth-enterprise' || plan === 'year-standard' ?
+                                <>
+                                    <div className="me-2">
+                                        {
+                                            speechTog === false ?
+                                                <button onClick={handleToggleSpeech} type="button">
+                                                    <HiSpeakerXMark />
+                                                </button> :
+                                                <button onClick={handleToggleSpeech} type="button">
+                                                    <HiSpeakerWave />
+                                                </button>
+                                        }
+                                    </div>
 
-                        <div className="audio-controls me-2">
-                            {!permission ? (
-                                <button onClick={getMicrophonePermission} type="button">
-                                    <FaMicrophoneSlash />
-                                </button>
-                            ) : null}
-                            {permission && recordingStatus === "inactive" ? (
-                                <button onClick={startRecording} type="button">
-                                    <FaMicrophone />
-                                </button>
-                            ) : null}
-                            {recordingStatus === "recording" ? (
-                                <button onClick={stopRecording} type="button">
-                                    <BsStopCircle />
-                                </button>
-                            ) : null}
-                        </div>
-                        </> : ''
+                                    <div className="audio-controls me-2">
+                                        {!permission ? (
+                                            <button onClick={getMicrophonePermission} type="button">
+                                                <FaMicrophoneSlash />
+                                            </button>
+                                        ) : null}
+                                        {permission && recordingStatus === "inactive" ? (
+                                            <button onClick={startRecording} type="button">
+                                                <FaMicrophone />
+                                            </button>
+                                        ) : null}
+                                        {recordingStatus === "recording" ? (
+                                            <button onClick={stopRecording} type="button">
+                                                <BsStopCircle />
+                                            </button>
+                                        ) : null}
+                                    </div>
+                                </> : ''
 
-                         }
+                        }
                         <button type="submit" ><img src={sendIcon} alt='Send' style={{ height: '22px', width: '25px', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} /></button>
                         {/* <button type="submit" ><img src="https://icons.veryicon.com/png/o/internet--web/iview-3-x-icons/ios-send.png" style={{ height:'25px', width:'40px', backgroundSize:'contain', backgroundRepeat:'no-repeat'}}/></button> */}
                     </form>

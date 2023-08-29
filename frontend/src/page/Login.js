@@ -16,16 +16,19 @@ import {BsGoogle} from 'react-icons/bs'
 import * as jose from 'jose';
 import env from 'react-dotenv'
 
+
 const Login = () => {
 
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.19.246.7/'
+  const navigate = useNavigate();
+
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'http://3.138.169.250/'
     const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const[loading, setLoading] = useState(false);
   const[param,setParam]=useState('')
   const[sl,setSl]=useState('')
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
 
   const handleSubmit =async (e) => {
@@ -37,8 +40,9 @@ const Login = () => {
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
   })
-    .then(data => { if(data.data === 'NO'){toast.error("Wrong Credentials");setLoading(false);}else{Cookies.set('accessToken', `${data.data}`); toast.success("Login Successful");setLoading(false);} })
+    .then(data => { if(data.data === 'NO'){toast.error("Wrong Credentials");setLoading(false);}else{Cookies.set('accessToken', `${data.data}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)} })
     // .then(data => console.log(data.data))
+    // .then(setTimeout(() => { navigate('/account') }, 2000))
     .catch(err => {console.log("login form err = ",err); toast.error("Something went wrong");setLoading(false);})
 
     console.log('Submitted:', username, password);

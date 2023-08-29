@@ -54,8 +54,8 @@ const ChatUIDe = (botID) => {
     const[chkk,setChkk] = useState([])
     const[ck,setCk]=useState([])
 
-    const BACKEND = 'http://localhost:5000/'
-    // const BACKEND = 'http://3.19.246.7/'
+    // const BACKEND = 'http://localhost:5000/'
+    const BACKEND = 'http://3.138.169.250/'
 
     const handleInputChange = async (e) => {
         await setInputValue(e.target.value)

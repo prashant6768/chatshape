@@ -21,22 +21,6 @@ import socketIO from 'socket.io-client';
 
 
 function TypingEffect({ text }) {
-    // const delay = 20;
-
-    // const [displayedText, setDisplayedText] = useState('');
-    // const [currentIndex, setCurrentIndex] = useState(0);
-
-    // useEffect(() => {
-    //     const timer = setTimeout(() => {
-    //         if (currentIndex < text.length) {
-    //             setDisplayedText(prevText => prevText + text.charAt(currentIndex));
-    //             setCurrentIndex(prevIndex => prevIndex + 1);
-    //         }
-    //     }, delay);
-
-    //     return () => clearTimeout(timer);
-    // }, [currentIndex, text]);
-
     return <div>{text}</div>;
 }
 
@@ -56,6 +40,9 @@ const ChatUIDemo = (botID) => {
     const [chkk, setChkk] = useState([])
     const [consecFail, setConsecFail] = useState(0)
     const [consecFailMsg, setConsecFailMsg] = useState([])
+    const[ansE,setAnsE]=useState('')
+    const[queE,setQueE]=useState('')
+    const[startSocket,setStartSocket]=useState(1)
 
 
 
@@ -68,21 +55,50 @@ const ChatUIDemo = (botID) => {
     const [room, setRoom] = useState('');
 
 
-    useEffect(() => {
-        const newSocket = socketIO.connect(BACKEND);
 
+    useEffect(() => {
+        try{
+
+        
+        console.log("startSocket-",startSocket)
+        if(startSocket == 1){
+        const newSocket = socketIO.connect(BACKEND
+            , {
+            transports: [ "wss"],
+            enabledTransports: [ "wss"],
+        }
+        );
+        console.log("----------------------------Socket connect front")
 
         setSocket(newSocket);
+        newSocket.on("connect", () => {
+            console.log("-----------------Socket connected on the front end");
+        });
+    
+        newSocket.on("error", (error) => {
+            console.error("--------------Socket error on the front end:", error);
+        });
 
         return () => {
             newSocket.disconnect();
+            console.log("Socket DIS--connect front")
         };
-    }, []);
+    }else if(startSocket == 0){
+        socket.disconnect();
+            console.log("Socket DIS--connect front")
+    }
+}catch(err){
+    console.log(err,"======try catch")
+}
+    }, [startSocket]); /* Remove startSocket after testing   */
+
+
 
     const joinRoom = (roomName) => {
         if (socket) {
             socket.emit('join', { room: roomName });
             setRoom(roomName);
+            console.log("-------------------------Room joined ", roomName)
         }
     };
 
@@ -108,14 +124,15 @@ const ChatUIDemo = (botID) => {
         });
     }, [socket])
 
-    //////////////////////////////////////////////////////////////// works but could potentially skip same token repated twice, thinking they are duplicates
     useEffect(() => {
+       
+
         socket?.on('message-chat', data => {
             setChkk(prevChkk => [...prevChkk, data.message])
             console.log(data.message)
         });
+   
     }, [socket])
-    //////////////////////////////////////////////////////////////// works but could potentially skip same token repated twice, thinking they are duplicates
 
 
 
@@ -145,12 +162,15 @@ const ChatUIDemo = (botID) => {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") }
-         else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } 
-         else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) } 
-         else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
-         else { setChatbotMsg(res.data[0]); setConsecFail(0); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } })
-         .catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+        }).then(res => {
+            if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") }
+            else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") }
+            else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }
+            else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+            else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+            else { setChatbotMsg(res.data[0]); setConsecFail(0); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) }
+        })
+            .catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
         scrollToBottom()
 
     }
@@ -187,7 +207,11 @@ const ChatUIDemo = (botID) => {
             'Access-Control-Allow-Origin': '*'
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
-            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, res.data[1]]) } else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, "Relevant Data Not Found"]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); setConsecFail(0); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); setConsecFail(consecFail + 1); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! "); setConsecFailMsg(prev => [...prev, err]) })
+            .then(res => {
+                if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, res.data[1]]) } else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, "Relevant Data Not Found"]); setConsecFail(consecFail + 1) }
+                else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+                else { setChatbotMsg(res.data[0]); setConsecFail(0); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); }
+            }).catch(err => { setLoading(false); setConsecFail(consecFail + 1); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! "); setConsecFailMsg(prev => [...prev, err]) })
         scrollToBottom()
 
     };
@@ -206,7 +230,7 @@ const ChatUIDemo = (botID) => {
                 'Accept': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             })
-                .then(res => { setConsecFailMsg([]);   console.log(res.data, " === from backend ") }).catch(err => console.log(err))
+                .then(res => { setConsecFailMsg([]); console.log(res.data, " === from backend ") }).catch(err => console.log(err))
             // .then()
         }
     }, [messages])
@@ -385,7 +409,6 @@ const ChatUIDemo = (botID) => {
         };
     };
 
-
     useEffect(() => {
         if (audio !== null) {
             const formData = new FormData();
@@ -422,6 +445,23 @@ const ChatUIDemo = (botID) => {
             console.log(chatContainerRef.current.scrollHeight, "chatContainerRef.current.scrollHeight")
         }, 10);
     };
+
+    const handleEmbedQuestion=(e)=>{
+        e.preventDefault()
+        if(queE == '' || ansE == ''){
+            toast.error('Fill both fields')
+        }else{
+
+            setLoading(true);
+        axios.post(`${BACKEND}api/embedQuestion/${botID.botID}`, { queE ,ansE }, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }).then(res => {if(res.data === 'success'){console.log("--430-",res.data); toast.success('Questions embedded into the Knowledge Base'); setLoading(false);setAnsE('');setQueE('')}else{toast.error("Some Error Occured"); setLoading(false);setAnsE('');setQueE('')}}).catch(err => {console.log(err);toast.error("Some Error Occured !!!!"); setLoading(false);setAnsE('');setQueE('') })
+        // .then(res => { if (res.data === 'Yes') { toast.success('Font Changes were successful'); setLoading(false); } else { toast.success('Some error occured'); setLoading(false); } }).catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoading(false); })
+        }
+
+    }
 
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
@@ -531,9 +571,11 @@ const ChatUIDemo = (botID) => {
 
             {/* ##################################### Chat UI DEMO */}
 
-
+            {/* <button className='btn btn-outline-warning px-5' onClick={()=>setStartSocket(!startSocket)} type="submit">CONNECT TO SOCKET (REMOVE AFTER TESTING)</button> */}
+            {/* <button className='btn btn-outline-warning px-5' onClick={()=>joinRoom(botID.botID)} type="submit">JOIN ROOM (REMOVE AFTER TESTING)</button> */}
+            {/* <button className='btn btn-outline-warning px-5' onClick={()=>leaveRoom()} type="submit">LEAVE ROOM (REMOVE AFTER TESTING)</button> */}
             <div className='d-flex justify-content-center my-5 col-lg-5 col-11'>
-
+            
                 <div className='d-flex  ' style={{ position: 'relative', height: '600px', minWidth: '240px', maxWidth: '540px', width: '100%', marginTop: '100px' }}>
                     {
                         mark ?
@@ -631,6 +673,31 @@ const ChatUIDemo = (botID) => {
 ) : null} */}
                 </div>
             </div>
+            <div className='d-flex justify-content-center my-5 col-lg-8 col-11'>
+            <form className='col-sm-9 mb-5 col-11 mx-auto ' style={{marginTop:'50px'}}>
+              <div className="form-group d-flex justify-content-center mt-5 mb-5 fs-2 fw-bold ">
+                <label className='text-center' style={{color:'white'}} >Embed specific questions</label>
+              </div>
+              <div className="form-group">
+                <label style={{color:'white'}} >Question</label>
+                <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3' onChange={(e)=>setQueE(e.target.value)} value={queE} placeholder='Question' />
+              </div>
+              <div className="form-group">
+                <label style={{color:'white'}} >Answer</label>
+                <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3' value={ansE} onChange={(e)=>setAnsE(e.target.value)} placeholder='Answer' />
+              </div>
+              <div className='form-group d-flex mt-5 justify-content-center'>
+                <button className='btn btn-outline-warning  mb-3 px-5  ' onClick={(e)=>handleEmbedQuestion(e)}>Embed Questions</button>
+              </div>
+              <div className='form-group d-flex justify-content-center'>
+                {loading ? (
+                  <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+                ) : (
+                  ''
+                )}
+              </div>
+            </form>
+             </div>   
             <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />
         </div>
     )

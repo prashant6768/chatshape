@@ -47,6 +47,8 @@ EMAILPASS = os.getenv("EMAILPASS")
 AUTH_FILE_SECRET_KEY = os.getenv("AUTHFILE_SECRET_KEY")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 SESSION_SECRET = os.getenv("SESSION_SECRET")
+pageURL = 'http://localhost:3000'
+pageBackendURL = 'http://localhost:5000/'
 
 client = MongoClient(MONGO)
 db = client['chatbot']
@@ -61,9 +63,9 @@ auth.secret_key = AUTH_FILE_SECRET_KEY
 # auth.config['SECRET_KEY'] = SECRET_KEY
 bcrypt = Bcrypt()
 
-CORS(auth, origins='http://localhost:3000') 
+CORS(auth, origins=pageURL) 
 app.secret_key = os.getenv("SESSION_SECRET_1")
-CORS(app, origins='http://localhost:3000')
+CORS(app, origins=pageURL)
 from google.auth import exceptions as google_auth_exceptions
 from google.auth.transport import requests as google_auth_requests
 from google.oauth2 import id_token
@@ -110,7 +112,7 @@ def callback_google():
     flow = Flow.from_client_secrets_file(
         "client_secret.json",
         scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"],
-        redirect_uri="http://localhost:5000/auth/callback",
+        redirect_uri= pageBackendURL+"auth/callback",
     )
     flow.fetch_token(authorization_response=request.url)
 
@@ -157,13 +159,13 @@ def callback_google():
         users_subscription.create_index("username", unique=True)
         users_subscription.insert_one(user_sub_data)
 
-        redirect_url = 'http://localhost:3000/login' 
+        redirect_url = pageURL+'/login' 
         redirect_url += '?access_token=' + username
         redirect_url += '&sl=' + 's'
         return redirect(redirect_url)           
 
     else:
-        redirect_url = 'http://localhost:3000/login' 
+        redirect_url =  pageURL+'/login' 
         redirect_url += '?access_token=' + username
         redirect_url += '&sl=' + 'l'
         return redirect(redirect_url)
@@ -261,18 +263,12 @@ def getOTP():
     otpSer = user_data['otpSer']
     print(user_data,"AAAAAAAAAAAAAAAaa",type(otpSer))
     
-   
-
     if user_otp == int(otpSer):
-        # users_collection = db['users']
         users_subscription = db['user_subscription']
-        
         created = datetime.now().date().strftime("%Y-%m-%d")
         expire = datetime.now().date()+relativedelta(years=1)
         expired = expire.strftime("%Y-%m-%d")
-
-        print("#######N",created,"u",expired)
-        
+        print("#######N",created,"u",expired)  
         user_sub_data={
             'plan-Info':default_sub,
             'username':user_data['username'],
@@ -282,61 +278,31 @@ def getOTP():
         }
         
         try:
-
             users_collection_user.update_one( {'username': username} ,  { "$set": { 'verifyFlag': "Y" } })
-
-            # users_collection.create_index("username", unique=True)
             users_subscription.create_index("username", unique=True)
-                    
-            # users_collection.insert_one(user_data) 
             users_subscription.insert_one(user_sub_data)
-            return "OK"      
-            
+            return "OK"          
         except OperationFailure as e:
             return "NO"
-            # if you get user already exists erro it might be due to user existing in subscription schema
     else:
         users_collection_user.delete_many( {'username': username})
-        return "Verification Failed"
-       
+        return "Verification Failed"      
 
 @auth.route('/login', methods=[ 'POST'])
 def login():
     if request.method == 'POST':
-
         username = request.get_json()['username']
         password = request.get_json()['password']
-        # ddd = json.loads(request.data, strict=False)
-        # print(ddd,"aaaaaaaaaaaaaaaaaaaaaaaa")
-
         users_collection = db['users']
-
-        # ooooooooooooooooooooooooooooooo Find function alternative 00000000000000000000000000000000000000000000
-        # obj = [{'k1':"apple",'k2':"red"}, {'k1':"banana",'k2':"yellow"}]
-        # for x in obj:
-        #   if x.get('k2') == 'red':
-        #      print(x.get('k2'),x.get('k1'))
-        #      print("{k2:",x.get('k2'),",k1:",x.get('k1'),"}") 
-        
         user_data_i = users_collection.find_one({'username': username})
         print("KKKKKKKKKKk",user_data_i.get('username'))
-        # user_data = {
         dbusername =user_data_i.get('username')
         dbpassword =user_data_i.get('password')
-        # }
 
         if dbusername and dbpassword == password :
-            # token = create_jwt_token(username)
-            # session['token'] = token
-            # response = make_response()
-            # response.set_cookie('token', token)
-           # # session['username'] = username
-            # print("RESponsee ",response , token )
             return dbusername
-            # return token
         else:
-            error = 'Invalid credentials. Please try again.'
-        
+            error = 'Invalid credentials. Please try again.'     
             print("no success")
             return "NO"
     print("login success")

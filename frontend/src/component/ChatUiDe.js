@@ -19,22 +19,6 @@ import env from 'react-dotenv'
 import socketIO from 'socket.io-client';
 
 function TypingEffect({ text }) {
-    // const delay = 20;
-
-    // const [displayedText, setDisplayedText] = useState('');
-    // const [currentIndex, setCurrentIndex] = useState(0);
-
-    // useEffect(() => {
-    //     const timer = setTimeout(() => {
-    //         if (currentIndex < text.length) {
-    //             setDisplayedText(prevText => prevText + text.charAt(currentIndex));
-    //             setCurrentIndex(prevIndex => prevIndex + 1);
-    //         }
-    //     }, delay);
-
-    //     return () => clearTimeout(timer);
-    // }, [currentIndex, text]);
-
     return <div>{text}</div>;
 }
 
@@ -53,6 +37,8 @@ const ChatUIDe = (botID) => {
     const [now, setNow] = useState('')
     const[chkk,setChkk] = useState([])
     const[ck,setCk]=useState([])
+    const[consecFail,setConsecFail]=useState(0)
+    const[consecFailMsg,setConsecFailMsg]=useState([])
 
     // const BACKEND = 'http://localhost:5000/'
     const BACKEND = 'http://3.138.169.250/'
@@ -67,7 +53,7 @@ const ChatUIDe = (botID) => {
    
   
     useEffect(() => {
-        const newSocket = socketIO.connect('http://localhost:5000/');
+        const newSocket = socketIO.connect(BACKEND);
   
     
         setSocket(newSocket);
@@ -146,7 +132,7 @@ const ChatUIDe = (botID) => {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") }else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
         scrollToBottom()
     }
 
@@ -184,9 +170,27 @@ const ChatUIDe = (botID) => {
             'Access-Control-Allow-Origin': '*'
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
-            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") }else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
             scrollToBottom()
         };
+
+        useEffect(()=>{
+            console.log("Consecutive failure",consecFail)
+            if(consecFail >= 5 && messages[messages.length -1]['sender'] == '' ){
+              console.log("AAAAAAAAAAAAAAAALLLLLLLEEEEEEEERRRRRRRTTTTTTTTT")
+               const failmsg = messages.filter(message => message.text !== '').slice(-10)
+               const consecFailMsgF = consecFailMsg.slice(-5)
+              // console.log("------------",messages.filter(message => message.text !== ''))
+              console.log("-----10message-------",messages.filter(message => message.text !== '').slice(-10))
+              axios.post(`${BACKEND}api/consecFailure`, { botID , failmsg ,consecFailMsgF}, {
+                  'Content-type': 'application/json',
+                  'Accept': 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+              })
+                  .then(res =>{setConsecFailMsg([]); setConsecFail(0); console.log(res.data," === from backend ")}).catch(err => console.log(err))
+                  // .then()
+            }
+          },[ messages])
 
     useEffect(() => {
         console.log("111111==", messages)

@@ -66,7 +66,7 @@ const ChatUI = (botID) => {
  
 
   useEffect(() => {
-      const newSocket = socketIO.connect('http://localhost:5000/');
+      const newSocket = socketIO.connect(BACKEND);
 
   
       setSocket(newSocket);
@@ -145,7 +145,7 @@ const ChatUI = (botID) => {
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(res.data, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(res.data, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
       scrollToBottom()
   }
 
@@ -184,7 +184,7 @@ const ChatUI = (botID) => {
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); console.log(res.data, "=== backend www", res.data[0]); setUniqueCon(0); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); console.log(res.data, "=== backend www", res.data[0]); setUniqueCon(0); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
       scrollToBottom()
     };
 

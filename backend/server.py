@@ -20,6 +20,7 @@ from langchain.chat_models import ChatOpenAI
 
 import re
 
+from langchain.docstore.document import Document
 from langchain.document_loaders import SeleniumURLLoader
 from langchain.document_loaders import OnlinePDFLoader
 from langchain.callbacks import get_openai_callback
@@ -53,6 +54,10 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver import Firefox ######################################################firefox
+from selenium.webdriver.firefox.options import Options as FirefoxOptions#####################################################firefox
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -86,6 +91,7 @@ import os
 from dotenv import find_dotenv, load_dotenv
 
 from langchain.document_loaders import SeleniumURLLoader
+from unstructured.partition.html import partition_html
 # from langchain.text_splitter import CharacterTextSplitter
 from langchain.text_splitter import TokenTextSplitter
 
@@ -188,7 +194,7 @@ def on_join(data):
     room = data['room']
     join_room(room)
     print(f'A user joined room {room}',type(room))
-    socketio.emit('welcome_message', {'message': f'Welcome to room from backend {room}'}, room=room)
+    socketio.emit('welcome_message', {'message': f'Welcome to room from backend join function {room}'}, room=room)
 
 @socketio.on('leave')
 def on_leave(data):
@@ -203,14 +209,8 @@ def handle_message(data):
     message = data['msg']
     socketio.emit('message-chat',{'message':message},room=str(roomID))
 
-    # socketio.emit('welcome_message', {'message': f'Welcome to----------- room {room}!'}, room=room)
-
-   
-
 ##################################3  socket io end
 
-
-# # @app.route('/api/stream')
 class StreamingHandle(BaseCallbackHandler):
     """Callback handler for streaming. Only works with LLMs that support streaming."""
 
@@ -292,13 +292,6 @@ dataOfSubs = {
                 'NoOfBots': 23,
                 'NoOfCharacters': 5000000,
             },
-            # "year-pro": {
-            #     'amount': 300000,
-            #     'plan': 'Professional',
-            #     'NoOfMsg': 30000,
-            #     'NoOfBots': 48,
-            #     'NoOfCharacters': 10000000,
-            # },
              "month-simple": {
                 'amount': 1900,
                 'plan': 'Hobby',
@@ -313,13 +306,6 @@ dataOfSubs = {
                 'NoOfBots': 23,
                 'NoOfCharacters': 5000000,
             },
-            # "month-pro": {
-            #     'amount': 30000,
-            #     'plan': 'Professional',
-            #     'NoOfMsg': 30000,
-            #     'NoOfBots': 48,
-            #     'NoOfCharacters': 10000000,
-            # },
            "free" :{
                 'amount': 0,
                 'plan': 'Free',
@@ -341,12 +327,6 @@ def choose_option(option):
     # 'NoOfMsg':4000,
     'tokens':100000,
     'NoOfCharacters':float('inf'),}
-    # elif option == "year-pro":
-    #    return {'amount':300000,
-    # 'plan':'year-pro',
-    # 'NoOfMsg':30000,
-   
-    # 'NoOfCharacters':10000000,}
     elif option == "month-simple":
        return {'amount':10000,
     'plan':'month-simple',
@@ -361,12 +341,6 @@ def choose_option(option):
     'tokens':100000,
   
     'NoOfCharacters':float('inf'),}
-    # elif option == "month-pro":
-    #    return {'amount':30000,
-    # 'plan':'month-pro',
-    # 'NoOfMsg':30000,
-  
-    # 'NoOfCharacters':10000000,}
     else:
         return{
         'amount': 0,
@@ -559,7 +533,7 @@ def start_ai(query,userData,uniqueCon):
         'email':dataDb_i.get('email'),
         'botname':dataDb_i.get('botname'),
         'url':dataDb_i.get('url'),
-        'prompt':dataDb_i.get('prompt')
+        'prompt':dataDb_i.get('prompt')+" If you can't find an answer just say 'Relevant Data not found'"
     }
     print("=-------------284",str(type([query])))
 
@@ -571,7 +545,7 @@ def start_ai(query,userData,uniqueCon):
       clientX = chromadb.Client() 
       collectionX = clientX.create_collection(
           name="collection_name_zema",
-          metadata={"hnsw:space": "cosine"}, # l2 is the default, cosine, ip
+          metadata={"hnsw:space": "l2"}, # l2 is the default, cosine, ip
       )
       print("----------------------------452------------")
       collectionX.add(
@@ -628,17 +602,35 @@ def start_ai(query,userData,uniqueCon):
 
       answer = summarize_chain.predict(text=text,query=query)
       print(type(answer),"==answer")
+      try:
+        template_DNF = "Does this {answer} is roughly means 'Couldn't find the specific info to answer'? Answer in yes or no only"
+        prompt_template_DNF = PromptTemplate(input_variables=["answer"],template=template_DNF)
+        llm_DNF = ChatOpenAI(model_name="gpt-4",temperature=1)
+        chain_DNF = LLMChain(llm=llm_DNF, prompt=prompt_template_DNF,verbose=False)
+        with get_openai_callback() as cb_DNF:
+           answer_DNF = chain_DNF.predict(answer=answer)
+        print("------------605--------",answer_DNF,'--',cb_DNF.total_tokens)
+      except Exception as e:
+        print("---------607------",str(e))  
+
+
+
+
+
     #   print("--------748------",cb)
       encoding = tiktoken.get_encoding("cl100k_base")
-      if answer == "Relevant Data not found.":
+      if answer.lower() == "relevant data not found.":
         print("-------634---------could work--------")
         return "RDNF"
-      if "Relevant Data not found." in answer:
+      if "relevant data not found." in answer.lower():
         print("-------634---------could work--------")
         return "RDNF"
-      return [answer, len(encoding.encode(input_string_F + "Human: "))+5+len(encoding.encode(answer))]
+      if str(answer_DNF.lower()) == 'yes':
+         return [answer,"RDN"]
+      return [answer, len(encoding.encode(input_string_F + "Human: "))+cb_DNF.total_tokens+5+len(encoding.encode(answer))]
 
   except Exception as e:
+    print("--626--",str(e))
     return str(e)  
    
 
@@ -678,6 +670,8 @@ def user_msg():
     if summariesCb == 'RDNF':
         print("---------676--could work------")
         return 'RDNF'
+    if summariesCb[1] == 'RDN':
+        return [summariesCb[0],summariesCb[1]]    
     summaries = summariesCb[0]
     cb = summariesCb[1]
     print("-------479 ", summaries,"----tokens--" ,int(cb))
@@ -753,7 +747,8 @@ def get_link_data():
     # print("username is ==", userData)
     # print("305-----------------",request.get_json()['exclude'])
     print("318-----------exclude----------",exclude)
-    get_data(urll,userData,botName,pdf,unique,exclude,datasub['plan-Info']['NoOfCharacters'])
+    value = get_data(urll,userData,botName,pdf,unique,exclude,datasub['plan-Info']['NoOfCharacters'])
+    return value + "This is return at wrong place , fix it"
     # print("-------------567----remove a = get_data() ",a)
     if os.path.exists(pdf):
         print("os path -------568",pdf)
@@ -787,8 +782,37 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
         # page_links_x = urls
         # str(type(page_links_x))
         print("Page links x:", page_links_x)
-        loader = SeleniumURLLoader(urls=page_links_x)
-        data = loader.load()
+        # loader = SeleniumURLLoader(urls=page_links_x)
+        # data = loader.load()
+
+        options = Options()
+        options.add_argument('--headless')  
+        options.add_argument('--disable-gpu')
+        driver = webdriver.Chrome(options=options) 
+        # driver = webdriver.Chrome(service=Service(r'/snap/bin/chromium.chromedriver'), options=options)  ###### for server code
+        docsSel: List[Document] = list()
+        # docsSel = []
+        WebDriverWait(driver, timeout=10)
+
+        for url in page_links_x:
+            try:
+
+                driver.get(url)
+                page_content = driver.page_source
+                elements = partition_html(text=page_content)
+                text = "\n\n".join([str(el) for el in elements])
+                metadata = {"source": url}
+                # return(str(Document(page_content=text, metadata=metadata)))
+                # print("Document ------------- 802",dd)
+                # return str(dd)
+                docsSel.append(Document(page_content=text, metadata=metadata))
+            except Exception as e:
+                print(str(e))
+
+        driver.quit()
+        data = docsSel
+        # print(data)
+        # return str(docsSel)
 
 
     
@@ -839,7 +863,7 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
         'tokenData':[],
         'UniqueCon':0,
         'UniqueConData':[],
-        'prompt':" You are a world class analyst.You are having a conversation with the user about the  text and you have to answer the users questions. Please follow these rules: 1. Make it engaging and informative. 2. Should address the {query} very well. 3. Don't repeat your sentences and information 4. Always mention name of things or people you talk about. 5.Don't mention your name when answering, go straight to the answer . If you can't find an answer just say 'Relevant Data not found'  {text}  Human: {query} "             
+        'prompt':" You are a world class analyst.You are having a conversation with the user about the  text and you have to answer the users questions. Please follow these rules: 1. Make it engaging and informative. 2. Should address the {query} very well. 3. Don't repeat your sentences and information 4. Always mention name of things or people you talk about. 5.Don't mention your name when answering, go straight to the answer   {text}  Human: {query} "             
     } 
     print("docs tyep---------------654--44--------","----------654--4---")
     try:
@@ -848,6 +872,7 @@ def get_data(urls,userData,botName,pdf,unique,exclude, NoOfCharacters):
        user_sub.update_one({"username": userData}, {"$inc": {"plan-Info.NoOfBots":-1}})
        print("Data stored successfully!")
     except Exception as e:
+       return str(e) 
        print("Error storing data:============", str(e),"===========================")
     print("dat stored hopefully = ")
     return "FOUND NO ERROR"
@@ -931,19 +956,36 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude, NoOfCharacters):
         # return str(type(urls.split()))
         page_links = scrape_links_and_buttons(urls)
         # return page_links
-        # print("------------------414--------",page_links)
+        print("------------------929--------",page_links)
         # return page_links
 
-        print("pdf---------------------614----Links-----",page_links)
-        print("----------615------",type(exclude.split(","))) 
+        # print("pdf---------------------614----Links-----",page_links)
+        # print("----------615------",type(exclude.split(","))) 
         page_links_x = [link for link in page_links if link not in exclude.split(",")]
         # page_links_x = urls
         # str(type(page_links_x))
-        print("Page links x:", page_links_x)
-        loader = SeleniumURLLoader(urls=page_links_x)
-        data = loader.load()
+        print("Page links x: -------937---", page_links_x)
+        # loader = SeleniumURLLoader(urls=page_links_x)
+        # data = loader.load()
+        options = Options()
+        options.add_argument('--headless')  
+        options.add_argument('--disable-gpu')
+        driver = webdriver.Chrome(options=options) 
+        docsSel= []
 
+        for url in page_links_x:
+            try:
+                driver.get(url)
+                page_content = driver.page_source
+                elements = partition_html(text=page_content)
+                text = "\n\n".join([str(el) for el in elements])
+                metadata = {"source": url}
+                docsSel.append(Document(page_content=text, metadata=metadata))
+            except Exception as e:
+                print(str(e))
 
+        driver.quit()
+        data = docsSel
     
     if len(pdf) != 0 :  #CHange this to not equal to after testing------------------------------------------------------------------  
         print("626--------------",pdf)   
@@ -958,6 +1000,15 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude, NoOfCharacters):
         docs = ''  
         print("______-----------------386")  
     print("------------637",type(urls))
+
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+    docsPdf = text_splitter.split_documents(docs)
+    docsUrl = text_splitter.split_documents(data)
+    mainDoc = docsUrl + docsPdf
+
+
+    embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    dba = Chroma.from_documents(documents=mainDoc, embedding=embeddings)
     
     users_collection = db['users_website_crawl_data']
     user_sub = db['user_subscription']
@@ -966,8 +1017,9 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude, NoOfCharacters):
        users_collection.update_one({'_id':objId},{"$set":
        {
         'NoOfCharacters': NoOfCharacters,
-        'crawldata': str(data),
-        'crawldataPdf':str(docs),
+        # 'crawldata': str(data),
+        # 'crawldataPdf':str(docs),
+        'crawl':dba.get(include=['embeddings','metadatas','documents']),
         'url':urls,
         'pdf':unique,
         }})
@@ -979,6 +1031,46 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude, NoOfCharacters):
     return "FOUND NO ERROR"
   except Exception as e:
     return str(e)  
+
+##################################################################################  embed question
+@app.route('/api/embedQuestion/<id>',methods=['POST'])
+def embedquestion(id):
+    try:
+        objId= ObjectId(id)
+        users_collection = db['users_website_crawl_data']
+        dataDb_i = users_collection.find_one({'_id':objId})
+        question = request.get_json()['queE']
+        answer =  request.get_json()['ansE'] 
+        qa = 'question: '+question+', answer: '+answer
+        print(qa)
+        doc=Document(
+                page_content=qa,
+                metadata={"question": question}
+            )
+        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+        text = text_splitter.split_documents([doc])
+        print(text,"===========================1013")
+
+        embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+        dba = Chroma.from_documents(documents=text, embedding=embeddings)
+        print(dba.get()['ids'],"==1021")
+        users_collection = db['users_website_crawl_data']
+        users_collection.update_one({'_id':objId},{"$push":
+       {
+        'crawl.ids':dba.get(include=['embeddings','metadatas','documents'])['ids'][len(dba.get()['ids'])-1],
+        'crawl.embeddings':dba.get(include=['embeddings','metadatas','documents'])['embeddings'][len(dba.get()['ids'])-1],
+        'crawl.metadatas':dba.get(include=['embeddings','metadatas','documents'])['metadatas'][len(dba.get()['ids'])-1],
+        'crawl.documents':dba.get(include=['embeddings','metadatas','documents'])['documents'][len(dba.get()['ids'])-1],
+        }})
+        print("--1008-",dba.get(include=['embeddings','metadatas','documents'])['metadatas'][len(dba.get()['ids'])-1],"---1008")
+        dba=None
+        
+        ##################3333  not complete, embedding needs ids, metadata,etc (4 fields) , pdf metadata is same for all documents .
+        return "success"
+        
+    except Exception as e:
+        print(str(e),"---------1001")    
+        return str(e)
 
 ##########################################################################3  char graph date
 @app.route('/api/chartToken/<id>',methods=['POST'])
@@ -1163,20 +1255,18 @@ def get_mybots():
 
 ################################################ scraper code
 def scrape_links_and_buttons(url):
-  try:
+  try:  
     options = Options()
     options.add_argument('--headless')  
     options.add_argument('--disable-gpu')
-
-    driver = webdriver.Chrome(options=options)  
-
+    driver = webdriver.Chrome(options=options) 
+   
     driver.get(url)
  
     WebDriverWait(driver, timeout=10)
 
     links = []
     unique_links=[]
-    print(driver)
 
     # # Find all <a> tags for links
     for link in driver.find_elements(By.TAG_NAME, 'a'):
@@ -1189,9 +1279,10 @@ def scrape_links_and_buttons(url):
          unique_links.append(link)        
 
     driver.quit()
+    print("================",unique_links)
     return unique_links
   except Exception as e:
-    return str(e)  
+    return "from scrap link and buttons = "+str(e)  
 
 ######################################################### send subscription info back to frontend
 @app.route('/api/subdata',methods=['POST'])
@@ -1330,8 +1421,8 @@ def consecFailure():
 
     email_headers = f"Subject: Zema Chatbot Failure Report\r\n"
     email_headers += f"From: {sender_email}\r\n"
-    email_headers += f"To: aniketshival007@gmail.com\r\n"
-    email_headers += f"Cc: aniket@dshgsonic.com\r\n"
+    email_headers += f"To: aniket@dshgsonic.com\r\n"
+    email_headers += f"Cc: prashant@dshgsonic.com\r\n"
     email_headers += "\r\n"
 
     message = f'Failure in chatbot ="{user_bot}", \n id ="{str(BotID)}", \n user ="{user_email[0]}",\n error = \n{formatted_error_msg}  .'
@@ -1344,7 +1435,7 @@ def consecFailure():
         server.starttls(context=context) 
         server.ehlo() 
         server.login(sender_email, password)
-        server.sendmail(sender_email, ["aniketshival007@gmail.com","aniket@dshgsonic.com"], email_message)
+        server.sendmail(sender_email, ["prashant@dshgsonic.com","aniket@dshgsonic.com"], email_message)
         # TODO: Send email here
     except Exception as e:
         print(e)

@@ -73,6 +73,7 @@ const messageStyleRec = {
   const [togDel, setTogDel] = useState(false)
   const [vis, setVis] = useState('Bot Properties')
   const [resizer, setResizer] = useState(true)
+
   // const BACKEND = 'http://localhost:5000/'
   const BACKEND = 'http://3.138.169.250/'
 

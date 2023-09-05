@@ -16,7 +16,8 @@ const AccountSection1 = () => {
     // const decoded = document.cookie.split('=')[1]
     const decoded = Cookies.get('accessToken');
     // const BACKEND = 'http://localhost:5000/'
-    const BACKEND = 'http://3.138.169.250/'
+    // const BACKEND = 'http://3.138.169.250/'
+    const BACKEND = 'https://api.zema.io/'
 
     const [data, setData] = useState('')
     const [data2, setData2] = useState('')

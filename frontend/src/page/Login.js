@@ -22,7 +22,8 @@ const Login = () => {
   const navigate = useNavigate();
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'http://3.138.169.250/'
+  // const BACKEND = 'http://3.138.169.250/'
+  const BACKEND = 'https://api.zema.io/'
 
     const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -41,7 +42,7 @@ const Login = () => {
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
   })
-    .then(data => { if(data.data === 'NO'){toast.error("Wrong Credentials");setLoading(false);}else{Cookies.set('accessToken', `${data.data}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)} })
+    .then(data => { if(data.data === 'NO'){toast.error("Wrong Credentials");setLoading(false);}else if(data.data === 'ic'){toast.error("Fill Both Fields");setLoading(false);}else{Cookies.set('accessToken', `${data.data}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)} })
     // .then(data => console.log(data.data))
     // .then(setTimeout(() => { navigate('/account') }, 2000))
     .catch(err => {console.log("login form err = ",err); toast.error("Something went wrong");setLoading(false);})

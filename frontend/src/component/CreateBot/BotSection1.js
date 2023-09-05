@@ -19,7 +19,8 @@ const BotSection1 = () => {
   const decoded = Cookies.get('accessToken');
   console.log("------------decoded",decoded)
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'http://3.138.169.250/'
+  // const BACKEND = 'http://3.138.169.250/'
+  const BACKEND = 'https://api.zema.io/'
 
   const[sendLink,setSendLink]= useState('')
   const[botName,setBot]=useState('')

@@ -10,7 +10,8 @@ import { Link } from 'react-router-dom'
 const SuccessPage = () => {
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'http://3.138.169.250/'
+  // const BACKEND = 'http://3.138.169.250/'
+  const BACKEND = 'https://api.zema.io/'
   const[data,setData]=useState('')
   const[product,setProduct]=useState('')
   const[user,setUser]=useState('')

@@ -16,7 +16,8 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
-  const BACKEND = 'http://3.138.169.250/'
+  // const BACKEND = 'http://3.138.169.250/'
+  const BACKEND = 'https://api.zema.io/'
   // const BACKEND = 'http://localhost:5000/'
 
     const [username, setUsername] = useState('');
@@ -31,14 +32,12 @@ const Signup = () => {
   
     const handleSubmit =async (e) => {
       e.preventDefault();
-      setShow(true)
       setLoading(true); 
       await axios.post(`${BACKEND}auth/signup`,{username,password,name,phone},{
-        // await axios.post('http://18.218.218.167:8000/auth/signup',{username,password},{
           'Content-type':'application/json', 
           'Accept':'application/json',
           'Access-Control-Allow-Origin':'*'
-    }).then(res => { console.log(res); setLoading(false)})
+    }).then(res => {if(res.data === 'User Exists'){ toast.error("User Exists");console.log(res); setLoading(false)}else{console.log(res); setLoading(false);setShow(true)}})
       .catch(err => {console.log("signup form err = ",err); toast.error("Something went wrong");setLoading(false);})
   
       console.log('Submitted:', BACKEND);

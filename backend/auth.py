@@ -203,6 +203,14 @@ def signup():
         nameUser = request.get_json()['name']
         phone = request.get_json()['phone']
 
+        users_collection = db['users']
+        userExist = users_collection.find_one({'username': username})
+        if userExist:
+            print("-----209")
+            return "User Exists"
+
+
+
         otp = random.randint(100000, 999999)
         otp_store[username] = otp
   
@@ -295,10 +303,21 @@ def login():
         password = request.get_json()['password']
         users_collection = db['users']
         user_data_i = users_collection.find_one({'username': username})
+
+        if  username == '' :
+            print("-------309")
+            return "ic" 
+        if password == '':
+            print("-------309")
+            return "ic"    
+        if user_data_i == None:
+            print("--------307",password)
+            return "NO"     
+        
         print("KKKKKKKKKKk",user_data_i.get('username'))
         dbusername =user_data_i.get('username')
         dbpassword =user_data_i.get('password')
-
+        print("308==",dbusername,password)
         if dbusername and dbpassword == password :
             return dbusername
         else:

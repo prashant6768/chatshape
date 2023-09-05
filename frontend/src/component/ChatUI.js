@@ -56,7 +56,8 @@ const ChatUI = (botID) => {
   const[consecFailMsg,setConsecFailMsg]=useState([])
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'http://3.138.169.250/'
+  // const BACKEND = 'http://3.138.169.250/'
+  const BACKEND = 'https://api.zema.io/'
 
   // const token = document.cookie.split('=')[1]
   // const decoded = jose.decodeJwt(token,'notmysecretkey');

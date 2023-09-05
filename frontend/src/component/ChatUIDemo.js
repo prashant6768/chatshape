@@ -48,7 +48,11 @@ const ChatUIDemo = (botID) => {
 
 
     // const BACKEND = 'http://localhost:5000/'
-    const BACKEND = 'http://3.138.169.250/'
+    // const BACKENDWS = 'ws://localhost:5000/'
+    const BACKEND = 'https://api.zema.io/'
+    // const BACKENDWS = 'https://api.zema.io/'
+    // const BACKEND = 'http://3.138.169.250/'
+    // const BACKENDWS = 'http://3.138.169.250/'
 
 
     const [socket, setSocket] = useState(null);
@@ -63,12 +67,12 @@ const ChatUIDemo = (botID) => {
         console.log("startSocket-",startSocket)
         if(startSocket == 1){
         const newSocket = socketIO.connect(BACKEND
-            , {
-            transports: [ "wss"],
-            enabledTransports: [ "wss"],
-        }
+        //     , {
+        //     transports: [ "ws"],
+        //     enabledTransports: [ "ws"],
+        // }
         );
-        console.log("----------------------------Socket connect front")
+        console.log("----------------------------Socket connect front",BACKEND)
 
         setSocket(newSocket);
         newSocket.on("connect", () => {
@@ -80,12 +84,14 @@ const ChatUIDemo = (botID) => {
         });
 
         return () => {
-            newSocket.disconnect();
-            console.log("Socket DIS--connect front")
+            if(newSocket.readyState === 1){  /** Remove if statement if error ,-------------------------- */
+                newSocket.disconnect();
+                console.log("Socket DIS--connect front------return one--")
+            }
         };
     }else if(startSocket == 0){
         socket.disconnect();
-            console.log("Socket DIS--connect front")
+            console.log("Socket DIS--connect front----manually")
     }
 }catch(err){
     console.log(err,"======try catch")

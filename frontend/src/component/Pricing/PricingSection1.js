@@ -19,7 +19,8 @@ const PricingSection1 = () => {
 
     const [selectedOption, setSelectedOption] = useState('A');
     // const BACKEND = 'http://localhost:5000/'
-    const BACKEND = 'http://3.138.169.250/'
+    // const BACKEND = 'http://3.138.169.250/'
+    const BACKEND = 'https://api.zema.io/'
     const handleOptionClick = (option) => {
         setSelectedOption(option);
     };

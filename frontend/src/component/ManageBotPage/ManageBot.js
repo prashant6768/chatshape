@@ -75,7 +75,8 @@ const messageStyleRec = {
   const [resizer, setResizer] = useState(true)
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'http://3.138.169.250/'
+  const BACKEND = 'https://api.zema.io/'
+  // const BACKEND = 'http://3.138.169.250/'
 
 
   const [sendLink, setSendLink] = useState('')

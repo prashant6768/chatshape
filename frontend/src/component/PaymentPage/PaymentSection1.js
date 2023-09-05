@@ -14,7 +14,8 @@ const PaymentSection1 = () => {
   const [dataArr, setDataArr] = useState([])
   const[sorted,setSorted]= useState('')
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'http://3.138.169.250/'
+  // const BACKEND = 'http://3.138.169.250/'
+  const BACKEND = 'https://api.zema.io/'
   useEffect(() => {
     axios.post(`${BACKEND}api/paymenthistory`, { decoded }, {
       'Content-type': 'application/json',

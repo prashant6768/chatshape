@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Navigate } from 'react-router-dom';
-import { decodeToken, getAccessToken } from './Auth';
+import { decodeToken, getAccessToken,getAdminToken } from './Auth';
 
 const PrivateRoute = ({ children }) => {
     const token = getAccessToken();

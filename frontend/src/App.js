@@ -25,6 +25,11 @@ import { decodeToken, getAccessToken } from './component/Auth'
 import ManageBotPage from './page/ManageBotPage';
 import TermsOfService from './page/TermsOfService';
 import PrivacyPolicy from './page/PrivacyPolicy';
+import SuperAdminPage from './page/SuperAdminPage';
+import AdminOnly from './component/AdminOnly';
+import UserDataSA from './page/UserDataSA';
+import UserDataIndiSA from './page/UserDataIndiSA';
+import UserDataBotSA from './page/UserDataBotSA';
 
 
 
@@ -74,6 +79,11 @@ const App = () => {
            <Route path ='/CancelPage' element={<PrivateRoute><CancelPage/></PrivateRoute>}/>
            <Route path ='/paymenthistory' element={<PrivateRoute><PaymentHistoryPage/></PrivateRoute>}/>
            <Route path ='/feature' element={<FeaturePage/>}/>
+           <Route path ='/superadmin' element={<AdminOnly><SuperAdminPage/></AdminOnly>}/>
+           <Route path ='/superadminUserData' element={<AdminOnly><UserDataSA/></AdminOnly>}/>
+           <Route path ='/superadminUserDataIndi/:id' element={<AdminOnly><UserDataIndiSA/></AdminOnly>}/>
+           <Route path ='/superadminBot/:id' element={<AdminOnly><UserDataBotSA/></AdminOnly>}/>
+
 
 
           

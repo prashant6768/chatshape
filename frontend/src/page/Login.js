@@ -21,15 +21,33 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'http://localhost:5000/'
   // const BACKEND = 'http://3.138.169.250/'
-  const BACKEND = 'https://api.zema.io/'
+  // const BACKEND = 'https://api.zema.io/'
 
     const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const[loading, setLoading] = useState(false);
   const[param,setParam]=useState('')
   const[sl,setSl]=useState('')
+
+  const [decoded,setDecoded]=useState(undefined)
+  const [showLogin,setShowLogin]=useState(true)
+
+
+  useEffect(()=>{
+      setDecoded(Cookies.get('accessToken'));
+      console.log(Cookies.get('accessToken'),"loginn  page ",decoded)
+  },[decoded])
+
+  useEffect(()=>{
+      if(decoded === undefined){
+        setShowLogin(true)
+      }else{
+          setShowLogin(false)
+      }
+      console.log("show login lll",showLogin)
+  },[decoded])
   // const navigate = useNavigate();
 
 
@@ -42,7 +60,7 @@ const Login = () => {
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
   })
-    .then(data => { if(data.data === 'NO'){toast.error("Wrong Credentials");setLoading(false);}else if(data.data === 'ic'){toast.error("Fill Both Fields");setLoading(false);}else{Cookies.set('accessToken', `${data.data}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)} })
+    .then(data => { if(data.data === 'NO'){toast.error("Wrong Credentials");setLoading(false);}else if(data.data === 'ic'){toast.error("Fill Both Fields");setLoading(false);}else if(data.data[1] === 'admin'){Cookies.set('accessToken', `${data.data[0]}`); Cookies.set('adminToken', `${data.data[1]}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}else{Cookies.set('accessToken', `${data.data}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)} })
     // .then(data => console.log(data.data))
     // .then(setTimeout(() => { navigate('/account') }, 2000))
     .catch(err => {console.log("login form err = ",err); toast.error("Something went wrong");setLoading(false);})
@@ -54,8 +72,10 @@ const Login = () => {
   const logout=()=>{
     // document.cookie = "accessToken; expires=Thu, 01 Jan 1970 00:00:00 UTC; ";
     Cookies.remove('accessToken')
+    Cookies.remove('adminToken')
      toast.success("Logout Successful")
-     navigate('/login');
+     setTimeout(() => { navigate('/') }, 1000)
+     
   }
 
   const handleGoogle= async(e)=>{
@@ -64,7 +84,8 @@ await axios.get(`${BACKEND}auth/googlelogin`,{
   headers: {
     'Access-Control-Allow-Origin': '*',
   },
-}).then(res => {window.location.href = res.data ; console.log(res.data)}).catch(err => console.log("GOOG ",err))
+}).then(res => {window.location.href = res.data ; console.log(res.data);setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}).catch(err => console.log("GOOG ",err))
+setTimeout(() => { navigate('/account') }, 2000)
 }
 
 
@@ -166,6 +187,8 @@ await axios.get(`${BACKEND}auth/googlelogin`,{
         />
       </div>
     </div>
+    {
+      showLogin === true ?
     <div className="col-12">
       <button
         type="submit"
@@ -174,10 +197,11 @@ await axios.get(`${BACKEND}auth/googlelogin`,{
       >
         Login
       </button>
-    </div>
+    </div>:
     <div className="col-12">
     <button type="button" onClick={()=> logout()} class="btn btn-outline-danger  mt-3 d-block w-100">Logout</button>
     </div>
+    }
   </div>
   <div className='form-group d-flex justify-content-center mt-4'>
        {loading ? (

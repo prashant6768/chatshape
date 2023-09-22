@@ -302,7 +302,9 @@ def login():
         username = request.get_json()['username']
         password = request.get_json()['password']
         users_collection = db['users']
-        user_data_i = users_collection.find_one({'username': username})
+        users_admin = db['admin_data']
+
+        deleteUsers = users_collection.delete_many({'verifyFlag':'N'})
 
         if  username == '' :
             print("-------309")
@@ -310,14 +312,20 @@ def login():
         if password == '':
             print("-------309")
             return "ic"    
+
+        user_data_i = users_collection.find_one({'username': username})  
+        user_admin_chk = users_admin.find_one({'admin': username})  
         if user_data_i == None:
             print("--------307",password)
-            return "NO"     
+            return "NO"   
+
         
         print("KKKKKKKKKKk",user_data_i.get('username'))
         dbusername =user_data_i.get('username')
         dbpassword =user_data_i.get('password')
         print("308==",dbusername,password)
+        if dbusername and dbpassword == password and user_admin_chk :
+            return [dbusername,'admin']
         if dbusername and dbpassword == password :
             return dbusername
         else:

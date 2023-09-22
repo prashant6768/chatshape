@@ -47,9 +47,9 @@ const ChatUIDemo = (botID) => {
 
 
 
-    // const BACKEND = 'http://localhost:5000/'
-    // const BACKENDWS = 'ws://localhost:5000/'
-    const BACKEND = 'https://api.zema.io/'
+    const BACKEND = 'http://localhost:5000/'
+    const BACKENDWS = 'ws://localhost:5000/'
+    // const BACKEND = 'https://api.zema.io/'
     // const BACKENDWS = 'https://api.zema.io/'
     // const BACKEND = 'http://3.138.169.250/'
     // const BACKENDWS = 'http://3.138.169.250/'
@@ -60,43 +60,65 @@ const ChatUIDemo = (botID) => {
 
 
 
-    useEffect(() => {
-        try{
+//     useEffect(() => {
+//         try{
+//         console.log("startSocket-",startSocket)
+//         if(startSocket == 1){
+//         const newSocket = socketIO.connect(BACKENDWS
+//             , {
+//             transports: [ "wss"],
+//             enabledTransports: [ "wss"],
+//         }
+//         );
+//         console.log("----------------------------Socket connect front",BACKEND)
+//         setSocket(newSocket);
+//         newSocket.on("connect", () => {
+//             console.log("-----------------Socket connected on the front end");
+//         });
+//         newSocket.on("error", (error) => {
+//             console.error("--------------Socket error on the front end:", error);
+//         });
+//         return () => {
+//             if(newSocket.readyState === 1){  /** Remove if statement if error ,-------------------------- */
+//                 newSocket.disconnect();
+//                 console.log("Socket DIS--connect front------return one--")
+//             }
+//         };
+//     }else if(startSocket == 0){
+//         socket.disconnect();
+//             console.log("Socket DIS--connect front----manually")
+//     }
+// }catch(err){
+//     console.log(err,"======try catch")
+// }
+//     }, []); /* Remove startSocket after testing   */
 
-        
-        console.log("startSocket-",startSocket)
-        if(startSocket == 1){
-        const newSocket = socketIO.connect(BACKEND
-        //     , {
-        //     transports: [ "ws"],
-        //     enabledTransports: [ "ws"],
-        // }
-        );
-        console.log("----------------------------Socket connect front",BACKEND)
-
-        setSocket(newSocket);
-        newSocket.on("connect", () => {
-            console.log("-----------------Socket connected on the front end");
-        });
-    
-        newSocket.on("error", (error) => {
-            console.error("--------------Socket error on the front end:", error);
-        });
-
-        return () => {
-            if(newSocket.readyState === 1){  /** Remove if statement if error ,-------------------------- */
-                newSocket.disconnect();
-                console.log("Socket DIS--connect front------return one--")
-            }
-        };
-    }else if(startSocket == 0){
-        socket.disconnect();
-            console.log("Socket DIS--connect front----manually")
-    }
+useEffect(() => {
+    try{
+    const newSocket = socketIO.connect(BACKENDWS
+    //     , {
+    //     transports: [ "wss"],
+    //     enabledTransports: [ "wss"],
+    // }
+    );
+    console.log("----------------------------Socket connect front",BACKEND)
+    setSocket(newSocket);
+    newSocket.on("connect", () => {
+        console.log("-----------------Socket connected on the front end");
+    });
+    newSocket.on("error", (error) => {
+        console.error("--------------Socket error on the front end:", error);
+    });
+    return () => {
+        if(newSocket.readyState === 1){  /** Remove if statement if error ,-------------------------- */
+            newSocket.disconnect();
+            console.log("Socket DIS--connect front------return one--")
+        }
+    };
 }catch(err){
-    console.log(err,"======try catch")
+console.log(err,"======try catch")
 }
-    }, [startSocket]); /* Remove startSocket after testing   */
+}, []);
 
 
 
@@ -266,7 +288,7 @@ const ChatUIDemo = (botID) => {
             text: chatbotMsg,
             sender: '',
         };
-        if (chatbotMsg === '' && chatbotMsg === null && chatbotMsg === []) {
+        if (chatbotMsg === '' && chatbotMsg === null ) {
             console.log("W")
         } else {
             setMessages((prevMessages) => [...prevMessages, newMessage]);

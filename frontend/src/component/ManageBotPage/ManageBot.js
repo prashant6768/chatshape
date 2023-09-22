@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../underline.css'
 import { ThreeDots } from 'react-loader-spinner';
 import Accordion from 'react-bootstrap/Accordion';
+import { BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill } from 'react-icons/bs'
 import '../ManageBotPage/histroy.css'
 
 import ChatUI from '../ChatUI';
@@ -74,8 +75,8 @@ const messageStyleRec = {
   const [vis, setVis] = useState('Bot Properties')
   const [resizer, setResizer] = useState(true)
 
-  // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://api.zema.io/'
+  const BACKEND = 'http://localhost:5000/'
+  // const BACKEND = 'https://api.zema.io/'
   // const BACKEND = 'http://3.138.169.250/'
 
 
@@ -87,6 +88,8 @@ const messageStyleRec = {
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedTimeCon, setSelectedTimeCon] = useState('');
   const[history,setHistory]= useState('')
+  const[urlsUsed,setUrlsUsed]=useState([])
+  const[urlsEx,setUrlsEx]=useState([])
 
 
   const handleCreateGraph = () => {
@@ -121,10 +124,13 @@ const messageStyleRec = {
     setPrompt(dataArr.prompt)
     setUrl(dataArr.url)
     setPdf(dataArr.pdf)
+    setUrlsUsed(dataArr.urlsUsed)
+    setUrlsEx(dataArr.urlsEx)
     setSPrompt(dataArr.sPrompt)
     setInitialMsg(dataArr.initialMsg)
     setTokenDataGraph(dataArr.tokenData)
     setConDataGraph(dataArr.UniqueConData)
+    console.log("------qqqqqqqq--",dataArr.urlsUsed)
     console.log(dataArr.tokenData, "------", dataArr.UniqueConData)
     //   setUrl(dataArr.url)
   }, [dataArr])
@@ -191,7 +197,7 @@ const messageStyleRec = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then((res) => { if (res.data === 'suc') { toast.success('Bot Deleted'); setLoadingdel(false); } else if (res.data === 'fail') { toast.success('Some Error Occured, Try Again'); setLoadingdel(false); } })
+    }).then((res) => { if (res.data === 'suc') { toast.success('Bot Deleted'); setLoadingdel(false); } else if (res.data === 'fail') { toast.error('Some Error Occured, Try Again'); setLoadingdel(false); } })
       .then(setTimeout(() => { navigate('/mychatbots') }, 2000))
       .catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoadingdel(false); })
     //  await navigate('/mychatbots');
@@ -260,10 +266,85 @@ const messageStyleRec = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*',
-    }).then(res => {setHistory(res.data); console.log(res.data)}).catch(err => console.log(err))
+    }).then(res => {setHistory(res.data); console.log("history ",res.data)}).catch(err => console.log(err))
   }
   },[vis])
 
+
+  const [minHeight, setMinHeight] = useState(500); 
+
+  const breakpoints = {
+    small: 768, 
+    medium: 1024, 
+  };
+  useEffect(() => {
+    const handleResize = () => {
+      const screenWidth = window.innerWidth;
+      if (screenWidth < breakpoints.small) {
+        setMinHeight(200);
+      } else if (screenWidth < breakpoints.medium) {
+        setMinHeight(300); 
+      } else {
+        setMinHeight(500); 
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const [searchTermPay, setSearchTermPay] = useState([]);
+  const[filterHistory,setFilterHistory]= useState([])
+
+  useEffect(()=>{
+    setFilterHistory(history)
+  },[history])
+
+  const handleSearchPay = (e) => {
+    const input = e.target.value;
+    setSearchTermPay(input);
+  
+    const filtered = history.filter((item) => {
+      const regex = new RegExp(input, 'i');
+      for (const key in item) {
+        if (item.hasOwnProperty(key) && regex.test(item[key])) {
+          return true;
+        }
+      }
+      return false;
+    });
+    setFilterHistory(filtered);
+    console.log("filtered pay", filterHistory)
+  };
+
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; 
+  const [sortedHistory, setSortedHistory] = useState([]); 
+
+  useEffect(() => {
+    const sortedData = Array.isArray(filterHistory)
+      ? filterHistory.sort((a, b) => new Date(b.time) - new Date(a.time))
+      : [];
+
+    setSortedHistory(sortedData);
+    setCurrentPage(1)
+  }, [filterHistory]);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  const itemsToDisplay = sortedHistory.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= Math.ceil(sortedHistory.length / itemsPerPage)) {
+      setCurrentPage(page);
+    }
+  };
+
+  
 
 
   return (
@@ -290,7 +371,13 @@ const messageStyleRec = {
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URL used</label>
           <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='URL Used' value={url} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >Pdf Used</label>
-          <input className='fs-4 d-flex justify-content-center container mt-1 text-center  ' style={{ width: '95%', marginBottom:'100px' }} readOnly placeholder='PDF Used' value={pdf} />
+          <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%'}} readOnly placeholder='PDF Used' value={pdf} />
+          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >Urls scrapped</label>
+          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%' }} readOnly placeholder='Urls scrapped'  value={Array.isArray(urlsUsed) ? urlsUsed.join('\n') : ''} />
+          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >Urls Excluded</label>
+          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center  ' style={{ width: '95%', marginBottom:'100px' }} readOnly placeholder='Urls excluded'  value={Array.isArray(urlsEx) ? urlsEx.join('\n') : ''} />
+          
+          
           {/* update bot */}
           <div className='fs-4 col-12 d-flex justify-content-center  text-center mb-5 mt-3' style={{ color: '#FFFFFF', backgroundColor:'#242439' }}>
             <form className='col-sm-9 mb-5 col-11 mx-auto ' style={{marginTop:'50px'}}>
@@ -411,14 +498,14 @@ const messageStyleRec = {
           </div>
            <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
             {tokenDataGraph.length === 0 ? '' :
-              <ResponsiveContainer width="99%" aspect={3}>
+              <ResponsiveContainer width="99%"  minHeight={minHeight}>
                 <LineChart width={1000} height={500} data={tokenDataGraph} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
                   <Line type="monotone" dataKey="usage" stroke="#8884d8" />
                   <XAxis dataKey="date"
                     minTickGap={10}
-                    fontSize={15}
+                    style={{fontSize:'14px'}}
                   />
-                  <YAxis allowDataOverflow={true} />
+                  <YAxis style={{fontSize:'14px'}} allowDataOverflow={true} />
                   <Tooltip content={<CustomTooltip />} />
                 </LineChart>
               </ResponsiveContainer>
@@ -436,14 +523,14 @@ const messageStyleRec = {
           </div>
           <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
             {conDataGraph.length === 0 ? '' :
-              <ResponsiveContainer width="99%" aspect={3}>
+              <ResponsiveContainer width="99%"  minHeight={minHeight}>
                 <LineChart width={1000} height={500} data={conDataGraph} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
                   <Line type="monotone" dataKey="ConNo" stroke="#8884d8" />
                   <XAxis dataKey="date"
                     minTickGap={10}
-                    fontSize={15}
+                    style={{fontSize:'14px'}}
                   />
-                  <YAxis allowDataOverflow={true} />
+                  <YAxis style={{fontSize:'14px'}} allowDataOverflow={true} />
                   <Tooltip content={<CustomTooltip2 />} />
                 </LineChart>
               </ResponsiveContainer>
@@ -452,8 +539,15 @@ const messageStyleRec = {
 
           <div className='fs-4 col-12 row d-flex justify-content-center text-center  mb-5 mt-3 mx-1 ' style={{ color: '#FFFFFF' }}>
             <label className='fs-4 d-flex justify-content-center  col-11 text-center mt-5 mb-5 mx-2' style={{ height: '100%', color: '#FFFFFF' }}>Chat History</label>
-          {history === '' ? '':
-          history.sort((a, b) => new Date(b.time) - new Date(a.time)).map(x =>
+        
+            <input className='fs-4 col-sm-8 col-lg-10 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"
+                placeholder="Search..."
+                value={searchTermPay}
+                onChange={handleSearchPay}
+                 />
+          {filterHistory === '' ? '':
+          // filterHistory.sort((a, b) => new Date(b.time) - new Date(a.time)).map(x =>
+          itemsToDisplay.map((x, index) => (
             <Accordion alwaysOpen='false' className='col-11 my-2 custom-accordion' >
               <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }} >
                 <Accordion.Header >{x.time}</Accordion.Header>
@@ -471,8 +565,27 @@ const messageStyleRec = {
                 </Accordion.Body>
               </Accordion.Item>
             </Accordion>
-)}
+))}
           </div>
+
+          
+      <div className=' d-flex justify-content-center fs-4'>    
+      <div
+        onClick={() => handlePageChange(currentPage - 1)}
+        className={` ${currentPage === 1 ? 'disabled' : ''}`}
+      >
+        <BsFillArrowLeftCircleFill style={{color:'white'}} />
+      </div>
+      <p className='d-flex  justify-content-center  text-center mb-1 mt-1 mx-4' style={{ color: '#FFFFFF' }}>
+        Page {currentPage}
+      </p>
+      <div
+        onClick={() => handlePageChange(currentPage + 1)}
+        className={` ${endIndex >= filterHistory.length ? 'disabled' : ''}`}
+      >
+        <BsFillArrowRightCircleFill style={{color:'white'}} />
+      </div>
+    </div>
 
         </div> : ''
       }

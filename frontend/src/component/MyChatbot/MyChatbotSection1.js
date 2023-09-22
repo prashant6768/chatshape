@@ -17,8 +17,8 @@ const MyChatbotSection1 = () => {
   const [dataArr, setDataArr] = useState([])
   const [botId,setBotId]=useState('')
 
-  // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://api.zema.io/'
+  const BACKEND = 'http://localhost:5000/'
+  // const BACKEND = 'https://api.zema.io/'
   // const BACKEND = 'http://3.138.169.250/'
 
   useEffect(() => {

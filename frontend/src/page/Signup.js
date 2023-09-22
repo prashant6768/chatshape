@@ -17,8 +17,8 @@ const Signup = () => {
   const navigate = useNavigate();
 
   // const BACKEND = 'http://3.138.169.250/'
-  const BACKEND = 'https://api.zema.io/'
-  // const BACKEND = 'http://localhost:5000/'
+  // const BACKEND = 'https://api.zema.io/'
+  const BACKEND = 'http://localhost:5000/'
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -28,7 +28,12 @@ const Signup = () => {
     const[loading2, setLoading2] = useState(false);
     const[otp,setOtp]=useState('')
     const[show,setShow]=useState(false)
+    const[userType,setUserType]=useState('None')
     const [isButtonDisabled,setIsButtonDisabled]=useState(true)
+
+    useEffect(()=>{
+      console.log("usertype ",userType)
+    },[userType])
   
     const handleSubmit =async (e) => {
       e.preventDefault();
@@ -49,7 +54,8 @@ const Signup = () => {
       headers: {
         'Access-Control-Allow-Origin': '*',
       },
-}).then(res => {window.location.href = res.data ; console.log(res.data)}).catch(err => console.log("GOOG ",err))
+}).then(res => {window.location.href = res.data ; console.log(res.data);setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}).catch(err => console.log("GOOG ",err))
+setTimeout(() => { navigate('/account') }, 2000)
     }
 
     const handleOtp=async(e)=>{
@@ -169,6 +175,10 @@ const Signup = () => {
           />
         </div>
       </div>
+      {/* <div class="col-12 pb-2">
+    <input type="checkbox" className="form-check-input me-3" value="Admin" onChange={(e)=>{if(e.target.checked === true){setUserType(e.target.value)}else{setUserType('None')}}} id="exampleCheck1"/>
+    <label className="form-check-label" for="exampleCheck1">Admin</label>
+  </div> */}
       <div className="col-12 py-2">
         <button
           type="submit"

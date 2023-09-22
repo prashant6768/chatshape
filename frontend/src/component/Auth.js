@@ -25,3 +25,9 @@ export const decodeToken = (token) => {
     return null;
   }
 };
+
+export const getAdminToken = () => {
+
+  const adminToken= Cookies.get('adminToken');
+  return adminToken;
+};

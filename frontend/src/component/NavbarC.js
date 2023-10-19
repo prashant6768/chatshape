@@ -82,8 +82,10 @@ const NavbarC = ({ gradientC }) => {
                     </div>
 
                     <Dropdown.Menu >
-                      <Dropdown.Item href="#"><Link to='/superadminUserData'><Nav.Link href="#link" className='fw-bolder mx-3 underline-grow' >Users Data</Nav.Link></Link></Dropdown.Item>
-                      <Dropdown.Item href="#"><Link to='/superadmin'><Nav.Link href="#link" className='fw-bolder mx-3 underline-grow' >super Admin</Nav.Link></Link></Dropdown.Item>
+                      <Dropdown.Item href="#"><Link to='/superadminUserData'><Nav.Link href="#link" className='fw-bolder mx-3 ' >Users Data</Nav.Link></Link></Dropdown.Item>
+                      <Dropdown.Item href="#"><Link to='/superadmin'><Nav.Link href="#link" className='fw-bolder mx-3 ' >Super Admin</Nav.Link></Link></Dropdown.Item>
+                      <Dropdown.Item href="#"><Link to='/superadminmanage'><Nav.Link href="#link" className='fw-bolder mx-3 ' >Manage LLM</Nav.Link></Link></Dropdown.Item>
+                      <Dropdown.Item href="#"><Link to='/superadminguide'><Nav.Link href="#link" className='fw-bolder mx-3 ' >Guide</Nav.Link></Link></Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
                   <Link to='/login' style={{ textDecoration: 'none' }}><Nav.Link href="#link" className='fw-bolder btn rounded-pill extraT px-5' style={{ color: '#FFFFFF', border: '4px solid #FFFFFF', maxWidth: '200px' }}>Try Zema</Nav.Link></Link>

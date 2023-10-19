@@ -15,6 +15,9 @@ import jwt
 from pymongo.errors import OperationFailure
 import pathlib
 
+import base64
+
+
 from google.auth.transport import requests
 
 # from jose import jwt
@@ -54,18 +57,19 @@ client = MongoClient(MONGO)
 db = client['chatbot']
 
 auth = Blueprint("auth",__name__)
-app = Flask(__name__)
+application = Flask(__name__)
 
 
 auth.secret_key = AUTH_FILE_SECRET_KEY
+
 
 
 # auth.config['SECRET_KEY'] = SECRET_KEY
 bcrypt = Bcrypt()
 
 CORS(auth, origins=pageURL) 
-app.secret_key = os.getenv("SESSION_SECRET_1")
-CORS(app, origins=pageURL)
+application.secret_key = os.getenv("SESSION_SECRET_1")
+CORS(application, origins=pageURL)
 from google.auth import exceptions as google_auth_exceptions
 from google.auth.transport import requests as google_auth_requests
 from google.oauth2 import id_token
@@ -81,24 +85,24 @@ default_sub = {
 
 @auth.route("/googlelogin")
 def login_google():
-  
+    print("----------------------")
     flow = Flow.from_client_secrets_file(
         "client_secret.json",
         scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"],
         redirect_uri= os.getenv("GOOGLE_REDIRECT_URI"),
     )
-
+    print("PPPPPPPPPPPPP")
     authorization_url, state = flow.authorization_url(
         prompt="consent",
         # response_type="code"
     )
 
     
-    session["oauth_state"] = state
-    state2 = session.pop("oauth_state", None)
-    print("121---------------------state2",state2)
+    # session["oauth_state"] = state
+    # state2 = session.pop("oauth_state", None)
+    # print("121---------------------state2",state2)
 
-    print("120------------------state",state)
+    # print("120------------------state",state)
     print("124-----------------redirect--------",authorization_url)
     
     return authorization_url
@@ -107,7 +111,7 @@ def login_google():
 
 @auth.route("/callback")
 def callback_google():
-    # print("State------------------127-----------",state)
+    print("State------------------127-----------")
 
     flow = Flow.from_client_secrets_file(
         "client_secret.json",
@@ -116,7 +120,9 @@ def callback_google():
     )
     flow.fetch_token(authorization_response=request.url)
 
+
     request_obj = requests.Request()
+    print("-----122-----",request )
 
     id_info = id_token.verify_oauth2_token(
         flow.credentials.id_token,
@@ -139,6 +145,7 @@ def callback_google():
             'password': '',
             'phone': '',
             'name':name,
+            'created' :datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
              'otpSer':'',
              'verifyFlag': "Y",
                      }
@@ -162,6 +169,56 @@ def callback_google():
         redirect_url = pageURL+'/login' 
         redirect_url += '?access_token=' + username
         redirect_url += '&sl=' + 's'
+        try:
+            smtp_server = "smtp.gmail.com"
+            port = 587  # For starttls
+            # port = 465   #---------------------------------for SSL setting
+            sender_email = "thedummydog@gmail.com"
+            password = EMAILPASS
+            email_headers = f"Subject: Welcome to Zema\r\n"
+            email_headers += f"From: {sender_email}\r\n"
+            email_headers += "Content-Type: text/html; charset=utf-8\r\n" 
+            email_headers += "\r\n"
+            image_url = "https://raw.githubusercontent.com/Aniket-Shival/popup/Aniket-Shival-mic-2/Zema_Bird_Transperent.png"
+
+            message = f"""
+<div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2">
+  <div style="margin: 50px auto; width: 70%; padding: 20px 0">
+    <div style="border-bottom: 1px solid #eee">
+      <img src="{image_url}" style="max-width: 100px; display: block; margin: 10px auto;" alt='Zema Logo'/>
+      <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600">Zema</a>
+    </div>
+    <p style="font-size: 1.1em">Hi,</p>
+    <p>Thank you for choosing Zema. We're thrilled to have you on board!</p>
+    <p style="font-size: 0.9em;">Regards,<br />Zema Team</p>
+    <hr style="border: none; border-top: 1px solid #eee" />
+    <div style="float: right; padding: 8px 0; color: #aaa; font-size: 0.8em; line-height: 1; font-weight: 300">
+      <p>Zema</p>
+    </div>
+  </div>
+</div>
+            """
+            email_message = email_headers + message
+            context = ssl.create_default_context()
+
+            try:
+                # server = smtplib.SMTP_SSL(smtp_server,port)
+                server = smtplib.SMTP(smtp_server,port)
+                server.ehlo() # Can be omitted
+                server.starttls(context=context) # Secure the connection # REMOVE IT IN SSL SETTING---------------------------
+                server.ehlo() # Can be omitted
+                server.login(sender_email, password)
+                server.sendmail(sender_email, username, email_message)
+                # TODO: Send email here
+            except Exception as e:
+                # Print any error messages to stdout
+                return str(e)+"AAAAA"
+                print(e)
+            finally:
+                server.quit() 
+        except Exception as e:
+            return str(e)
+
         return redirect(redirect_url)           
 
     else:
@@ -194,71 +251,110 @@ def verify_jwt_token(token):
 
 @auth.route('/signup', methods=[ 'POST'])
 def signup():
-    if request.method == 'POST':
+    try:
+        if request.method == 'POST':
        
-        otp_store = {}
-        
-        username = request.get_json()['username']
-        passwordUser = request.get_json()['password']
-        nameUser = request.get_json()['name']
-        phone = request.get_json()['phone']
+            username = request.get_json()['username']
+            passwordUser = request.get_json()['password']
+            nameUser = request.get_json()['name']
+            phone = request.get_json()['phone']
 
-        users_collection = db['users']
-        userExist = users_collection.find_one({'username': username})
-        if userExist:
-            print("-----209")
-            return "User Exists"
+            users_collection = db['users']
+            userExist = users_collection.find_one({'username': username})
+
+            if userExist:
+                if userExist['verifyFlag'] == 'N':
+                    users_collection.delete_one({'username': username})
+                print("-----209")
+                if userExist['verifyFlag'] != 'N':
+                    return "User Exists"
 
 
-
-        otp = random.randint(100000, 999999)
-        otp_store[username] = otp
+            otp_store = {}
+            otp = random.randint(100000, 999999)
+            otp_store[username] = otp
   
-        otpSer = otp
-        # session['otpSer_s'] = otp
-        smtp_server = "smtp.gmail.com"
-        port = 587  # For starttls
-        sender_email = "thedummydog@gmail.com"
-        password = EMAILPASS
-        email_headers = f"Subject: Zema Signup OTP\r\n"
-        email_headers += f"From: {sender_email}\r\n"
-        email_headers += "\r\n"
-        message = "Your OTP for Zemo signup is "+str(otp)
-        email_message = email_headers + message
+            otpSer = otp
+            # session['otpSer_s'] = otp
+            smtp_server = "smtp.gmail.com"
+            port = 587  # For starttls
+            # port = 465   #---------------------------------for SSL setting
+            sender_email = "thedummydog@gmail.com"
+            password = EMAILPASS
+            email_headers = f"Subject: Zema Signup OTP\r\n"
+            email_headers += f"From: {sender_email}\r\n"
+            email_headers += "Content-Type: text/html; charset=utf-8\r\n" 
+            email_headers += "\r\n"
+            image_url = "https://raw.githubusercontent.com/Aniket-Shival/popup/Aniket-Shival-mic-2/Zema_Bird_Transperent.png"
+            # logo_img = None
 
-        # Create a secure SSL context
-        context = ssl.create_default_context()
+            # with open('assets/Zema_Logo_Transperent.png', 'rb') as image_file:
+            #     logo_img = base64.b64encode(image_file.read()).decode()
+            message = f"""
+            <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+                <div style="margin:50px auto;width:70%;padding:20px 0">
+                    <div style="border-bottom:1px solid #eee">
+                         <img src="{image_url}" style="max-width: 100px; display: block; margin: 10px auto;" alt='Zema Logo'/>
+                         <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Zema</a>
+                     </div>
+                    <p style="font-size:1.1em">Hi,</p>
+                    <p>Thank you for choosing Zema. Use the following OTP to complete your Sign Up procedures.</p>
+                    <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">{otp}</h2>
+                    <p style="font-size:0.9em;">Regards,<br />Zema</p>
+                    <hr style="border:none;border-top:1px solid #eee" />
+                    <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+                      <p>Zema</p>
+                    </div>
+                </div>
+            </div>
+            """.format(otp=otp)
 
-        # Try to log in to server and send email
-        try:
-            server = smtplib.SMTP(smtp_server,port)
-            server.ehlo() # Can be omitted
-            server.starttls(context=context) # Secure the connection
-            server.ehlo() # Can be omitted
-            server.login(sender_email, password)
-            server.sendmail(sender_email, username, email_message)
-            # TODO: Send email here
-        except Exception as e:
-            # Print any error messages to stdout
-            print(e)
-        finally:
-            server.quit() 
+            # email_message = email_headers + message
+
+
+            # message = "Your OTP for Zemo signup is "+str(otp)
+            email_message = email_headers + message
+
+            # Create a secure SSL context
+            context = ssl.create_default_context()
+
+            # Try to log in to server and send email
+            try:
+                # server = smtplib.SMTP_SSL(smtp_server,port)
+                server = smtplib.SMTP(smtp_server,port)
+                server.ehlo() # Can be omitted
+                server.starttls(context=context) # Secure the connection # REMOVE IT IN SSL SETTING---------------------------
+                server.ehlo() # Can be omitted
+                server.login(sender_email, password)
+                server.sendmail(sender_email, username, email_message)
+                # TODO: Send email here
+            except Exception as e:
+                # Print any error messages to stdout
+                return str(e)+"AAAAA"
+                print(e)
+            finally:
+                server.quit() 
       
-        print("2")
-        user_data = {
-            'username': username,
-            # 'password': bcrypt.generate_password_hash(passwordUser),  REMOVE BCRYPT FOR NOW
-            'password': passwordUser,
-            'phone': phone,
-            'name':nameUser,
-             'otpSer':str(otpSer),
-             'verifyFlag': "N",
-                     }
-        users_collection = db['users']
-        users_collection.create_index("username", unique=True)
-        users_collection.insert_one(user_data) 
-     
-    return "ok"
+            print("2")
+            user_data = {
+                'username': username,
+                # 'password': bcrypt.generate_password_hash(passwordUser),  REMOVE BCRYPT FOR NOW
+                'password': passwordUser,
+                'phone': phone,
+                'name':nameUser,
+                'created': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                 'otpSer':str(otpSer),
+                 'verifyFlag': "N",
+                         }
+            users_collection = db['users']
+            users_collection.create_index("username", unique=True)
+            users_collection.insert_one(user_data) 
+        return "ok"
+    except Exception as e:
+        return str(e)    
+
+
+
         
 @auth.route('/getOTP',methods=['POST'])
 def getOTP():
@@ -289,12 +385,212 @@ def getOTP():
             users_collection_user.update_one( {'username': username} ,  { "$set": { 'verifyFlag': "Y" } })
             users_subscription.create_index("username", unique=True)
             users_subscription.insert_one(user_sub_data)
+
+
+            smtp_server = "smtp.gmail.com"
+            port = 587  # For starttls
+            # port = 465   #---------------------------------for SSL setting
+            sender_email = "thedummydog@gmail.com"
+            password = EMAILPASS
+            email_headers = f"Subject: Welcome to Zema\r\n"
+            email_headers += f"From: {sender_email}\r\n"
+            email_headers += "Content-Type: text/html; charset=utf-8\r\n" 
+            email_headers += "\r\n"
+            image_url = "https://raw.githubusercontent.com/Aniket-Shival/popup/Aniket-Shival-mic-2/Zema_Bird_Transperent.png"
+            # logo_img = None
+
+            # with open('assets/Zema_Logo_Transperent.png', 'rb') as image_file:
+            #     logo_img = base64.b64encode(image_file.read()).decode()
+            message = f"""
+<div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2">
+  <div style="margin: 50px auto; width: 70%; padding: 20px 0">
+    <div style="border-bottom: 1px solid #eee">
+      <img src="{image_url}" style="max-width: 100px; display: block; margin: 10px auto;" alt='Zema Logo'/>
+      <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600">Zema</a>
+    </div>
+    <p style="font-size: 1.1em">Hi,</p>
+    <p>Thank you for choosing Zema. We're thrilled to have you on board!</p>
+    <p style="font-size: 0.9em;">Regards,<br />Zema Team</p>
+    <hr style="border: none; border-top: 1px solid #eee" />
+    <div style="float: right; padding: 8px 0; color: #aaa; font-size: 0.8em; line-height: 1; font-weight: 300">
+      <p>Zema</p>
+    </div>
+  </div>
+</div>
+            """
+
+            # email_message = email_headers + message
+
+
+            # message = "Your OTP for Zemo signup is "+str(otp)
+            email_message = email_headers + message
+
+            # Create a secure SSL context
+            context = ssl.create_default_context()
+
+            # Try to log in to server and send email
+            try:
+                # server = smtplib.SMTP_SSL(smtp_server,port)
+                server = smtplib.SMTP(smtp_server,port)
+                server.ehlo() # Can be omitted
+                server.starttls(context=context) # Secure the connection # REMOVE IT IN SSL SETTING---------------------------
+                server.ehlo() # Can be omitted
+                server.login(sender_email, password)
+                server.sendmail(sender_email, username, email_message)
+                # TODO: Send email here
+            except Exception as e:
+                # Print any error messages to stdout
+                return str(e)+"AAAAA"
+                print(e)
+            finally:
+                server.quit() 
+
             return "OK"          
         except OperationFailure as e:
             return "NO"
     else:
         users_collection_user.delete_many( {'username': username})
         return "Verification Failed"      
+
+
+######################################################################  forget passowrd
+
+@auth.route('/forgetpassword', methods=[ 'POST'])
+def forgetpassword():
+    try:
+        username = request.get_json()['username']
+        users_collection = db['users']
+
+        if  username == '' :
+            print("-------309")
+            return "ic" 
+    
+
+        user_data_i = users_collection.find_one({'username': username})  
+        if user_data_i == None:
+            print("--------307")
+            return "NO"   
+
+        otp_store = {}
+        otp = random.randint(100000, 999999)
+        otp_store[username] = otp
+  
+        otpSer = otp
+        # session['otpSer_s'] = otp
+        smtp_server = "smtp.gmail.com"
+        port = 587  # For starttls
+        # port = 465 #-----------------------------------------------for SSL
+        sender_email = "thedummydog@gmail.com"
+        password = EMAILPASS
+        email_headers = f"Subject: Zema Reset Password OTP\r\n"
+        email_headers += f"From: {sender_email}\r\n"
+        email_headers += "Content-Type: text/html; charset=utf-8\r\n" 
+        email_headers += "\r\n"
+        image_url = "https://raw.githubusercontent.com/Aniket-Shival/popup/Aniket-Shival-mic-2/Zema_Bird_Transperent.png"
+            # logo_img = None
+
+            # with open('assets/Zema_Logo_Transperent.png', 'rb') as image_file:
+            #     logo_img = base64.b64encode(image_file.read()).decode()
+        message = f"""
+            <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+                <div style="margin:50px auto;width:70%;padding:20px 0">
+                    <div style="border-bottom:1px solid #eee">
+                         <img src="{image_url}" style="max-width: 100px; display: block; margin: 10px auto;" alt='Zema Logo'/>
+                         <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Zema</a>
+                     </div>
+                    <p style="font-size:1.1em">Hi,</p>
+                    <p>Use the following OTP to proceed towards resetting your password</p>
+                    <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">{otp}</h2>
+                    <p style="font-size:0.9em;">Regards,<br />Zema</p>
+                    <hr style="border:none;border-top:1px solid #eee" />
+                    <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+                      <p>Zema</p>
+                    </div>
+                </div>
+            </div>
+            """.format(otp=otp)
+
+            # email_message = email_headers + message
+
+
+            # message = "Your OTP for Zemo signup is "+str(otp)
+        email_message = email_headers + message
+
+        # Create a secure SSL context
+        context = ssl.create_default_context()
+
+        # Try to log in to server and send email
+        try:
+            server = smtplib.SMTP(smtp_server,port)
+            # server = smtplib.SMTP_SSL(smtp_server,port)
+            server.ehlo() # Can be omitted
+            server.starttls(context=context) # Secure the connection   # REMOVE FOR SSL
+            server.ehlo() # Can be omitted
+            server.login(sender_email, password)
+            server.sendmail(sender_email, username, email_message)
+            # TODO: Send email here
+        except Exception as e:
+            # Print any error messages to stdout
+            print(e)
+        finally:
+            server.quit()   
+        users_collection.update_one({'username': username}, {'$set': {'otpSer': otp}})   
+        print("login success")
+        return 'OK'
+    except Exception as e:
+        print(str(e),"----------------353")
+        return str(e)   
+
+####################################################### forget passowrd chk otp
+
+@auth.route('/fpOTP',methods=['POST'])
+def fpOTP():
+    try:
+        user_otp = int(request.get_json()['otp'])
+        username = request.get_json()['username']
+        print(user_otp,"user",type(user_otp))
+        # print(otpSer,"server",type(otpSer))
+        users_collection_user = db['users']
+        user_data = users_collection_user.find_one({'username': username})
+        otpSer = user_data['otpSer']
+        print(user_data,"AAAAAAAAAAAAAAAaa",type(otpSer))
+    
+        if user_otp == int(otpSer):
+            try:
+                users_collection_user.update_one( {'username': username} ,  { "$set": { 'verifyFlag': "CP" } })
+                return "OK"          
+            except OperationFailure as e:
+                return "NO"
+        else:
+            return "Verification Failed"  
+    except Exception as e:
+        print(str(e),"-------379")
+        return str(e)        
+
+####################################################### forget passowrd chk otp
+
+@auth.route('/cpOTP',methods=['POST'])
+def cpOTP():
+    try:
+        password = request.get_json()['newPassword']
+        username = request.get_json()['username']
+        print("-----389",password)
+        if password == '' or password == None:
+            return 'mt'
+
+        users_collection_user = db['users']
+        user_data = users_collection_user.find_one({'username': username})
+        if user_data['verifyFlag'] == 'CP':
+            users_collection_user.update_one( {'username': username} ,  { "$set": { 'verifyFlag': "Y" } })
+            users_collection_user.update_one( {'username': username} ,  { "$set": { 'password': password } }) 
+            users_collection_user.update_one( {'username': username} ,  { "$set": { 'updated': datetime.now().strftime("%Y-%m-%d %H:%M:%S") } }) 
+            
+            return 'OK'
+        else:
+            return 'na'         
+    except Exception as e:
+        print(str(e),"-------389")
+        return str(e)     
 
 @auth.route('/login', methods=[ 'POST'])
 def login():
@@ -352,3 +648,8 @@ def login():
         return func(*args, **kwargs)
 
     return wrapper
+
+
+ 
+
+

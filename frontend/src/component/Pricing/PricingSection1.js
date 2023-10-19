@@ -7,6 +7,7 @@ import * as jose from 'jose';
 import '../Pricing/toggle.css'
 import env from 'react-dotenv'
 import { Link } from 'react-router-dom';
+import { ThreeDots } from 'react-loader-spinner';
 import Nav from 'react-bootstrap/Nav';
 import Cookies from 'js-cookie';
 
@@ -18,9 +19,10 @@ const PricingSection1 = () => {
     const decoded = Cookies.get('accessToken');
 
     const [selectedOption, setSelectedOption] = useState('A');
-    const BACKEND = 'http://localhost:5000/'
-    // const BACKEND = 'http://3.138.169.250/'
-    // const BACKEND = 'https://api.zema.io/'
+
+    // const BACKEND = 'http://localhost:5000/'
+    const BACKEND = 'https://zemaapi.zema.io/'
+
     const handleOptionClick = (option) => {
         setSelectedOption(option);
     };
@@ -137,13 +139,16 @@ const PricingSection1 = () => {
         },
     ]
 
+    const [apiload,setApiload] = useState(false)
+
     const handleSub = async (key) => {
+        setApiload(true)
         console.log(key)
         await axios.post(`${BACKEND}stripepay/create-checkout-session`, { key, decoded }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*',
-        }).then(res => { window.location.replace(res.data); console.log(res) }).catch(err => console.log("handle subscribe error = ", err))
+        }).then(res => { window.location.replace(res.data); console.log(res); setApiload(false) }).catch(err => {console.log("handle subscribe error = ", err.response.data); setApiload(false)})
     }
 
 
@@ -166,6 +171,15 @@ const PricingSection1 = () => {
                         Monthly
                     </button>
                 </div>
+
+                <div className='form-group d-flex justify-content-center mt-4'>
+       {apiload ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
 
                 <div className='d-flex justify-content-center'>
                     <div className='d-flex  justify-content-center flex-wrap flex-row sectionwidth ' style={{}}>

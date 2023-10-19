@@ -16,9 +16,8 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
-  // const BACKEND = 'http://3.138.169.250/'
-  // const BACKEND = 'https://api.zema.io/'
-  const BACKEND = 'http://localhost:5000/'
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'https://zemaapi.zema.io/'
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -38,11 +37,42 @@ const Signup = () => {
     const handleSubmit =async (e) => {
       e.preventDefault();
       setLoading(true); 
+
+      const nameRegex = /[0-9!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|~`]/;
+      if (nameRegex.test(name)) {
+        toast.error("Name cannot contain numbers or symbols");
+        setLoading(false);
+        return;
+      }
+    
+      if (password.length < 8) {
+        toast.error("Password must be at least 8 characters long");
+        setLoading(false);
+        return;
+      }
+
+      const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+      if (!emailRegex.test(username)) {
+        toast.error("Invalid Email Format");
+        setLoading(false);
+        return;
+      }
+
+       const phoneRegex = /^(?:\d{10})$/;
+if(phone !== ''){
+  if (!phoneRegex.test(phone)) {
+    toast.error("Invalid Phone Number Format");
+    setLoading(false);
+    return;
+  }
+}
+
+
       await axios.post(`${BACKEND}auth/signup`,{username,password,name,phone},{
           'Content-type':'application/json', 
           'Accept':'application/json',
           'Access-Control-Allow-Origin':'*'
-    }).then(res => {if(res.data === 'User Exists'){ toast.error("User Exists");console.log(res); setLoading(false)}else{console.log(res); setLoading(false);setShow(true)}})
+    }).then(res => {if(res.data === 'User Exists'){ toast.error("User Exists");console.log(res); setLoading(false)}else if(res.data === 'ok'){console.log(res); setLoading(false);setShow(true)}else{ toast.error("Some error");console.log(res.data,"-------from signup backend error"); setLoading(false)}})
       .catch(err => {console.log("signup form err = ",err); toast.error("Something went wrong");setLoading(false);})
   
       console.log('Submitted:', BACKEND);
@@ -52,7 +82,9 @@ const Signup = () => {
         e.preventDefault()
     await axios.get(`${BACKEND}auth/googlelogin`,{
       headers: {
-        'Access-Control-Allow-Origin': '*',
+        'Content-type':'application/json', 
+        'Accept':'application/json',
+        'Access-Control-Allow-Origin':'*'
       },
 }).then(res => {window.location.href = res.data ; console.log(res.data);setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}).catch(err => console.log("GOOG ",err))
 setTimeout(() => { navigate('/account') }, 2000)
@@ -65,12 +97,12 @@ setTimeout(() => { navigate('/account') }, 2000)
         'Content-type':'application/json', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
-  }).then((res)=>{console.log("signup = ",res); if(res.data === "NO"){toast.error("User Already Exists");setLoading2(false);}else if(res.data == "Verification Failed"){toast.error("Verification Failed");setLoading2(false);} else{toast.success("Profile created Successfully");setLoading2(false);setTimeout(() => { navigate('/login') }, 2000) }}).catch(err => {console.log(err);setLoading2(false);{toast.error("Some Error Occured")}})
+  }).then((res)=>{console.log("signup = ",res); if(res.data === "NO"){toast.error("User Already Exists");setLoading2(false);}else if(res.data == "Verification Failed"){toast.error("Verification Failed");setLoading2(false);console.log("res ",res.data);setTimeout(() => { window.location.reload(); }, 2000)} else{toast.success("Profile created Successfully");setLoading2(false);setTimeout(() => { navigate('/login') }, 2000) }}).catch(err => {console.log(err);setLoading2(false);{toast.error("Some Error Occured")}})
     }
 
     useEffect(()=>{
 
-      if(username === '' || name === '' || phone === '' || password === ''){
+      if(username === '' || password === ''){
         setIsButtonDisabled(true)
       }else{
         setIsButtonDisabled(false)
@@ -92,13 +124,13 @@ setTimeout(() => { navigate('/account') }, 2000)
     <div className='d-flex justify-content-center col-12'  >
     <form action="#" className="mt-4 register-form rounded-3 p-3 mx-1 " style={{width:'330px',height:'470px',backgroundColor:'white',  border:'1px solid lightgrey'}}>
     <div className="row">
-      <h3>Signup</h3>
+      <h3>Sign up</h3>
       
 
 
       <div className="col-sm-12">
         <label htmlFor="email" className="mb-1">
-          Google Login / Signup
+          Google Login / Sign up
         </label>
         <div className="input-group mb-3">
          <button className='btn btn-dark col-12 ' onClick={(e)=>{handleGoogle(e)}} >Google <BsGoogle style={{color:'white'}} className='ms-2'/></button>
@@ -109,7 +141,7 @@ setTimeout(() => { navigate('/account') }, 2000)
 
       <div className="col-sm-12">
         <label htmlFor="email" className="mb-1">
-          Email 
+          Email <span className="text-danger">*</span>
         </label>
         <div className="input-group mb-3">
           <input
@@ -136,7 +168,7 @@ setTimeout(() => { navigate('/account') }, 2000)
             id="nameFreelancer"
             required
             aria-label="Name"
-            value={name}
+            value={name.replace(/[0-9!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|~`]/g, '')}
             onChange={(e)=>setName(e.target.value)}
           />
         </div>
@@ -160,7 +192,7 @@ setTimeout(() => { navigate('/account') }, 2000)
       </div>
       <div className="col-sm-12">
         <label htmlFor="password" className="mb-1">
-          Password 
+          Password <span className="text-danger">*</span>
         </label>
         <div className="input-group mb-3">
           <input

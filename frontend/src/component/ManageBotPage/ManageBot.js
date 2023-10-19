@@ -5,10 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import '../underline.css'
 import { ThreeDots } from 'react-loader-spinner';
+import Card from 'react-bootstrap/Card';
 import Accordion from 'react-bootstrap/Accordion';
 import { BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill } from 'react-icons/bs'
+import { Tooltip as Tp } from 'react-tooltip'
 import '../ManageBotPage/histroy.css'
 
+import { FaRegCopy } from 'react-icons/fa'
 import ChatUI from '../ChatUI';
 
 import Button from 'react-bootstrap/Button';
@@ -25,14 +28,14 @@ const ManageBot = (id) => {
     fontSize: '14px',
     // color: '#FFFFFF',
     fontFamily: 'arial',
-};
-const messageStyleRec = {
+  };
+  const messageStyleRec = {
     backgroundColor: '#3D4648',
     fontSize: '14px',
     // color: '#FFFFFF',
     fontFamily: 'arial',
 
-};
+  };
 
   function CustomTooltip({ payload, label, active }) {
     if (active) {
@@ -65,6 +68,7 @@ const messageStyleRec = {
   const [prompt, setPrompt] = useState('')
   const [url, setUrl] = useState('None')
   const [pdf, setPdf] = useState('None')
+  const [embeddedQA, setEmbeddedQA] = useState([])
   const [tokenDataGraph, setTokenDataGraph] = useState('')
   const [conDataGraph, setConDataGraph] = useState('')
 
@@ -75,9 +79,10 @@ const messageStyleRec = {
   const [vis, setVis] = useState('Bot Properties')
   const [resizer, setResizer] = useState(true)
 
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'https://api.zema.io/'
-  // const BACKEND = 'http://3.138.169.250/'
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'https://zemaapi.zema.io/'
+
+  const [apiload,setApiload] = useState(false)
 
 
   const [sendLink, setSendLink] = useState('')
@@ -87,9 +92,9 @@ const messageStyleRec = {
   const [togRetrain, setTogRetrain] = useState(false)
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedTimeCon, setSelectedTimeCon] = useState('');
-  const[history,setHistory]= useState('')
-  const[urlsUsed,setUrlsUsed]=useState([])
-  const[urlsEx,setUrlsEx]=useState([])
+  const [history, setHistory] = useState('')
+  const [urlsUsed, setUrlsUsed] = useState([])
+  const [urlsEx, setUrlsEx] = useState([])
 
 
   const handleCreateGraph = () => {
@@ -98,7 +103,7 @@ const messageStyleRec = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date ") }else if(res.data[0] == 'error'){console.log(res.data[1]);toast.error("Error Fetching data");} else { console.log(res.data); setTokenDataGraph(res.data) } }).catch(err => console.log(err))
+    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date ") } else if (res.data[0] == 'error') { console.log(res.data[1]); toast.error("Error Fetching data"); } else { console.log(res.data); setTokenDataGraph(res.data) } }).catch(err => console.log(err))
   }
   const handleCreateGraphCon = () => {
     console.log(selectedTimeCon)
@@ -106,7 +111,7 @@ const messageStyleRec = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date "); }else if(res.data[0] == 'error'){console.log(res.data[1]);toast.error("Error Fetching data ");} else { console.log(res.data); setConDataGraph(res.data) } }).catch(err => console.log(err))
+    }).then(res => { if (res.data === 'nodata') { console.log(res.data); toast.error("Data Doesn't exist for this date "); } else if (res.data[0] == 'error') { console.log(res.data[1]); toast.error("Error Fetching data "); } else { console.log(res.data); setConDataGraph(res.data) } }).catch(err => console.log(err))
   }
 
 
@@ -126,11 +131,13 @@ const messageStyleRec = {
     setPdf(dataArr.pdf)
     setUrlsUsed(dataArr.urlsUsed)
     setUrlsEx(dataArr.urlsEx)
+    setEmbeddedQA(dataArr.embeddedQA)
+    console.log("---131----", dataArr.embeddedQA)
     setSPrompt(dataArr.sPrompt)
     setInitialMsg(dataArr.initialMsg)
     setTokenDataGraph(dataArr.tokenData)
     setConDataGraph(dataArr.UniqueConData)
-    console.log("------qqqqqqqq--",dataArr.urlsUsed)
+    console.log("------qqqqqqqq--", dataArr.urlsUsed)
     console.log(dataArr.tokenData, "------", dataArr.UniqueConData)
     //   setUrl(dataArr.url)
   }, [dataArr])
@@ -213,6 +220,16 @@ const messageStyleRec = {
 
   // #################################33 retrain api
 
+  const [multiLink, setMultiLink] = useState(false);
+  const handleCheckboxChange = (event) => {
+    const checkbox = event.target;
+    if (checkbox.checked) {
+      setMultiLink("Y")
+    } else {
+      setMultiLink("N")
+    }
+  };
+
   const handleRetrain = async (e) => {
     e.preventDefault()
     setLoadingre(true);
@@ -231,6 +248,7 @@ const messageStyleRec = {
       formData.append('sendLink', sendLink);
       formData.append('exclude', exclude);
       formData.append('pdfFile', pdfFile);
+      formData.append('multiLink', multiLink);
 
 
       for (let pair of formData.entries()) {
@@ -243,7 +261,7 @@ const messageStyleRec = {
         'Access-Control-Allow-Origin': '*',
       })
         // .then(res =>console.log("FROM BACKEND = ",res.data)).catch(err => console.log(err))
-        .then(res => { if (res.data == 'BotF') { toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoadingre(false); } else if (res.data == 'FillOne') { toast.error('Atleast fill one of these, PDF or website URL'); console.log("ressssssssssssss", res.data); setLoadingre(false); } else if (res.data == 'SubE') { toast.error('Your Subscription has Expired, renew subscription for more'); setLoadingre(false); } else if (res.data == 'noname') { toast.error('Botname is compulsary'); setLoadingre(false); } else if(res.data === 'ok'){ toast.success('Bot Retrained successfully!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoadingre(false); setTimeout(() => { window.location.reload(true) }, 2000) }else { toast.error('Some Error Occured!!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoading(false);  } })
+        .then(res => { if (res.data == 'BotF') { toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoadingre(false); } else if (res.data == 'FillOne') { toast.error('Atleast fill one of these, PDF or website URL'); console.log("ressssssssssssss", res.data); setLoadingre(false); } else if (res.data == 'SubE') { toast.error('Your Subscription has Expired, renew subscription for more'); setLoadingre(false); } else if (res.data == 'noname') { toast.error('Botname is compulsary'); setLoadingre(false); } else if (res.data === 'ok') { toast.success('Bot Retrained successfully!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoadingre(false); setTimeout(() => { window.location.reload(true) }, 2000) } else { toast.error('Some Error Occured!!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoading(false); } })
         .catch(err => { console.log("error  botsection 1 ", err); toast.error('API request failed!'); setLoadingre(false); })
       console.log(formData)
     }
@@ -260,22 +278,22 @@ const messageStyleRec = {
     }
   }, [vis])
 
-  useEffect(()=>{
-    if(vis === 'Bot Analytics'){
-    axios.get(`${BACKEND}api/historyget/${id.id}`, {
-      'Content-type': 'application/json',
-      'Accept': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    }).then(res => {setHistory(res.data); console.log("history ",res.data)}).catch(err => console.log(err))
-  }
-  },[vis])
+  useEffect(() => {
+    if (vis === 'Bot Analytics') {
+      axios.get(`${BACKEND}api/historyget/${id.id}`, {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      }).then(res => { setHistory(res.data); console.log("history ", res.data) }).catch(err => console.log(err))
+    }
+  }, [vis])
 
 
-  const [minHeight, setMinHeight] = useState(500); 
+  const [minHeight, setMinHeight] = useState(500);
 
   const breakpoints = {
-    small: 768, 
-    medium: 1024, 
+    small: 768,
+    medium: 1024,
   };
   useEffect(() => {
     const handleResize = () => {
@@ -283,9 +301,9 @@ const messageStyleRec = {
       if (screenWidth < breakpoints.small) {
         setMinHeight(200);
       } else if (screenWidth < breakpoints.medium) {
-        setMinHeight(300); 
+        setMinHeight(300);
       } else {
-        setMinHeight(500); 
+        setMinHeight(500);
       }
     };
     handleResize();
@@ -296,16 +314,16 @@ const messageStyleRec = {
   }, []);
 
   const [searchTermPay, setSearchTermPay] = useState([]);
-  const[filterHistory,setFilterHistory]= useState([])
+  const [filterHistory, setFilterHistory] = useState([])
 
-  useEffect(()=>{
+  useEffect(() => {
     setFilterHistory(history)
-  },[history])
+  }, [history])
 
   const handleSearchPay = (e) => {
     const input = e.target.value;
     setSearchTermPay(input);
-  
+
     const filtered = history.filter((item) => {
       const regex = new RegExp(input, 'i');
       for (const key in item) {
@@ -321,8 +339,8 @@ const messageStyleRec = {
 
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; 
-  const [sortedHistory, setSortedHistory] = useState([]); 
+  const itemsPerPage = 10;
+  const [sortedHistory, setSortedHistory] = useState([]);
 
   useEffect(() => {
     const sortedData = Array.isArray(filterHistory)
@@ -344,43 +362,203 @@ const messageStyleRec = {
     }
   };
 
-  
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+
+  const toggleAccordion2 = () => {
+    setIsAccordionOpen(!isAccordionOpen);
+  };
+
+  const [openAccordionIndex, setOpenAccordionIndex] = useState(null);
+
+  const toggleAccordion = (index) => {
+    if (openAccordionIndex === index) {
+      setOpenAccordionIndex(null);
+    } else {
+      setOpenAccordionIndex(index);
+    }
+  };
+
+  const [manageSAdata, setManageSAdata] = useState('')
+  const [embedScript, setEmbedScript] = useState('')
+
+  useEffect(() => {
+    setApiload(true)
+    axios.post(`${BACKEND}api/getmanagesa`, {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }).then(res => { console.log(res.data, "======"); setManageSAdata(res.data[1]);setApiload(false) }).catch(err => {console.log(err);setApiload(false)})
+  }, [])
+
+  useEffect(() => {
+    if (manageSAdata.embedScript != undefined) {
+      setEmbedScript(manageSAdata.embedScript.replace(/\${id\.id}/g, id.id))
+      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", manageSAdata.embedScript.replace(/\${id\.id}/g, id.id))
+
+    }
+  }, [manageSAdata])
+
+  const handleCopyClick = () => {
+
+    const textArea = document.createElement('textarea');
+    textArea.value = embedScript;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    toast.success('Script Copied', 3000)
+  };
 
 
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
       <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pt-5' style={{ color: '#FFFFFF' }}>Manage Chatbot</h1>
       <h2 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 mt-5' style={{ color: '#FFFFFF' }}>{botname}</h2>
+      <div className='form-group d-flex justify-content-center mt-4'>
+       {apiload ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
       <div>
         <ul className='fw-bolder fs-5 row col-12 d-flex justify-content-around   text-center mb-5 mt-5' style={{ color: '#FFFFFF', listStyle: 'none', textDecoration: 'none' }}>
-          {['Bot Properties', 'Demo Chat', 'Bot Analytics'].map(x => (
+          {['Bot Properties', 'Demo Chatbot', 'Bot Analytics'].map(x => (
 
+            // vis === x ?
+            //   <button className='btn btn-link col-lg-4 col-12 fw-bold fs-5' style={{ textDecoration: 'underline', color: '#FFFFFF' }} onClick={(e) => setVis(e.target.value)} value={x} >{x}</button>
+            //   : <button className='btn btn-link col-lg-4 col-12 fw-bold fs-5 ' style={{ textDecoration: 'none', color: '#FFFFFF' }} onClick={(e) => setVis(e.target.value)} value={x} >{x}</button>
+         
             vis === x ?
-              <button className='btn btn-link col-lg-4 col-12 fw-bold fs-5' style={{ textDecoration: 'underline', color: '#FFFFFF' }} onClick={(e) => setVis(e.target.value)} value={x} >{x}</button>
-              : <button className='btn btn-link col-lg-4 col-12 fw-bold fs-5 ' style={{ textDecoration: 'none', color: '#FFFFFF' }} onClick={(e) => setVis(e.target.value)} value={x} >{x}</button>
-          ))}
+            <div className='me-sm-auto p-0 col-lg-4 col-12   my-2'>
+            <button className='btn btn-link px-0 fw-bold fs-5' style={{ textDecoration: 'underline', color: '#FFFFFF' }} onClick={(e) => setVis(e.target.value)} value={x} >{x}</button>
+           </div>
+            :
+            <div className=' me-sm-auto p-0 col-lg-4 col-12  my-2'> 
+            <button className='btn btn-link px-0 col-lg-4 col-12 fw-bold fs-5 ' style={{ textDecoration: 'none', color: '#FFFFFF' }} onClick={(e) => setVis(e.target.value)} value={x} >{x}</button>
+</div>        
+        ))}
 
-          {/* <button className='btn btn-link ' style={{ textDecoration:'none', color:'#FFFFFF' }} onClick={(e)=>setVis(e.target.value) } value='b' >BAAA</button>
-        <button className='btn btn-link ' style={{ textDecoration:'none', color:'#FFFFFF' }} onClick={(e)=>setVis(e.target.value) } value='c' >CAAA</button> */}
+          {/* <div className='col-sm-5 me-sm-auto p-0 col-11 my-2'>
+            <Button className='  p-0 fw-bolder fs-5 link d-flex justify-content-center mx-auto text-center  my-2' style={{ color: '#FFFFFF' }} variant="link"><Link className='' to='/pricing' style={{ color: '#FFFFFF' }}>Get a Chatbot</Link></Button>
+          </div> */}
+
         </ul>
       </div>
       {vis === 'Bot Properties' ?
         <div >
-          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF', marginTop:'100px' }} >Add this Script to your website to get your chatbot</label>
-          <textarea id='textareascript' className='fs-4 d-flex justify-content-center container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={`<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js" defer id="popup" cred="${id.id}"></script>`} />
-          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URL used</label>
+          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF', marginTop: '100px' }} >Add this Script to your website to get your chatbot</label>
+          {/* <textarea id='textareascript' className='fs-4 d-flex justify-content-center container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={`<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js" defer id="popup" cred="${id.id}"></script>`} /> */}
+
+          <Tp anchorSelect=".my-anchor-element" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000", fontWeight: 'bolder' }} place="top">
+            Click to Copy the script
+          </Tp>
+          <textarea id='textareascript' className='fs-4 d-flex justify-content-center my-anchor-element container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={embedScript}
+            onClick={handleCopyClick}
+          />
+
+
+          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URL Used</label>
           <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='URL Used' value={url} />
-          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >Pdf Used</label>
-          <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%'}} readOnly placeholder='PDF Used' value={pdf} />
-          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >Urls scrapped</label>
-          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%' }} readOnly placeholder='Urls scrapped'  value={Array.isArray(urlsUsed) ? urlsUsed.join('\n') : ''} />
-          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >Urls Excluded</label>
-          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center  ' style={{ width: '95%', marginBottom:'100px' }} readOnly placeholder='Urls excluded'  value={Array.isArray(urlsEx) ? urlsEx.join('\n') : ''} />
-          
-          
+          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >PDF Used</label>
+          <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='PDF Used' value={pdf} />
+          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URLs Scrapped</label>
+          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%', height: '150px' }} readOnly placeholder='Urls scrapped' value={Array.isArray(urlsUsed) ? urlsUsed.join('\n') : ''} />
+          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URLs Excluded</label>
+          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%' }} readOnly placeholder='Urls excluded' value={Array.isArray(urlsEx) ? urlsEx.join('\n') : ''} />
+
+          {/* {
+            embeddedQA && embeddedQA.length > 0 && (
+              <>
+                <Accordion alwaysOpen='false' className='col-10 my-4 mx-auto custom-accordion' style={{ marginBottom: '100px'}} >
+                  <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #171725' }} >
+                    <Accordion.Header>
+                    <label className='fs-4 d-flex justify-content-center container text-center ' style={{ height: '100%', color: '#FFFFFF' }}>
+                  Embedded Q/A
+                </label> 
+                    </Accordion.Header>
+                    <Accordion.Body style={{ color: 'white', backgroundColor: '#171725' }} >
+                      {embeddedQA.map((item, index) => (
+                        <>
+                          <div key={index} className='mt-5'>
+                            <input
+                              className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3'
+                              style={{ width: '95%' }}
+                              readOnly
+                              placeholder='Embedded Q/A'
+                              value={item.question}
+                            />
+                            <textarea
+                              className='fs-4 d-flex justify-content-center container mt-1 text-center mb-5'
+                              style={{ width: '95%' }}
+                              readOnly
+                              placeholder='Embedded Q/A'
+                              value={item.answer}
+                            />
+                            
+                          </div>
+                        </>
+                      ))}
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
+              </>
+            )
+          } */}
+
+          {embeddedQA && embeddedQA.length > 0 && (
+            <>
+              <Accordion
+                activeKey={isAccordionOpen ? '0' : null}
+                onSelect={toggleAccordion2}
+                className='col-10 my-4 mx-auto custom-accordion'
+                style={{ marginBottom: '100px' }}
+              >
+                <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #171725' }}>
+                  <Accordion.Header>
+                    <div className='d-flex justify-content-center fs-4 container text-center' style={{ height: '100%', color: '#FFFFFF' }}>
+                      Embedded Q/A
+                      <span style={{
+                        color: '#FFE459',
+                        position: 'absolute',
+                        right: '25px', // Adjust this value to fine-tune the position
+                        top: '50%',
+                        fontSize: '34px',
+                        transform: 'translateY(-50%)',
+                      }}>
+                        {isAccordionOpen ? '-' : '+'}
+                      </span>
+                    </div>
+                  </Accordion.Header>
+                  <Accordion.Body style={{ color: 'white', backgroundColor: '#171725' }}>
+                    {embeddedQA.map((item, index) => (
+                      <div key={index} className='mt-5'>
+                        <input
+                          className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3'
+                          style={{ width: '95%' }}
+                          readOnly
+                          placeholder='Embedded Q/A'
+                          value={item.question}
+                        />
+                        <textarea
+                          className='fs-4 d-flex justify-content-center container mt-1 text-center mb-5'
+                          style={{ width: '95%' }}
+                          readOnly
+                          placeholder='Embedded Q/A'
+                          value={item.answer}
+                        />
+                      </div>
+                    ))}
+                  </Accordion.Body>
+                </Accordion.Item>
+              </Accordion>
+            </>
+          )}
+
           {/* update bot */}
-          <div className='fs-4 col-12 d-flex justify-content-center  text-center mb-5 mt-3' style={{ color: '#FFFFFF', backgroundColor:'#242439' }}>
-            <form className='col-sm-9 mb-5 col-11 mx-auto ' style={{marginTop:'50px'}}>
+          <div className='fs-4 col-12 d-flex justify-content-center  text-center mb-5 mt-3' style={{ color: '#FFFFFF', backgroundColor: '#242439' }}>
+            <form className='col-sm-9 mb-5 col-11 mx-auto ' style={{ marginTop: '50px' }}>
               <div className="form-group mt-5 mb-5 fs-2 fw-bold">
                 <label  >You can update these properties :</label>
               </div>
@@ -398,7 +576,7 @@ const messageStyleRec = {
               </div>
               <div className="form-group">
                 <label>Prompt (Don't remove text and query from the prompt)</label>
-                <textarea id="textareaprompt" className='fs-4 d-flex justify-content-center container text-center mt-1  mb-3' value={prompt} placeholder='Name of bot' onChange={(e) => { setPrompt(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${e.target.scrollHeight}px`; console.log("scroll", e.target.scrollHeight) }} />
+                <textarea id="textareaprompt" className='fs-4 d-flex justify-content-center container text-start mt-1  mb-3' value={prompt} placeholder='Name of bot' onChange={(e) => { setPrompt(e.target.value); e.target.style.height = 'auto'; e.target.style.height = `${e.target.scrollHeight}px`; console.log("scroll", e.target.scrollHeight) }} />
               </div>
               <div className='form-group'>
                 <button className='btn btn-outline-warning mb-3 px-5 ' onClick={(e) => handleSubmit(e)}>Update Bot</button>
@@ -421,6 +599,18 @@ const messageStyleRec = {
               <div className="form-group">
                 <label>Website Link you want the chatbot about</label>
                 <input className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' value={sendLink} placeholder='website link' onChange={(e) => setSendLink(e.target.value)} />
+              </div>
+              <div className="form-check form-switch mt-1 d-flex justify-content-center mb-3">
+                <input
+                  className="form-check-input me-4"
+                  type="checkbox"
+                  role="switch"
+                  id="flexSwitchCheckDefault"
+                  onChange={handleCheckboxChange}
+                />
+                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
+                  Scrap data from Urls found inside the above url
+                </label>
               </div>
               <div className="form-group">
                 <label>Pages you want to exclude from the chatbot (Write each individual link in seperate line)</label>
@@ -477,7 +667,7 @@ const messageStyleRec = {
           </div>
         </div> : ''
       }
-      {vis === 'Demo Chat' ?
+      {vis === 'Demo Chatbot' ?
         <div className=''>
 
           <ChatUIDemo botID={id.id} />
@@ -496,21 +686,21 @@ const messageStyleRec = {
             </div>
 
           </div>
-           <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
+          <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
             {tokenDataGraph.length === 0 ? '' :
-              <ResponsiveContainer width="99%"  minHeight={minHeight}>
+              <ResponsiveContainer width="99%" minHeight={minHeight}>
                 <LineChart width={1000} height={500} data={tokenDataGraph} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
                   <Line type="monotone" dataKey="usage" stroke="#8884d8" />
                   <XAxis dataKey="date"
                     minTickGap={10}
-                    style={{fontSize:'14px'}}
+                    style={{ fontSize: '14px' }}
                   />
-                  <YAxis style={{fontSize:'14px'}} allowDataOverflow={true} />
+                  <YAxis style={{ fontSize: '14px' }} allowDataOverflow={true} />
                   <Tooltip content={<CustomTooltip />} />
                 </LineChart>
               </ResponsiveContainer>
             }
-          </div> 
+          </div>
 
           <label className='fs-4 d-flex justify-content-center container text-center mt-5 mb-5' style={{ height: '100%', color: '#FFFFFF' }} >Unique Conversations</label>
           <div className='fs-4 d-flex justify-content-center  text-center mt-1 mb-5'>
@@ -523,14 +713,14 @@ const messageStyleRec = {
           </div>
           <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-5 mt-3' style={{ color: '#FFFFFF' }}>
             {conDataGraph.length === 0 ? '' :
-              <ResponsiveContainer width="99%"  minHeight={minHeight}>
+              <ResponsiveContainer width="99%" minHeight={minHeight}>
                 <LineChart width={1000} height={500} data={conDataGraph} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
                   <Line type="monotone" dataKey="ConNo" stroke="#8884d8" />
                   <XAxis dataKey="date"
                     minTickGap={10}
-                    style={{fontSize:'14px'}}
+                    style={{ fontSize: '14px' }}
                   />
-                  <YAxis style={{fontSize:'14px'}} allowDataOverflow={true} />
+                  <YAxis style={{ fontSize: '14px' }} allowDataOverflow={true} />
                   <Tooltip content={<CustomTooltip2 />} />
                 </LineChart>
               </ResponsiveContainer>
@@ -539,53 +729,99 @@ const messageStyleRec = {
 
           <div className='fs-4 col-12 row d-flex justify-content-center text-center  mb-5 mt-3 mx-1 ' style={{ color: '#FFFFFF' }}>
             <label className='fs-4 d-flex justify-content-center  col-11 text-center mt-5 mb-5 mx-2' style={{ height: '100%', color: '#FFFFFF' }}>Chat History</label>
-        
+
             <input className='fs-4 col-sm-8 col-lg-10 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"
-                placeholder="Search..."
-                value={searchTermPay}
-                onChange={handleSearchPay}
-                 />
-          {filterHistory === '' ? '':
-          // filterHistory.sort((a, b) => new Date(b.time) - new Date(a.time)).map(x =>
-          itemsToDisplay.map((x, index) => (
-            <Accordion alwaysOpen='false' className='col-11 my-2 custom-accordion' >
-              <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }} >
-                <Accordion.Header >{x.time}</Accordion.Header>
-                <Accordion.Body style={{ color: 'white' }} >
-                 {x.history.map(message=>
-                  <div
-                  key={message.id}
-                  className={`message ${message.sender === 'me' ? 'sent' : 'received'}`}
-                  style={message.sender === 'me' ? messageStyleSend : messageStyleRec}
-              >
-                  {/* <div id="text-container" className="message-content typing">{message.text}</div> */}
-                  <p  style={{color:'white'}} className="message-content my-1 ">{message.text}</p>
-              </div>
-                  )}
-                </Accordion.Body>
-              </Accordion.Item>
-            </Accordion>
-))}
+              placeholder="Search..."
+              value={searchTermPay}
+              onChange={handleSearchPay}
+            />
+            {/* {filterHistory === '' ? '' :
+              // filterHistory.sort((a, b) => new Date(b.time) - new Date(a.time)).map(x =>
+              itemsToDisplay.map((x, index) => (
+                <Accordion alwaysOpen='false' key={index} className='col-11 my-2 custom-accordion'
+          
+                >
+                  <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }} >
+                    <Accordion.Header >
+                      {x.time}
+                    </Accordion.Header>
+                    <Accordion.Body style={{ color: 'white' }} >
+                      {x.history.map(message =>
+                        <div
+                          key={message.id}
+                          className={`message ${message.sender === 'me' ? 'sent' : 'received'}`}
+                          style={message.sender === 'me' ? messageStyleSend : messageStyleRec}
+                        >
+                    
+                          <p style={{ color: 'white' }} className="message-content my-1 ">{message.text}</p>
+                        </div>
+                      )}
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
+              ))} */}
+            {filterHistory === ''
+              ? ''
+              : itemsToDisplay.map((x, index) => (
+                <Accordion
+                  alwaysOpen='false'
+                  key={index}
+                  className='col-11 my-2 custom-accordion'
+                  activeKey={openAccordionIndex === index ? '0' : null}
+                  onSelect={() => toggleAccordion(index)}
+                >
+                  <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }}>
+                    <Accordion.Header>
+                      {x.time}
+                      <span
+                        style={{
+                          color: '#FFE459',
+                          position: 'absolute',
+                          right: '25px',
+                          top: '50%',
+                          fontSize: '34px',
+                          transform: 'translateY(-50%)',
+                        }}
+                      >
+                        {openAccordionIndex === index ? '-' : '+'}
+                      </span>
+                    </Accordion.Header>
+                    <Accordion.Body style={{ color: 'white' }}>
+                      {x.history.map((message) => (
+                        <div
+                          key={message.id}
+                          className={`message ${message.sender === 'me' ? 'sent' : 'received'}`}
+                          style={message.sender === 'me' ? messageStyleSend : messageStyleRec}
+                        >
+                          <p style={{ color: 'white' }} className={`my-1 ${message.sender === 'me' ? 'text-end' : 'text-start'}`}>
+                            {message.text}
+                          </p>
+                        </div>
+                      ))}
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
+              ))}
           </div>
 
-          
-      <div className=' d-flex justify-content-center fs-4'>    
-      <div
-        onClick={() => handlePageChange(currentPage - 1)}
-        className={` ${currentPage === 1 ? 'disabled' : ''}`}
-      >
-        <BsFillArrowLeftCircleFill style={{color:'white'}} />
-      </div>
-      <p className='d-flex  justify-content-center  text-center mb-1 mt-1 mx-4' style={{ color: '#FFFFFF' }}>
-        Page {currentPage}
-      </p>
-      <div
-        onClick={() => handlePageChange(currentPage + 1)}
-        className={` ${endIndex >= filterHistory.length ? 'disabled' : ''}`}
-      >
-        <BsFillArrowRightCircleFill style={{color:'white'}} />
-      </div>
-    </div>
+
+          <div className=' d-flex justify-content-center fs-4'>
+            <div
+              onClick={() => handlePageChange(currentPage - 1)}
+              className={` ${currentPage === 1 ? 'disabled' : ''}`}
+            >
+              <BsFillArrowLeftCircleFill style={{ color: 'white' }} />
+            </div>
+            <p className='d-flex  justify-content-center  text-center mb-1 mt-1 mx-4' style={{ color: '#FFFFFF' }}>
+              Page {currentPage}
+            </p>
+            <div
+              onClick={() => handlePageChange(currentPage + 1)}
+              className={` ${endIndex >= filterHistory.length ? 'disabled' : ''}`}
+            >
+              <BsFillArrowRightCircleFill style={{ color: 'white' }} />
+            </div>
+          </div>
 
         </div> : ''
       }

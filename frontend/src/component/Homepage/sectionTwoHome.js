@@ -134,7 +134,7 @@ Ask a question to get started.</h2>
                 </span>
               </Accordion.Header>
               <Accordion.Body className='' style={{ color: 'white' }}>
-                <p style={{ color: 'white' }} className="my-1">
+                <p style={{ color: 'white' }} className="my-1 text-start">
                   {x.answer}
                 </p>
               </Accordion.Body>

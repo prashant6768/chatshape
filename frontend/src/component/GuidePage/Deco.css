@@ -1,0 +1,39 @@
+li::before{
+    color:transparent
+}
+
+@media screen and (min-width: 768px) {
+   .guide{
+    width:calc(100vw - 300px);
+    position:sticky;
+    left:300px;
+   }
+   .guideNav{
+    display: inline-block;
+   }
+   .guideMenu{
+    display:none;
+   }
+
+  }
+@media screen and (max-width: 767px) {
+   .guideNav{
+    display: none;
+   }
+   .guideMenu{
+    position:fixed;
+    width:100vw;
+    top:0;
+   }
+   /* .pageContent{
+    margin-top: 100px;
+   } */
+  }
+
+  .hidden{
+    display: none;
+  }
+
+  p{
+    font-size: 20px;
+  }

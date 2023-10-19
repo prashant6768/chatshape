@@ -21,9 +21,9 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.138.169.250/'
-  // const BACKEND = 'https://api.zema.io/'
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'https://zemaapi.zema.io/'
+  
 
     const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -74,7 +74,7 @@ const Login = () => {
     Cookies.remove('accessToken')
     Cookies.remove('adminToken')
      toast.success("Logout Successful")
-     setTimeout(() => { navigate('/') }, 1000)
+     setTimeout(() => { navigate('/') }, 3000)
      
   }
 
@@ -82,9 +82,11 @@ const Login = () => {
     e.preventDefault()
 await axios.get(`${BACKEND}auth/googlelogin`,{
   headers: {
-    'Access-Control-Allow-Origin': '*',
+    'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Access-Control-Allow-Origin': '*'
   },
-}).then(res => {window.location.href = res.data ; console.log(res.data);setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}).catch(err => console.log("GOOG ",err))
+}).then(res => {window.location.href = res.data ; console.log(res.data,"========hello g");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}).catch(err => console.log("GOOG ",err))
 setTimeout(() => { navigate('/account') }, 2000)
 }
 
@@ -107,10 +109,12 @@ setTimeout(() => { navigate('/account') }, 2000)
     if(sl === 's'){
       Cookies.set('accessToken', `${param}`)
       toast.success("Profile created Successfully")
+      setTimeout(() => { navigate('/account') }, 2000)
       console.log(param,"SSSSSSSSSSS")
     }else if(sl === 'l'){
       Cookies.set('accessToken', `${param}`)
       toast.success("Login successful")
+      setTimeout(() => { navigate('/account') }, 2000)
       console.log(param,"LLLLLLLLL")
     }
    
@@ -136,17 +140,14 @@ setTimeout(() => { navigate('/account') }, 2000)
     <h3>Login</h3>
 
     <div className="col-sm-12">
-        {/* <label htmlFor="signup" className="mb-1">
-          Don't have an account? Signup
-        </label> */}
         <div className="input-group mb-3">
-        <Link to='/signup' style={{ textDecoration:'none'}}><Nav.Link href="#link" className='btn link' style={{ }}>Don't have an account? Signup</Nav.Link></Link>        
+        <Link to='/signup' style={{ textDecoration:'none'}}><Nav.Link href="#link" className='btn link' style={{ }}>Don't have an account? Sign up</Nav.Link></Link>        
         </div>
       </div>
 
     <div className="col-sm-12">
         <label htmlFor="email" className="mb-1">
-          Google Login / Signup
+          Google Login / Sign up
         </label>
         <div className="input-group mb-3">
          <button className='btn btn-dark col-12 ' onClick={(e)=>{handleGoogle(e)}} >Google <BsGoogle style={{color:'white'}} className='ms-2'/></button>
@@ -189,6 +190,7 @@ setTimeout(() => { navigate('/account') }, 2000)
     </div>
     {
       showLogin === true ?
+      <>
     <div className="col-12">
       <button
         type="submit"
@@ -197,10 +199,18 @@ setTimeout(() => { navigate('/account') }, 2000)
       >
         Login
       </button>
-    </div>:
+    </div>
+     <div className="col-sm-12">
+     <div className="input-group mt-2 mb-3">
+     <Link to='/forgetpassword' style={{ textDecoration:'none'}}><Nav.Link href="#link" className='btn link' style={{ }}>Forgot Password</Nav.Link></Link>        
+     </div>
+   </div>
+   </>
+    :
     <div className="col-12">
     <button type="button" onClick={()=> logout()} class="btn btn-outline-danger  mt-3 d-block w-100">Logout</button>
     </div>
+
     }
   </div>
   <div className='form-group d-flex justify-content-center mt-4'>

@@ -6,20 +6,22 @@ import { ToastContainer, toast } from 'react-toastify';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { Link } from 'react-router-dom';
+import {ThreeDots} from 'react-loader-spinner';
 
 const SectionOneSA = () => {
 
   const decoded = Cookies.get('accessToken');
   const adminToken = Cookies.get('adminToken')
 
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'https://api.zema.io/'
-  // const BACKEND = 'http://3.138.169.250/'
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'https://zemaapi.zema.io/'
 
 
   const [data, setData] = useState([])
+  const[apiload,setApiload]= useState(false)
 
   useEffect(() => {
+    setApiload(true)
     axios.post(`${BACKEND}api/admin/dataAdmin`, { decoded, adminToken }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
@@ -27,9 +29,10 @@ const SectionOneSA = () => {
     })
       .then(res => {
         console.log(res.data, "all the data");
-        setData(res.data)
+        setData(res.data);
+        setApiload(false)
       })
-      .catch(err => console.log(err))
+      .catch(err => {console.log(err);setApiload(false)})
   }, [])
 
   const [addAdmin, setAddAdmin] = useState('')
@@ -63,13 +66,21 @@ const [filteredData, setFilteredData] = useState(data);
   })
     .then(res => {
       console.log(res.data, "all the error data");
-      setErrData(res.data)
+      if(res.data === null){
+        setErrData([])
+        console.log("MMMMMMMMMMMTY")
+      }
+      else{
+        setErrData(res.data)
+        console.log("FULL")
+      }
+      
     })
     .catch(err => console.log(err))
  },[])
 
  useEffect(()=>{
-  setFilteredData(errData)
+    setFilteredData(errData)
  },[errData])
 
  const handleSearch = (e) => {
@@ -90,10 +101,56 @@ const [filteredData, setFilteredData] = useState(data);
 };
 
 
+const[issueData,setIssueData]=useState([])
+const [searchTermIssue, setSearchTermIssue] = useState('');
+const [filteredDataIssue, setFilteredDataIssue] = useState(data);
+
+useEffect(()=>{
+  axios.post(`${BACKEND}api/admin/issueLog`, { decoded, adminToken }, {
+    'Content-type': 'application/json',
+    'Accept': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+  })
+    .then(res => {
+      console.log(res.data, "all the issue data");
+      setIssueData(res.data)
+    })
+    .catch(err => console.log(err))
+ },[])
+
+ useEffect(()=>{
+  setFilteredDataIssue(issueData)
+ },[issueData])
+
+ const handleSearchIssue = (e) => {
+  const input = e.target.value;
+  setSearchTermIssue(input);
+
+  const filtered = issueData.filter((item) => {
+    const regex = new RegExp(input, 'i');
+    for (const key in item) {
+      if (item.hasOwnProperty(key) && regex.test(item[key])) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  setFilteredDataIssue(filtered);
+};
 
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
       <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 pb-4 mb-4' style={{ color: '#FFFFFF' }}>Super Admins</h3>
+
+      <div className='form-group d-flex justify-content-center mt-4'>
+       {apiload ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
 
       <div className='row col-11 mx-auto mt-4 d-flex '>
         <Card style={{ backgroundColor: '#212529' }} className='  d-flex rounded-4'>
@@ -112,7 +169,7 @@ const [filteredData, setFilteredData] = useState(data);
                     <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>Conversations used : {x.ConNo}</p>
                   </div> */}
                   <div className='col-lg-2 col-sm-5'>
-                    <button className='btn btn-outline-warning col-12 d-flex justify-content-center text-center ' value={x.id} onClick={(e)=>{handleRemoveAdmin(e.target.value)}} style={{  }}>Remove</button>
+                    <button className='btn btn-outline-danger col-12 d-flex justify-content-center text-center ' value={x.id} onClick={(e)=>{handleRemoveAdmin(e.target.value)}} style={{  }}>Remove</button>
                   </div>
                 </div>
               ))}
@@ -160,7 +217,7 @@ const [filteredData, setFilteredData] = useState(data);
               </Dropdown> */}
             </div>
             {
-                  filteredData.length === 0?
+                  filteredData == undefined || filteredData == null ?
                   <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>No Data Available</p>
                   :
               filteredData.map(x => (
@@ -181,10 +238,51 @@ const [filteredData, setFilteredData] = useState(data);
                   </div>
                 </div>
               ))}
+          
           </Card.Body>
         </Card>
       </div>
 
+
+      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 pb-4 mb-4' style={{ color: '#FFFFFF' }}>Issue Logs</h3>
+
+      <div className='row col-11 mx-auto mt-4 d-flex '>
+        <Card style={{ backgroundColor: '#212529' }} className='  d-flex rounded-4'>
+          <Card.Body className="d-flex flex-column" style={{}}>
+            <div className='row'>
+              <input className='fs-4 col-sm-12 col-lg-12 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"
+                placeholder="Search..."
+                value={searchTermIssue}
+                onChange={handleSearchIssue} />
+            </div>
+            {
+                  filteredDataIssue.length === 0?
+                  <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>No Data Available</p>
+                  :
+              filteredDataIssue.map(x => (
+                <div className='row col-12 mt-3' style={{ borderBottom: '1px solid white', display: 'flex', flexWrap: 'wrap' }}>
+                  <div className='col-xl-3 col-sm-6'>
+                    <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>{x.username}</p>
+                  </div>
+                  <div className='col-xl-4 col-sm-6'>
+                    <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>{x.issue}</p>
+                  </div>
+                  <div className='col-xl-2 col-sm-6'>
+                    <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>Bots used: {x.bot}</p>
+                  </div>
+                  <div className='col-xl-2 col-sm-6'>
+                    <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}> {x.time}</p>
+                  </div>
+                  <div className='col-xl-1 col-sm-6'>
+                    {/* <p className=' col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</p> */}
+                  <Link to={`/superadminBot/${x.bot_id}`} style={{ textDecoration: 'none' }}><Nav.Link href="#link" className='col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</Nav.Link></Link>
+ 
+                  </div>
+                </div>
+              ))}
+          </Card.Body>
+        </Card>
+      </div>
 
       <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />
     </div>

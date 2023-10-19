@@ -15,9 +15,11 @@ const AccountSection1 = () => {
     // const decoded = jose.decodeJwt(token, 'notmysecretkey');
     // const decoded = document.cookie.split('=')[1]
     const decoded = Cookies.get('accessToken');
-    const BACKEND = 'http://localhost:5000/'
-    // const BACKEND = 'http://3.138.169.250/'
-    // const BACKEND = 'https://api.zema.io/'
+
+    // const BACKEND = 'http://localhost:5000/'
+    const BACKEND = 'https://zemaapi.zema.io/'
+
+  
 
     const [data, setData] = useState('')
     const [data2, setData2] = useState('')
@@ -25,13 +27,15 @@ const AccountSection1 = () => {
     const [name, setName] = useState('')
     const [phone, setPhone] = useState('')
     const [loading, setLoading] = useState(false);
+    const [apiload,setApiload]= useState(false)
 
     useEffect(() => {
+        setApiload(true)
         axios.post(`${BACKEND}api/subdata`, { decoded }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*',
-        }).then(res => { console.log(res.data); setData(res.data); setData2(res.data[0]) }).catch(err => console.log(err))
+        }).then(res => { console.log(res.data); setData(res.data); setData2(res.data[0]); setApiload(false) }).catch(err => {console.log(err); setApiload(false)})
     }, [])
 
     useEffect(() => {
@@ -50,12 +54,49 @@ const AccountSection1 = () => {
     const handleProfile = (e) => {
         e.preventDefault()
         setLoading(true)
+
+        const nameRegex = /[0-9!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|~`]/;
+        if (nameRegex.test(name)) {
+          toast.error("Name cannot contain numbers or symbols");
+          setLoading(false);
+          return;
+        }
+  
+         const phoneRegex = /^(?:\d{10})$/;
+  if(phone !== ''){
+    if (!phoneRegex.test(phone)) {
+      toast.error("Invalid Phone Number Format");
+      setLoading(false);
+      return;
+    }
+  }
+
+      
         axios.put(`${BACKEND}api/profiledata`, { name, phone, decoded }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*',
         }).then(res => { if (res.data === 'Update Successful') { toast.success(res.data); console.log("AAA", res.data); setLoading(false) } else { toast.error("Updation Failed"); console.log("AAA", res.data); setLoading(false) } }).catch(err => { toast.error(err); setLoading(false) })
     }
+
+    function abbrNum(number, decPlaces) {
+
+        decPlaces = Math.pow(10, decPlaces);
+        var abbrev = ["k", "m", "b", "t"];
+        for (var i = abbrev.length - 1; i >= 0; i--) {
+          var size = Math.pow(10, (i + 1) * 3);
+          if (size <= number) {
+            number = Math.round(number * decPlaces / size) / decPlaces;
+            if ((number == 1000) && (i < abbrev.length - 1)) {
+              number = 1;
+              i++;
+            }
+            number += abbrev[i];
+            break;
+          }
+        } 
+        return number;
+      }
 
 
     return (
@@ -75,7 +116,6 @@ const AccountSection1 = () => {
                         <div className='form-group d-flex justify-content-center'>
                             {loading ? (
                                 <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
-
                             ) : (
                                 ''
                             )}
@@ -86,6 +126,14 @@ const AccountSection1 = () => {
             <div className=' mt-5 d-flex justify-content-center pb-5' style={{ backgroundColor: '#171725' }} >
                 <Card style={{ backgroundColor: '#171725', height: '100%', border: 'none' }} className='mx-1 mx-sm-3 mt-5 p-2  col-xl-5 col-xxl-4 col-lg-6  col-sm-9 col-12'>
                     <Card.Text className='fw-bolder fs-2 col-sm-8 col-12 d-flex  justify-content-center container text-center me-auto mb-5' style={{ color: '#FFFFFF' }}>Manage subscription</Card.Text>
+                    <div className='form-group d-flex justify-content-center mt-4'>
+       {apiload ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
                     <Card style={{ backgroundColor: '#242439', height: '100%', border: 'none' }} className=' mt-4 p-2   col-12'>
                         <Card.Text className='fs-5  d-flex  justify-content-center container text-center  ' style={{ color: '#FFFFFF' }}>
                             Subscribed to: <br/> {data2.plan} plan
@@ -104,11 +152,11 @@ const AccountSection1 = () => {
                     </div>
                     <div className='row col-12 mb-5 mx-auto d-flex justify-content-around'>
                         <Card style={{ backgroundColor: '#242439', height: '100%', border: 'none' }} className=' mt-4 p-2  col-sm-5 col-12'>
-                            <Card.Text className='fs-5  d-flex  justify-content-center container text-center' style={{ color: '#FFFFFF' }}>Bots left:<br/> {data2.NoOfBots}</Card.Text>
+                            <Card.Text className='fs-5  d-flex  justify-content-center container text-center' style={{ color: '#FFFFFF' }}>Bots left:<br/> {data2.NoOfBots}/{data2.totalBots}</Card.Text>
                         </Card>
                         {data2.tokens > 1 ?
                             <Card style={{ backgroundColor: '#242439', height: '100%', border: 'none' }} className=' mt-4 p-2 ms-auto col-sm-5 col-12'>
-                                <Card.Text className='fs-5  d-flex  justify-content-center container text-center ' style={{ color: '#FFFFFF'}}>Tokens Left:<br/> {data2.tokens}</Card.Text>
+                                <Card.Text className='fs-5  d-flex  justify-content-center container text-center ' style={{ color: '#FFFFFF'}}>Tokens Left:<br/>{abbrNum(data2.tokens,1)}/{abbrNum(data2.totalTokens,1)} </Card.Text>
                             </Card>
                             :
                             <Card style={{ backgroundColor: '#242439', height: '100%', border: 'none' }} className=' mt-4 p-2 ms-auto col-sm-5 col-12'>
@@ -123,8 +171,13 @@ const AccountSection1 = () => {
                         <Link to='/paymenthistory' style={{ textDecoration: 'none' }}><Button className='fw-bolder fs-4 col-sm-4 col-12 d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF', backgroundColor: '#620B84' }} variant="primary">View Payment History</Button></Link>
                     </div> */}
                     <div className='row d-flex justify-content-center'>
-                        <Link className='col-sm-5 me-sm-auto col-11 my-2' to='/pricing' style={{}}> <Button className='fw-bolder fs-5 link d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF' }} variant="link">Get a Chatbot</Button></Link>
-                        <Link className='col-sm-5 ms-sm-auto col-11 my-2' to='/paymenthistory' style={{ textDecoration: 'none' }}><Button className='fw-bolder fs-4 rounded-3  d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF', backgroundColor: '#242439', borderColor: '#FFFFFF', borderWidth: '2px' }} variant="primary">Transactions</Button></Link>
+                        <div className='col-sm-5 me-sm-auto p-0 col-11 my-2'>
+                        <Button className='  p-0 fw-bolder fs-5 link d-flex justify-content-center mx-auto text-center  my-2' style={{ color: '#FFFFFF' }} variant="link"><Link className='' to='/pricing' style={{color: '#FFFFFF'}}>Get a Chatbot</Link></Button>
+                        </div>
+                        <div className='col-sm-5 ms-sm-auto col-11 my-2'>
+                        <Button className='fw-bolder fs-4 rounded-3  d-flex justify-content-center container text-center px-0 py-2 mb-1' style={{ color: '#FFFFFF', backgroundColor: '#242439', borderColor: '#FFFFFF', borderWidth: '2px' }} variant="primary"><Link className='' to='/paymenthistory' style={{ textDecoration: 'none', color:'white', width:'100%' }}>Transactions</Link></Button>
+                        </div>
+                      
                     </div>
                 </Card>
             </div>
@@ -133,8 +186,12 @@ const AccountSection1 = () => {
                 <div style={{ height: '100%' }} className='mx-3 mt-5 p-2 col-xl-5 col-xxl-4 col-lg-6  col-sm-9 col-11'>
                     <h1 className='fw-bolder fs-2 col-12 d-flex justify-content-center container text-center mb-5 pb-3' style={{ color: '#FFFFFF', marginTop: '50px' }}>Manage your Chatbots</h1>
                     <div className='row d-flex justify-content-center mb-5'>
-                        <Link className='col-sm-5 me-sm-auto col-11 my-2' to='/create' style={{}}> <Button className='fw-bolder fs-5 link d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF' }} variant="link">Create Chatbot</Button></Link>
-                        <Link className='col-sm-5 ms-sm-auto col-11 my-2' to='/mychatbots' style={{ textDecoration: 'none' }}><Button className='fw-bolder fs-5 rounded-3  d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF', backgroundColor: '#242439', borderColor: '#FFFFFF', borderWidth: '2px' }} variant="primary">View Chatbot</Button></Link>
+                        <div className='col-sm-5 me-sm-auto p-0 col-11 my-2'>
+                        <Button className='  p-0 fw-bolder fs-5 link d-flex justify-content-center mx-auto text-center  my-2' style={{ color: '#FFFFFF' }} variant="link"><Link className='' to='/create' style={{color: '#FFFFFF'}}>Create Chatbot</Link></Button>
+                        </div>
+                        <div className='col-sm-5 ms-sm-auto col-11 my-2'>
+                        <Button className='fw-bolder fs-4 rounded-3 px-0 d-flex justify-content-center container text-center py-2 mb-1' style={{ color: '#FFFFFF', backgroundColor: '#242439', borderColor: '#FFFFFF', borderWidth: '2px' }} variant="primary"><Link className='' to='/mychatbots' style={{ textDecoration: 'none', color:'white', width:'100%' }}>View Chatbots</Link></Button>
+                        </div>
                     </div>
                 </div>
             </div>

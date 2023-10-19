@@ -49,7 +49,9 @@ const Footer = () => {
                    : <Link to='/login' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4 onClick={()=> logout()}>Logout</h4></Nav.Link></Link>
                
                 }
-                    <Link to='/blog' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Blog</h4></Nav.Link></Link>
+                    <Link to='/blog' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Blogs</h4></Nav.Link></Link>
+                    <Link to='/guide' style={{textDecoration:'none'}}><Nav.Link  href="#link" style={{color:'white'}}  className='my-4' ><h4>Guide</h4></Nav.Link></Link>
+               
                 </ul>
             </div>
         </div>

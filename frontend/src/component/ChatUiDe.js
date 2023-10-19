@@ -40,9 +40,8 @@ const ChatUIDe = (botID) => {
     const[consecFail,setConsecFail]=useState(0)
     const[consecFailMsg,setConsecFailMsg]=useState([])
 
-    // const BACKEND = 'http://localhost:5000/'
-    // const BACKEND = 'http://3.138.169.250/'
-    const BACKEND = 'https://api.zema.io/'
+//  const BACKEND = 'http://localhost:5000/'
+ const BACKEND = 'https://zemaapi.zema.io/'
 
     const handleInputChange = async (e) => {
         await setInputValue(e.target.value)
@@ -219,7 +218,8 @@ const ChatUIDe = (botID) => {
             text: chatbotMsg,
             sender: '',
         };
-        if (chatbotMsg === '' && chatbotMsg === null && chatbotMsg === []) {
+        // if (chatbotMsg === '' && chatbotMsg === null && chatbotMsg === []) {
+            if (chatbotMsg === '' && chatbotMsg === null ) {
             console.log("W")
         } else {
             setMessages((prevMessages) => [...prevMessages, newMessage]);

@@ -8,6 +8,7 @@ import { ThreeDots } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa'
 import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2'
+import Accordion from 'react-bootstrap/Accordion';
 // import {} from 'react-icons/hi2'
 import { BsStopCircle } from 'react-icons/bs'
 import sendIcon from '../assets/send.png'
@@ -34,6 +35,7 @@ const ChatUIDemo = (botID) => {
     const [plan, setPlan] = useState('')
     const [mark, setMark] = useState(false)
     const [loading, setLoading] = useState(false);
+    const [loadingI, setLoadingI] = useState(false);
     const [audioSub, setAudioSub] = useState(false)
     const [uniqueCon, setUniqueCon] = useState(1)
     const [now, setNow] = useState('')
@@ -47,12 +49,11 @@ const ChatUIDemo = (botID) => {
 
 
 
-    const BACKEND = 'http://localhost:5000/'
-    const BACKENDWS = 'ws://localhost:5000/'
-    // const BACKEND = 'https://api.zema.io/'
-    // const BACKENDWS = 'https://api.zema.io/'
-    // const BACKEND = 'http://3.138.169.250/'
-    // const BACKENDWS = 'http://3.138.169.250/'
+    // const BACKEND = 'http://localhost:5000/'
+    // const BACKENDWS = 'ws://localhost:5000/'
+    const BACKEND = 'https://zemaapi.zema.io/'
+    const BACKENDWS = 'wss://zemaapi.zema.io/'
+
 
 
     const [socket, setSocket] = useState(null);
@@ -96,10 +97,12 @@ const ChatUIDemo = (botID) => {
 useEffect(() => {
     try{
     const newSocket = socketIO.connect(BACKENDWS
-    //     , {
-    //     transports: [ "wss"],
-    //     enabledTransports: [ "wss"],
-    // }
+        , {
+        transports: [ "websocket"],
+        enabledTransports: [ "websocket"],
+    },
+    {secure:true},
+    // ,{transports: ['wss'], enabledTransports: ['wss'],}
     );
     console.log("----------------------------Socket connect front",BACKEND)
     setSocket(newSocket);
@@ -118,15 +121,21 @@ useEffect(() => {
 }catch(err){
 console.log(err,"======try catch")
 }
-}, []);
+}, [inputValue]);
 
 
 
     const joinRoom = (roomName) => {
+        console.log("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
         if (socket) {
-            socket.emit('join', { room: roomName });
-            setRoom(roomName);
-            console.log("-------------------------Room joined ", roomName)
+            try{
+                socket.emit('join', { room: roomName });
+                setRoom(roomName);
+                console.log("-------------------------Room joined ", roomName)
+            }catch(err){
+                console.log("ERR on join room frontend code == ",err)
+            }
+           
         }
     };
 
@@ -138,6 +147,30 @@ console.log(err,"======try catch")
         }
     };
 
+    const test = () => {
+        if (socket) {
+            socket.emit('test');
+            console.log("test room frontend ")
+        }
+    };
+    const testRoom = (roomName) => {
+        if (socket) {
+            socket.emit('testRoom', { room: roomName });
+            console.log("test room frontend, it needs roomName objectId, check if it is right ")
+        }
+    };
+    // useEffect(() => {
+    //     socket?.on('test', data => {
+    //         console.log(data.message,"===========from backend test====")
+    //     });
+    //     socket?.on('testRoom', data => {
+    //         console.log(data.message,"===========from backend test room====")
+    //     });
+   
+    // }, [socket])
+
+    
+
     const sendMessage = (message) => {
         if (socket) {
             socket.emit('message', { room, msg: message });
@@ -147,14 +180,13 @@ console.log(err,"======try catch")
     };
 
     useEffect(() => {
+        console.log("Socket changeeeeeeeeeeeeeee ssssssssssssss")
         socket?.on('welcome_message', (data) => {
             console.log('Received welcome message:', data.message);
         });
     }, [socket])
 
     useEffect(() => {
-       
-
         socket?.on('message-chat', data => {
             setChkk(prevChkk => [...prevChkk, data.message])
             console.log(data.message)
@@ -165,6 +197,8 @@ console.log(err,"======try catch")
 
 
     const handleInputChange = async (e) => {
+        test()
+        testRoom("Roonmane")
         await setInputValue(e.target.value)
     };
 
@@ -176,6 +210,7 @@ console.log(err,"======try catch")
 
         setSpromptHide(true)
         joinRoom(botID.botID)
+        console.log("BBBBBBBBBBBBBBBBBBBBBB",botID.botID)
         const newMessage = {
             id: messages.length + 1,
             text: x,
@@ -190,10 +225,12 @@ console.log(err,"======try catch")
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => {
+        })
+        // .then(res => console.log("=============================",res.data,"================"))
+        .then(res => {
             if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") }
             else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") }
-            else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }
+            else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false);console.log("-------111111-----",res.data); setChatbotMsg("Some Error Occured !!!5!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }
             else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
             else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
             else { setChatbotMsg(res.data[0]); setConsecFail(0); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) }
@@ -275,8 +312,11 @@ console.log(err,"======try catch")
         }).then(res => console.log(res.data, " === from backend message history ")).catch(err => console.log(err))
     }, [chatbotMsg])
 
+    const[apiload,setApiload] = useState(false)
+
     useEffect(() => {
-        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); setPlan(res.data.plan); console.log(res.data.initialMsg, "=font api init") }).catch(err => console.log(err))
+        setApiload(true)
+        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); setPlan(res.data.plan); console.log(res.data.initialMsg, "=font api init"); setApiload(false) }).catch(err => {console.log(err); setApiload(false)})
         console.log(suggestedPrompt)
     }, [])
 
@@ -488,17 +528,121 @@ console.log(err,"======try catch")
         }).then(res => {if(res.data === 'success'){console.log("--430-",res.data); toast.success('Questions embedded into the Knowledge Base'); setLoading(false);setAnsE('');setQueE('')}else{toast.error("Some Error Occured"); setLoading(false);setAnsE('');setQueE('')}}).catch(err => {console.log(err);toast.error("Some Error Occured !!!!"); setLoading(false);setAnsE('');setQueE('') })
         // .then(res => { if (res.data === 'Yes') { toast.success('Font Changes were successful'); setLoading(false); } else { toast.success('Some error occured'); setLoading(false); } }).catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoading(false); })
         }
+    }
+
+    const handleIssue=(e)=>{
+        e.preventDefault()
+        if(issue == '' || detailIssue == ''){
+            toast.error('Fill both fields')
+        }else{
+            setLoadingI(true);
+        axios.post(`${BACKEND}api/issue/${botID.botID}`, { issue ,detailIssue }, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }).then(res => {if(res.data === 'success'){console.log("--430-",res.data); toast.success('Feedback / Issue submitted'); setLoadingI(false);setIssue('');setDetailIssue('')}else{toast.error("Some Error Occured"); setLoadingI(false);setIssue('');setDetailIssue('')}}).catch(err => {console.log(err);toast.error("Some Error Occured !!!!"); setLoadingI(false);setIssue('');setDetailIssue('') })
+        }
 
     }
 
+    const[issue,setIssue]=useState('')
+    const[detailIssue,setDetailIssue]=useState('')
+    const [embedDB,setEmbedDB] = useState([])
+    const [embeddedQA,setEmbeddedQA]= useState([])
+    const [embeddedQASaved,setEmbeddedQASaved] = useState([])
+
+
+    useEffect(() => {
+        axios.get(`${BACKEND}api/updatebot/${botID.botID}`, {
+          'Content-type': 'application/json',
+          'Accept': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }).then(res => { console.log("====================================",res.data);setEmbeddedQA(res.data.embeddedQA);setEmbeddedQASaved(res.data.embeddedQAsaved) })
+      }, [])
+
+    //   useEffect(() => {
+    //     setEmbeddedQASaved(embedDB.embeddedQASaved)
+    //     console.log("---131----", embedDB.embeddedQA)
+    //   }, [embedDB])
+
+    const [buttonClicked, setButtonClicked] = useState({});
+    
+
+    const handleEmbedQuestionA=(e,qa)=>{
+        e.preventDefault()
+        
+        if (!buttonClicked[qa.question]) {
+            setButtonClicked((prevState) => ({
+              ...prevState,
+              [qa.question]: true,
+            }));
+          }
+
+        console.log("QA ",qa.question)
+        const queE = qa.question
+        const ansE = qa.answer
+
+            setLoading(true);
+        axios.post(`${BACKEND}api/embedQuestion/${botID.botID}`, { queE ,ansE }, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }).then(res => {if(res.data === 'success'){console.log("--430-",res.data); toast.success('Questions embedded into the Knowledge Base'); setLoading(false);setAnsE('');setQueE('')}else{toast.error("Some Error Occured"); setLoading(false);setAnsE('');setQueE('')}}).catch(err => {console.log(err);toast.error("Some Error Occured !!!!"); setLoading(false);setAnsE('');setQueE('') })
+    }
+
+    const handleEmbedSavedRemove=(e,qa)=>{
+        e.preventDefault()
+
+        if (!buttonClicked[qa.question]) {
+            setButtonClicked((prevState) => ({
+              ...prevState,
+              [qa.question]: true,
+            }));
+          }
+
+        console.log("QA ",qa.question)
+        const queE = qa.question
+        const ansE = qa.answer
+
+
+
+            setLoading(true);
+        axios.post(`${BACKEND}api/embedQuestionSavedRemove/${botID.botID}`, { queE ,ansE }, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }).then(res => {if(res.data === 'success'){console.log("--430-",res.data); toast.success('Removed'); setLoading(false);setAnsE('');setQueE('')}else{toast.error("Some Error Occured"); setLoading(false);setAnsE('');setQueE('')}}).catch(err => {console.log(err);toast.error("Some Error Occured !!!!"); setLoading(false);setAnsE('');setQueE('') })
+    }
+
+    const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+
+    const toggleAccordion = () => {
+      setIsAccordionOpen(!isAccordionOpen);
+    };
+
+    const [isAccordionOpen2, setIsAccordionOpen2] = useState(false);
+
+    const toggleAccordion2 = () => {
+      setIsAccordionOpen2(!isAccordionOpen2);
+    };
+
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
+
+<div className='form-group d-flex justify-content-center mt-4'>
+       {apiload ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
 
             {/*  ############################### Font select form */}
             {/* <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >{receivedMessages}</label>  */}
 
             <div style={{ backgroundColor: '#212529' }} className=' rounded-4 my-5 col-lg-5 col-10 d-flex justify-content-center '>
-                <form className='d-flex row justify-content-around mt-3 ' onSubmit={handleFontSubmit}>
+                <form className='d-flex row justify-content-around mt-3 ' style={{width:''}} onSubmit={handleFontSubmit}>
                     <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label className='fs-4 d-flex justify-content-center container text-center mb-1' style={{ height: '100%', color: '#FFFFFF' }} >Update how your Chatbot looks</label>
                     </div>
@@ -701,10 +845,14 @@ console.log(err,"======try catch")
 ) : null} */}
                 </div>
             </div>
-            <div className='d-flex justify-content-center my-5 col-lg-8 col-11'>
+
+<div style={{backgroundColor:'#242439', paddingBottom:'50px'}}>
+            <div className='d-flex justify-content-center mx-auto my-5 col-lg-8 col-11'>
             <form className='col-sm-9 mb-5 col-11 mx-auto ' style={{marginTop:'50px'}}>
-              <div className="form-group d-flex justify-content-center mt-5 mb-5 fs-2 fw-bold ">
-                <label className='text-center' style={{color:'white'}} >Embed specific questions</label>
+              <div className="form-group d-flex justify-content-center flex-wrap mt-5 mb-5 fs-2 fw-bold ">
+                <label className='text-center col-12' style={{color:'white'}} >Embed specific questions</label>
+                <label className='text-center  fs-6' style={{color:'white'}} >(Works best with multiple line/ detailed answers)</label>
+
               </div>
               <div className="form-group">
                 <label style={{color:'white'}} >Question</label>
@@ -725,7 +873,160 @@ console.log(err,"======try catch")
                 )}
               </div>
             </form>
-             </div>   
+             </div>  
+
+                  {
+            embeddedQA && embeddedQA.length > 0 && (
+              <>
+                {/* <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}>
+                  Embedded Q/A
+                </label> */}
+                <Accordion alwaysOpen='false' className='col-11 my-2 mx-auto custom-accordion' style={{ marginBottom: '100px'}}
+                 activeKey={isAccordionOpen ? '0' : null}
+                 onSelect={toggleAccordion}
+                >
+                  <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #171725' }} >
+                    <Accordion.Header >
+                    <label className='fs-4 d-flex justify-content-center container text-center' style={{ height: '100%', color: '#FFFFFF' }}>
+                  Embedded Q/A
+                </label>
+                <span style={{
+                  color: '#FFE459',
+                  position: 'absolute',
+                  right: '25px', // Adjust this value to fine-tune the position
+                  top: '50%',
+                  fontSize: '34px',
+                  transform: 'translateY(-50%)',
+                }}>
+                  {isAccordionOpen? '-' : '+'}
+                </span> 
+                    </Accordion.Header>
+                    <Accordion.Body style={{ color: 'white', backgroundColor: '#171725' }} >
+                      {embeddedQA.map((item, index) => (
+                        <>
+                          <div key={index} className='mt-5'>
+                            <input
+                              className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3'
+                              style={{ width: '95%' }}
+                              readOnly
+                              placeholder='Embedded Q/A'
+                              value={item.question}
+                            />
+                            <textarea
+                              className='fs-4 d-flex justify-content-center container mt-1 text-center mb-5'
+                              style={{ width: '95%' }}
+                              readOnly
+                              placeholder='Embedded Q/A'
+                              value={item.answer}
+                            />
+                          </div>
+                        </>
+                      ))}
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
+              </>
+            )
+          } 
+
+
+{
+  embeddedQASaved && embeddedQASaved.length > 0 && (
+    <>
+      {/* <label className='fs-4 d-flex justify-content-center container text-center mb-3 mt-3' style={{ height: '100%', color: '#FFFFFF' }}>
+        Embedded Q/A Saved
+      </label> */}
+      <Accordion alwaysOpen='false' className='col-11 my-4 mx-auto custom-accordion' style={{ marginBottom: '100px'}}
+                  activeKey={isAccordionOpen2 ? '0' : null}
+                  onSelect={toggleAccordion2}
+      >
+        <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #171725' }} >
+          <Accordion.Header >
+          <label className='fs-4 d-flex justify-content-center container text-center ' style={{ height: '100%', color: '#FFFFFF' }}>
+        Embedded Q/A Saved
+      </label>
+      <span style={{
+                  color: '#FFE459',
+                  position: 'absolute',
+                  right: '25px', // Adjust this value to fine-tune the position
+                  top: '50%',
+                  fontSize: '34px',
+                  transform: 'translateY(-50%)',
+                }}>
+                  {isAccordionOpen2? '-' : '+'}
+                </span> 
+          </Accordion.Header>
+          <Accordion.Body style={{ color: 'white',backgroundColor: '#171725' }} >
+            {embeddedQASaved.map((itemSaved, index) => {
+              const isCommon = embeddedQA.some(item => item.question === itemSaved.question && item.answer === itemSaved.answer);
+              return (
+                <div  className='my-5' key={index}>
+                  <div>
+                    <input
+                      className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3'
+                      style={{ width: '95%' }}
+                      readOnly
+                      placeholder='Embedded Q/A'
+                      value={itemSaved.question}
+                    />
+                    <input
+                      className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3'
+                      style={{ width: '95%' }}
+                      readOnly
+                      placeholder='Embedded Q/A'
+                      value={itemSaved.answer}
+                    />
+                  </div>
+                  <div className='d-flex flex-wrap justify-content-center'>
+                    <button
+                      className='btn btn-outline-warning px-5 my-1 mx-3'
+                      onClick={(e)=> handleEmbedQuestionA(e, itemSaved)}
+                      disabled={buttonClicked[itemSaved.question] || isCommon}
+                    >
+                      Embed Question
+                    </button>
+                    <button className='btn btn-outline-danger px-5 my-1 mx-3'
+                     onClick={(e)=> handleEmbedSavedRemove(e, itemSaved)}
+                     disabled={buttonClicked[itemSaved.question] || isCommon}
+                    >Remove Question</button>
+                  </div>
+                </div>
+              );
+            })}
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
+    </>
+  )
+}
+</div>
+
+             <div className='d-flex justify-content-center my-5 col-lg-8 col-11'>
+            <form className='col-sm-9 mb-5 col-11 mx-auto ' style={{marginTop:'50px'}}>
+              <div className="form-group d-flex justify-content-center mt-5 mb-5 fs-2 fw-bold ">
+                <label className='text-center' style={{color:'white'}} >Feedback or Issues</label>
+              </div>
+              <div className="form-group">
+                <label style={{color:'white'}} >Feedback / Issue</label>
+                <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3' onChange={(e)=>setIssue(e.target.value)} value={issue} placeholder='Feedback / Issue' />
+              </div>
+              <div className="form-group">
+                <label style={{color:'white'}} >Details</label>
+                <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3' value={detailIssue} onChange={(e)=>setDetailIssue(e.target.value)} placeholder='Details' />
+              </div>
+              <div className='form-group d-flex mt-5 justify-content-center'>
+                <button className='btn btn-outline-warning  mb-3 px-5  ' onClick={(e)=>handleIssue(e)}>Submit</button>
+              </div>
+              <div className='form-group d-flex justify-content-center'>
+                {loadingI ? (
+                  <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+                ) : (
+                  ''
+                )}
+              </div>
+            </form>
+             </div> 
+
             <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />
         </div>
     )

@@ -8,6 +8,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill } from 'react-icons/bs'
 import { Link } from 'react-router-dom';
+import {ThreeDots} from 'react-loader-spinner';
 // import '../../css/chartCss.css'
 
 function CustomTooltip2({ payload, label, active }) {
@@ -51,18 +52,20 @@ const SectionOneUserDataSA = () => {
   const decoded = Cookies.get('accessToken');
   const adminToken = Cookies.get('adminToken')
 
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'https://api.zema.io/'
-  // const BACKEND = 'http://3.138.169.250/'
+  const[apiload,setApiload]= useState(false)
+
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'https://zemaapi.zema.io/'
 
   useEffect(() => {
+    setApiload(true)
     axios.post(`${BACKEND}api/admin/data`, { decoded, adminToken }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { console.log(res.data," all data"); setData(res.data[0]); setData2(res.data[1]);setData3(res.data[2]); console.log("llll", res.data[0].length) })
-      .catch(err => console.log(err))
+      .then(res => { console.log(res.data," all data"); setData(res.data[0]); setData2(res.data[1]);setData3(res.data[2]); console.log("llll", res.data[0].length); setApiload(false) })
+      .catch(err => {console.log(err); setApiload(false)})
   }, [])
 
 
@@ -394,17 +397,45 @@ const handlePageChangePay = (page) => {
   }
 };
 
+function abbrNum(number, decPlaces) {
+
+  decPlaces = Math.pow(10, decPlaces);
+  var abbrev = ["k", "m", "b", "t"];
+  for (var i = abbrev.length - 1; i >= 0; i--) {
+    var size = Math.pow(10, (i + 1) * 3);
+    if (size <= number) {
+      number = Math.round(number * decPlaces / size) / decPlaces;
+      if ((number == 1000) && (i < abbrev.length - 1)) {
+        number = 1;
+        i++;
+      }
+      number += abbrev[i];
+      break;
+    }
+  } 
+  return number;
+}
+
 
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
       <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>User Data</h1>
+
+      <div className='form-group d-flex justify-content-center mt-4'>
+       {apiload ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
 
       <div className='row col-11 d-flex  mx-auto'>
         <div className='col-lg-3 col-sm-6 col-11 my-3 d-flex mx-auto justify-content-center'>
           <Card style={{ backgroundColor: '#212529', width: '270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
             <Card.Body className="d-flex flex-column" style={{}}>
               <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}> Users</Card.Title>
-              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>  {tUser}</Card.Title>
+              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>  {abbrNum(tUser,2)}</Card.Title>
 
             </Card.Body>
           </Card>
@@ -414,7 +445,7 @@ const handlePageChangePay = (page) => {
           <Card style={{ backgroundColor: '#212529', width: '270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
             <Card.Body className="d-flex flex-column" style={{}}>
               <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}> Bots</Card.Title>
-              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{tBots}</Card.Title>
+              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{abbrNum(tBots,2)}</Card.Title>
 
             </Card.Body>
           </Card>
@@ -424,7 +455,7 @@ const handlePageChangePay = (page) => {
           <Card style={{ backgroundColor: '#212529', width: '270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
             <Card.Body className="d-flex flex-column" style={{}}>
               <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}> Tokens </Card.Title>
-              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{tTokens}</Card.Title>
+              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{abbrNum(tTokens,2)}</Card.Title>
 
             </Card.Body>
           </Card>
@@ -434,8 +465,7 @@ const handlePageChangePay = (page) => {
           <Card style={{ backgroundColor: '#212529', width: '270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
             <Card.Body className="d-flex flex-column" style={{}}>
               <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}>Conversations </Card.Title>
-              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{tCon}</Card.Title>
-
+              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{abbrNum(tCon,2)}</Card.Title>
             </Card.Body>
           </Card>
         </div>
@@ -556,6 +586,7 @@ const handlePageChangePay = (page) => {
       </div>
 
 
+      <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Payments Data</h1>
 
       <div className='row col-11 d-flex  mx-auto'>
 
@@ -563,7 +594,7 @@ const handlePageChangePay = (page) => {
     <Card style={{ backgroundColor: '#212529', width: '270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
       <Card.Body className="d-flex flex-column" style={{}}>
         <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}> Tokens Used</Card.Title>
-        <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}> {tTokens} </Card.Title>
+        <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}> {abbrNum(tTokens,2)} </Card.Title>
 
       </Card.Body>
     </Card>
@@ -573,7 +604,7 @@ const handlePageChangePay = (page) => {
     <Card style={{ backgroundColor: '#212529', width: '270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
       <Card.Body className="d-flex flex-column" style={{}}>
         <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}> Payments</Card.Title>
-        <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}> {tPay} </Card.Title>
+        <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}> {abbrNum(tPay,2)} </Card.Title>
 
       </Card.Body>
     </Card>
@@ -583,7 +614,7 @@ const handlePageChangePay = (page) => {
     <Card style={{ backgroundColor: '#212529', width: '270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
       <Card.Body className="d-flex flex-column" style={{}}>
         <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}> Total Payment </Card.Title>
-        <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{filteredDataPaySum} USD</Card.Title>
+        <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{abbrNum(filteredDataPaySum,2)} USD</Card.Title>
 
       </Card.Body>
     </Card>
@@ -593,7 +624,7 @@ const handlePageChangePay = (page) => {
     <Card style={{ backgroundColor: '#212529', width: '270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
       <Card.Body className="d-flex flex-column" style={{}}>
         <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}>Conversations </Card.Title>
-        <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{tCon}</Card.Title>
+        <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>{abbrNum(tCon,2)}</Card.Title>
 
       </Card.Body>
     </Card>

@@ -4,7 +4,7 @@ import axios from 'axios'
 import * as jose from 'jose';
 import Cookies from 'js-cookie';
 import Accordion from 'react-bootstrap/Accordion';
-
+import { ThreeDots } from 'react-loader-spinner';
 
 const PaymentSection1 = () => {
 
@@ -13,16 +13,19 @@ const PaymentSection1 = () => {
   const decoded = Cookies.get('accessToken');
   const [dataArr, setDataArr] = useState([])
   const[sorted,setSorted]= useState('')
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.138.169.250/'
-  // const BACKEND = 'https://api.zema.io/'
+  const [apiload,setApiload] = useState(false)
+
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'https://zemaapi.zema.io/'
+
   useEffect(() => {
+    setApiload(true)
     axios.post(`${BACKEND}api/paymenthistory`, { decoded }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => setDataArr(res.data)).catch(err => console.log(" error from mybots", err))
+      .then(res => {setDataArr(res.data); setApiload(false)}).catch(err => {console.log(" error from mybots", err); setApiload(false)})
   }, [])
 
   useEffect(()=>{
@@ -38,6 +41,14 @@ const PaymentSection1 = () => {
   return (
     <div div className='pb-5 px-3 ' style={{ backgroundColor: '#242439', height: '100%',minHeight:'70vh',width:'100vw' }}>
       <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pt-5 mb-4' style={{ color: '#FFFFFF' }}>Payments History</h1>
+      <div className='form-group d-flex justify-content-center mt-4'>
+       {apiload ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
      {dataArr.sort((a, b) => new Date(b.created) - new Date(a.created)).map(x=>(
 
 <Accordion

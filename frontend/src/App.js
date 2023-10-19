@@ -30,6 +30,10 @@ import AdminOnly from './component/AdminOnly';
 import UserDataSA from './page/UserDataSA';
 import UserDataIndiSA from './page/UserDataIndiSA';
 import UserDataBotSA from './page/UserDataBotSA';
+import ForgetPassword from './page/ForgetPassword';
+import ManageBotSA from './page/ManageBotSA';
+import GuidePage from './page/GuidePage';
+import GuidePageSA from './component/GuideSA/GuidePageSA';
 
 
 
@@ -75,6 +79,7 @@ const App = () => {
            <Route path='/privacy' element={<PrivacyPolicy/>}/> 
            <Route path ='/login' element={<Login/>}/>
            <Route path ='/signup' element={<Signup/>}/>
+           <Route path ='/forgetpassword' element={<ForgetPassword/>}/>
            <Route path ='/SuccessPage' element={<PrivateRoute><SuccessPage/></PrivateRoute>}/>
            <Route path ='/CancelPage' element={<PrivateRoute><CancelPage/></PrivateRoute>}/>
            <Route path ='/paymenthistory' element={<PrivateRoute><PaymentHistoryPage/></PrivateRoute>}/>
@@ -83,6 +88,12 @@ const App = () => {
            <Route path ='/superadminUserData' element={<AdminOnly><UserDataSA/></AdminOnly>}/>
            <Route path ='/superadminUserDataIndi/:id' element={<AdminOnly><UserDataIndiSA/></AdminOnly>}/>
            <Route path ='/superadminBot/:id' element={<AdminOnly><UserDataBotSA/></AdminOnly>}/>
+           <Route path ='/superadminmanage' element={<AdminOnly><ManageBotSA/></AdminOnly>}/>
+           <Route path='/guide' element={<GuidePage/>}/>
+           <Route path='/superadminguide' element={<GuidePageSA/>}/>
+
+
+
 
 
 

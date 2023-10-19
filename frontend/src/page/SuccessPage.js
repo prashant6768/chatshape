@@ -6,29 +6,33 @@ import NavbarC from '../component/NavbarC';
 import Footer from '../component/Footer';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom'
+import {ThreeDots} from 'react-loader-spinner';
 
 const SuccessPage = () => {
 
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.138.169.250/'
-  // const BACKEND = 'https://api.zema.io/'
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'https://zemaapi.zema.io/'
+  
   const[data,setData]=useState('')
   const[product,setProduct]=useState('')
   const[user,setUser]=useState('')
   const[date,setDate]=useState('')
   const[time,setTime]=useState('')
+  const[apiload,setApiload]= useState(false)
 
     // const token = document.cookie.split('=')[1]
   // const decoded = jose.decodeJwt(token, 'notmysecretkey');
   const decoded = Cookies.get('accessToken');
 
 useEffect(()=>{
+
+  setApiload(true)
   
 axios.post(`${BACKEND}stripepay/order/success`,{decoded},{
   'Content-type':'application/json', 
   'Accept':'application/json',
   'Access-Control-Allow-Origin':'*',
-}).then(res => {console.log(res.data); setData(res.data[0]);setProduct(res.data[1]);setUser(res.data[2]) })
+}).then(res => {console.log(res.data); setData(res.data[0]);setProduct(res.data[1]);setUser(res.data[2]); setApiload(false) })
 
 },[])
 
@@ -54,6 +58,14 @@ const gradientC = true
   <div className="card-body" style={{color:'white'}}>
     <h1>Zema</h1>
     <h5 className="card-title mb-3"> Payment was Successful</h5>
+    <div className='form-group d-flex justify-content-center mt-4'>
+       {apiload ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
     <p><strong>Zema User: </strong>{user}</p>
     <p><strong>Payment made at: </strong>{time}</p>
     <p><strong>Payment made at: </strong>{date}</p>

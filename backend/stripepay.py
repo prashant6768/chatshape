@@ -7,6 +7,9 @@ from pymongo import MongoClient
 from flask import Flask, redirect, jsonify, json, request, current_app
 from flask import Flask, request, render_template_string
 
+import smtplib, ssl
+import base64
+
 from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
 
@@ -14,7 +17,7 @@ import stripe
 stripe.api_key=os.getenv('STRIPE_SECRET_KEY_2')
 stripepay = Blueprint("stripepay",__name__)
 
-YOUR_DOMAIN = os.getenv("YOUR_DOMAIN")
+# YOUR_DOMAIN = os.getenv("YOUR_DOMAIN")
 
 from flask_cors import CORS
 CORS(stripepay) 
@@ -23,6 +26,7 @@ from collections import OrderedDict
 
 MONGO = os.getenv("MONGO")
 pageURL = 'http://localhost:3000/'
+EMAILPASS = os.getenv("EMAILPASS")
 client = MongoClient(MONGO)
 db = client['chatbot']
 
@@ -140,6 +144,9 @@ def create_checkout_session():
     try:
         key = request.get_json()['key']
         decoded = request.get_json()['decoded']
+        if users_temp.find_one({'gUser':decoded}):
+            users_temp.delete_one({'gUser':decoded})
+
         print("key is ------------200 ",decoded)
         users_temp.insert_one({'gUser':decoded})
         print(decoded)
@@ -180,7 +187,7 @@ def create_checkout_session():
     except Exception as e:
         print("Error is ===",e)
         users_temp.delete_one({'gUser':decoded})
-        return "Server error", 500
+        return "Server error"+str(e), 500
 
 @stripepay.route('/order/success', methods=['POST'])
 def order_success():
@@ -240,8 +247,76 @@ def order_success():
           print("sub = ",sub_type['NoOfCharacters'])       
     except Exception as e:
         users_temp.delete_one({'gUser':decoded})
+        print("------------247")
         return ["Couldn't save data"]    
     users_temp.delete_one({'gUser':decoded})
+
+    try:
+        smtp_server = "smtp.gmail.com"
+        port = 587  # For starttls
+        # port = 465 #-----------------------------------------------for SSL
+        sender_email = "thedummydog@gmail.com"
+        password = EMAILPASS
+        email_headers = f"Subject: Zema Subscription\r\n"
+        email_headers += f"From: {sender_email}\r\n"
+        email_headers += "Content-Type: text/html; charset=utf-8\r\n" 
+        email_headers += "\r\n"
+        print("------------261")
+        image_url = "https://raw.githubusercontent.com/Aniket-Shival/popup/Aniket-Shival-mic-2/Zema_Bird_Transperent.png"
+            # logo_img = None
+
+            # with open('assets/Zema_Logo_Transperent.png', 'rb') as image_file:
+            #     logo_img = base64.b64encode(image_file.read()).decode()
+        print("------------267")    
+        message = f"""
+            <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+                <div style="margin:50px auto;width:70%;padding:20px 0">
+                    <div style="border-bottom:1px solid #eee">
+                         <img src="{image_url}" style="max-width: 100px; display: block; margin: 10px auto;" alt='Zema Logo'/>
+                         <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Zema</a>
+                     </div>
+                    <p style="font-size:1.1em">Hi,</p>
+                    <p>Your Zema account has successfully been renewed to </p>
+                    <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">{sub_type['plan']}</h2>
+                     <p>Amount paid : {sub_type['amount']/100} USD</p>
+                    <p style="font-size:0.9em;">Regards,<br />Zema</p>
+                    <hr style="border:none;border-top:1px solid #eee" />
+                    <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+                      <p>Zema</p>
+                    </div>
+                </div>
+            </div>
+            """
+
+            # email_message = email_headers + message
+
+
+            # message = "Your OTP for Zemo signup is "+str(otp)
+        email_message = email_headers + message
+        username = decoded
+
+        # Create a secure SSL context
+        context = ssl.create_default_context()
+        print("-----294")
+        # Try to log in to server and send email
+        try:
+            server = smtplib.SMTP(smtp_server,port)
+            # server = smtplib.SMTP_SSL(smtp_server,port)
+            server.ehlo() # Can be omitted
+            server.starttls(context=context) # Secure the connection   # REMOVE FOR SSL
+            server.ehlo() # Can be omitted
+            server.login(sender_email, password)
+            server.sendmail(sender_email, username, email_message)
+            print("---------304")
+            # TODO: Send email here
+        except Exception as e:
+            # Print any error messages to stdout
+            print(e)
+        finally:
+            server.quit()   
+    except Exception as e:
+        return str(e)
+    
     return [customer,gProduct,gUser]
 
 @stripepay.route('/webhook', methods=['POST'])

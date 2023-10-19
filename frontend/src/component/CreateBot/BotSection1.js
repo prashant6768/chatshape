@@ -8,6 +8,7 @@ import env from 'react-dotenv'
 import Cookies from 'js-cookie';
 import '../CreateBot/createbotcss.css'
 import { useNavigate } from 'react-router-dom';
+import { Tooltip as Tp}  from 'react-tooltip'
 
 const BotSection1 = () => {
 
@@ -17,10 +18,11 @@ const BotSection1 = () => {
   // const decoded = jose.decodeJwt(token,'notmysecretkey');
   // const decoded = document.cookie.split('=')[1]
   const decoded = Cookies.get('accessToken');
-  console.log("------------decoded",decoded)
-  const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.138.169.250/'
-  // const BACKEND = 'https://api.zema.io/'
+  console.log("-----------decoded",decoded)
+
+  // const BACKEND = 'http://localhost:5000/'
+  const BACKEND = 'https://zemaapi.zema.io/'
+
 
   const[sendLink,setSendLink]= useState('')
   const[botName,setBot]=useState('')
@@ -29,6 +31,18 @@ const BotSection1 = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const[loading, setLoading] = useState(false);
 
+  const [multiLink, setMultiLink] = useState(false);
+
+ 
+
+  const handleCheckboxChange = (event) => {
+    const checkbox = event.target;
+    if (checkbox.checked) {
+      setMultiLink("Y")
+    } else {
+      setMultiLink("N")
+    }
+  };
 
   // old way of submit, no pdf
   const handleSubmit=async(e)=>{
@@ -41,15 +55,22 @@ const BotSection1 = () => {
   }
 
   useEffect(()=>{
+console.log(multiLink)
+  },[multiLink])
+
+  useEffect(()=>{
     if(botName !== ''){
       console.log(exclude,'---exclude')
 
       const formData = new FormData();
     formData.append('sendLink', sendLink);
     formData.append('exclude', exclude);
+    formData.append('multiLink',multiLink);
     formData.append('botName', botName);
     formData.append('pdfFile', pdfFile);
     formData.append('decoded', decoded); 
+    
+    console.log("111111111111111111--------",multiLink)
 
     for (let pair of formData.entries()) {
       console.log(pair[0] + ', ' + pair[1]);
@@ -61,7 +82,7 @@ const BotSection1 = () => {
         'Access-Control-Allow-Origin':'*',
     })
     // .then(res =>console.log("FROM BACKEND = ",res.data)).catch(err => console.log(err))
-    .then(res=>{if(res.data == 'BotF'){ toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoading(false);}else if(res.data == 'FillOne'){ toast.error('Atleast fill one of these, PDF or website URL'); setLoading(false);}else if(res.data == 'SubE'){ toast.error('Your Subscription has Expired, renew subscription for more'); setLoading(false);}else if(res.data == 'noname'){ toast.error('Botname is compulsary'); setLoading(false);}else if(res.data === 'ok'){toast.success('Stored successfully!'); console.log(res.data,"CHKKKKKKKKKKKK"); setLoading(false);setTimeout(() => { navigate('/mychatbots') }, 2000)}else{toast.error('Some Error Occured!!'); console.log("==========",res.data,"CHKKKKKKKKKKKK"); setLoading(false)}}).catch(err => {console.log("error  botsection 1 ",err.response); toast.error('API request failed!'); setLoading(false);})
+    .then(res=>{if(res.data == 'BotF'){ toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoading(false);}else if(res.data == 'FillOne'){ toast.error('Atleast fill one of these, PDF or website URL'); setLoading(false);}else if(res.data == 'SubE'){ toast.error('Your Subscription has Expired, renew subscription for more'); setLoading(false);}else if(res.data == 'noname'){ toast.error('Botname is compulsary'); setLoading(false);}else if(res.data === 'ok'){toast.success('Stored successfully!'); console.log(res.data," working"); setLoading(false);setTimeout(() => { navigate('/mychatbots') }, 2000)}else{toast.error('Some Error Occured!!'); console.log("==========",res.data,"not woring"); setLoading(false)}}).catch(err => {console.log("error  botsection 1 ",err); toast.error('API request failed!'); setLoading(false);})
     console.log(formData)
     }
 
@@ -74,7 +95,7 @@ const BotSection1 = () => {
      <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pb-5 pt-5' style={{ color: '#FFFFFF' }}>Create Chatbot</h1>
         <p className='fs-4 col-12 d-flex justify-content-center container text-center pb-2 pt-3 mb-0' style={{ color: '#FFFFFF' }}>1. Enter the website / PDF you want to create a bot from.</p>
         <p className='fs-4 col-12 d-flex justify-content-center container text-center mb-0 pb-2 pt-3' style={{ color: '#FFFFFF' }}>2. The website / PDF will be crawled and pages extracted.</p>
-        <p className='fs-4 col-12 d-flex justify-content-center container text-center mb-0 pb-5 pt-3' style={{ color: '#FFFFFF' }}>3. Go to My Bots page, click on your Bot, and copy the scipt to add to your website.</p>
+        <p className='fs-4 col-12 d-flex justify-content-center container text-center mb-0 pb-5 pt-3' style={{ color: '#FFFFFF' }}>3. Go to My Chatbots page, click on your Bot, and copy the scipt to add to your website.</p>
        
        <div className='fs-4 col-12 d-flex justify-content-center container text-center mb-0 pb-5 pt-3' style={{ color: '#FFFFFF' }}>
 
@@ -82,10 +103,27 @@ const BotSection1 = () => {
 
 
        <form className='col-sm-9 col-12'>
-       <div className="form-group">
+       <div className="form-group ">
         <label>Website Link you want the chatbot about</label>
        <input className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' value={sendLink} placeholder='website link' onChange={(e)=> setSendLink(e.target.value)}  />
        </div>
+       <div className="form-check form-switch mt-1 ps-0 d-flex justify-content-center flex-wrap mb-3 ">
+      <input
+        className="form-check-input col-12  mx-1"
+        type="checkbox"
+        role="switch"
+        id="flexSwitchCheckDefault"
+        onChange={handleCheckboxChange}
+      />
+       {/* <a className='my-anchor-element col-12 '> */}
+      <label className="form-check-label my-anchor-element  col-12" style={{color:'white'}} htmlFor="flexSwitchCheckDefault">
+        Scrap data from Urls found inside the above url.
+      </label>
+      {/* </a> */}
+      <Tp anchorSelect=".my-anchor-element" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000",fontWeight:'bolder',width:'90vw' }} place="top">
+  In "Off State", the chatbot will have data from only the URL provided. <br/> In "On State", the chatbot will also have data from additional webpages whose URLs it finds in the given webpage 
+</Tp>
+    </div>
        <div className="form-group">
        <label>Pages you want to exclude from the chatbot (Write each individual link in seperate line)</label>
        <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' value={ex} placeholder='link to exclude' onChange={(e)=> setEx(e.target.value)}  />

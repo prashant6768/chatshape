@@ -56,8 +56,7 @@ const ChatUI = (botID) => {
   const[consecFailMsg,setConsecFailMsg]=useState([])
 
   // const BACKEND = 'http://localhost:5000/'
-  // const BACKEND = 'http://3.138.169.250/'
-  const BACKEND = 'https://api.zema.io/'
+  const BACKEND = 'https://zemaapi.zema.io/'
 
   // const token = document.cookie.split('=')[1]
   // const decoded = jose.decodeJwt(token,'notmysecretkey');
@@ -230,7 +229,8 @@ const ChatUI = (botID) => {
       text: chatbotMsg,
       sender: '',
     };
-    if (chatbotMsg === '' && chatbotMsg === null && chatbotMsg === []) {
+    // if (chatbotMsg === '' && chatbotMsg === null && chatbotMsg === []) {
+      if (chatbotMsg === '' && chatbotMsg === null ) {
       console.log("W")
     } else {
       setMessages((prevMessages) => [...prevMessages, newMessage]);

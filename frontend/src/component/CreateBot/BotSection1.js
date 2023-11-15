@@ -67,8 +67,16 @@ console.log(multiLink)
     formData.append('exclude', exclude);
     formData.append('multiLink',multiLink);
     formData.append('botName', botName);
-    formData.append('pdfFile', pdfFile);
     formData.append('decoded', decoded); 
+
+    // formData.append('pdfFile', pdfFile);
+
+    if (pdfFile) {
+      for (let i = 0; i < pdfFile.length; i++) {
+        formData.append(`pdfFile[]`, pdfFile[i]);
+        console.log(`pdfFile[]`, pdfFile[i])
+      }
+    }
     
     console.log("111111111111111111--------",multiLink)
 
@@ -135,7 +143,8 @@ console.log(multiLink)
           accept=".pdf"
           style={{backgroundColor:'white',color:'black', borderRadius:'0px'}}
           className="btn custom-file-input w-100 me-auto"
-          onChange={(e) => setPdfFile(e.target.files[0])}
+          multiple
+          onChange={(e) => setPdfFile(e.target.files)}
         />
       </div>
        <div className="form-group">

@@ -214,7 +214,7 @@ def order_success():
     except Exception as e:
         return f"Error: {e}"
     
-    created = datetime.now().date().strftime("%Y-%m-%d")
+    created = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     pay_data={
         'username': gUser,
         'payment':customer,
@@ -240,6 +240,7 @@ def order_success():
             'username':gUser,
             'created':created,
             'expiration':expired ,
+            'status':'Paid',
         }
           sub.replace_one({"username": gUser},user_sub_data)
           char_1 = db['users_website_crawl_data']

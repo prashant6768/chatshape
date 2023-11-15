@@ -15,6 +15,7 @@ const AccountSection1 = () => {
     // const decoded = jose.decodeJwt(token, 'notmysecretkey');
     // const decoded = document.cookie.split('=')[1]
     const decoded = Cookies.get('accessToken');
+    const decoded1 = Cookies.get('accessToken');
 
     // const BACKEND = 'http://localhost:5000/'
     const BACKEND = 'https://zemaapi.zema.io/'
@@ -40,11 +41,13 @@ const AccountSection1 = () => {
 
     useEffect(() => {
         console.log("QQQQQQQQQQ ", decoded)
-        axios.post(`${BACKEND}api/profiledata`, { decoded }, {
+        // const decoded1 = decoded
+        axios.post(`${BACKEND}api/profiledata`, { decoded1 }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*',
-        }).then(res => { setName(res.data.name); setPhone(res.data.phone); console.log(res.data, "profile") }).catch(err => console.log(err))
+        })
+        .then(res => {if(res.data[1] == 'error'){console.log(res.data[0])}else{ setName(res.data.name); setPhone(res.data.phone); console.log(res.data, "profile") }}).catch(err => console.log(err))
     }, [])
 
     useEffect(() => {
@@ -70,9 +73,10 @@ const AccountSection1 = () => {
       return;
     }
   }
-
+ 
+  const decoded1 = decoded
       
-        axios.put(`${BACKEND}api/profiledata`, { name, phone, decoded }, {
+        axios.put(`${BACKEND}api/profiledata`, { name, phone, decoded1 }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*',

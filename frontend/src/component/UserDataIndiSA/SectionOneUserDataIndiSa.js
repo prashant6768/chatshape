@@ -27,6 +27,7 @@ function CustomTooltip2({ payload, label, active }) {
 const SectionOneUserDataIndiSa = (id) => {
 
   const decoded = Cookies.get('accessToken');
+  // const decoded1 = 
   const adminToken = Cookies.get('adminToken')
 
   const [dataSub, setDataSub] = useState([])
@@ -47,10 +48,10 @@ const SectionOneUserDataIndiSa = (id) => {
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => {
+      .then(res => {if(res.data[4] == 'ok'){
         console.log(res.data,"all the data");
         setDataSub(res.data[0][0]); setDataPay(res.data[1]); setDataBot(res.data[2]);setDataUsername(res.data[3]);setApiload(false)
-      })
+      }else if(res.data == 'You Are Not Authorized'){console.log(res.data);setApiload(false);toast.error("You Are Not Authorized")}else{console.log(res.data);setApiload(false);toast.error("Some Error Occured")}})
       .catch(err => {console.log(err); setApiload(false)})
   }, [])
 
@@ -240,6 +241,9 @@ const SectionOneUserDataIndiSa = (id) => {
     });
     setFilteredDataConG(filtered);
     console.log("filtered  ", filtered)
+    if(filtered.length == 0){
+      toast.error("Data Doesn't exist for this date ")
+    }
   };
 
 
@@ -258,6 +262,9 @@ const SectionOneUserDataIndiSa = (id) => {
     });
     setFilteredDataTokenG(filtered);
     console.log("chk  ", filtered)
+    if(filtered.length == 0){
+      toast.error("Data Doesn't exist for this date ")
+    }
   };
 
   // /////////////////////////////////////////////////////////////////////////////////////// Payment history
@@ -326,6 +333,9 @@ const SectionOneUserDataIndiSa = (id) => {
     }));
     setFilteredDataPayG(filtered100);
     console.log("filtered  ", filtered100)
+    if(filtered100.length == 0){
+      toast.error("Data Doesn't exist for this date ")
+    }
   };
 
   const [minHeight, setMinHeight] = useState(500); 
@@ -391,7 +401,7 @@ const SectionOneUserDataIndiSa = (id) => {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then((res) => {console.log(res.data,"========9999") ;if (res.data === 'Del') { toast.success('User Deleted'); setLoadingdel(false); } else if (res.data === 'UA') { toast.success('User is an Admin'); setLoadingdel(false); }else{ toast.error('Some Error occured');console.log(res.data); setLoadingdel(false)} })
+    }).then((res) => {console.log(res.data,"========9999") ;if (res.data === 'Del') { toast.success('User Deleted'); setLoadingdel(false); } else if (res.data === 'UA') { toast.error('User is an Admin'); setLoadingdel(false); }else if(res.data == 'You Are Not Authorized'){toast.error('You Are Not Authorized'); setLoadingdel(false);}else{ toast.error('Some Error occured');console.log(res.data); setLoadingdel(false)} })
     .then(setTimeout(() => { navigate(`/superadminUserData`) }, 5000))  
     .catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoadingdel(false); })
     //  await navigate('/mychatbots');
@@ -432,14 +442,40 @@ const handlePageChangePay = (page) => {
   }
 };
 
-const [name, setName] = useState('')
-const [phone, setPhone] = useState('')
+const [name, setName] = useState([])
+const [phone, setPhone] = useState([])
 const [loading, setLoading] = useState(false);
+const [decoded1,setDecoded1] = useState('')
+
+useEffect(()=>{
+setDecoded1(dataUsername)
+},[dataUsername])
+
+useEffect(() => {
+  console.log("QQQQQQQQQQ ", decoded)
+  // const decoded1 = dataUsername
+  axios.post(`${BACKEND}api/profiledata`, { decoded1 }, {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+  })
+  .then(res => {if(res.data[1] == 'error'){console.log(res.data[0])}else{ setName(res.data.name); setPhone(res.data.phone); console.log(res.data, "profile") }}).catch(err => console.log(err))
+  // .then(res => { setName(res.data.name); setPhone(res.data.phone); console.log(res.data, "profile") }).catch(err => console.log(err))
+}, [decoded1])
 
 const handleProfile = (e) => {
   e.preventDefault()
   setLoading(true)
-  axios.put(`${BACKEND}api/profiledata`, { name, phone, decoded }, {
+  // const decoded1 = dataUsername
+  const phoneRegex = /^(?:\d{10})$/;
+  if(phone !== ''){
+    if (!phoneRegex.test(phone)) {
+      toast.error("Invalid Phone Number Format");
+      setLoading(false);
+      return;
+    }
+  }
+  axios.put(`${BACKEND}api/profiledata`, { name, phone, decoded1 }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*',
@@ -468,7 +504,7 @@ function abbrNum(number, decPlaces) {
 
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
-      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>User Data</h3>
+      <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Client Data</h1>
       <div className='form-group d-flex justify-content-center mt-4'>
        {apiload ? (
           <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
@@ -523,7 +559,10 @@ function abbrNum(number, decPlaces) {
 
 
       <div className='row col-11 mx-auto mt-4 d-flex '>
+
         <Card style={{ backgroundColor: '#212529' }} className='  d-flex rounded-4'>
+<h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-4 ' style={{ color: '#FFFFFF' }}>Client Chatbots</h3>
+
           <Card.Body className="d-flex flex-column" style={{}}>
             <div className='row'>
               <input className='fs-4 col-sm-8 col-lg-10 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"
@@ -584,11 +623,9 @@ function abbrNum(number, decPlaces) {
                   <div className='col-lg-3 col-sm-7'>
                     <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>Conversations : {abbrNum(x.totalUniqueConversations,2)}</p>
                   </div>
-                  <div className='col-lg-2 col-sm-5'>
-                    {/* <p className=' col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</p> */}
-                    <Link to={`/superadminBot/${x.id}`} style={{ textDecoration: 'none' }}><Nav.Link href="#link" className='col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</Nav.Link></Link>
-
-                  </div>
+                  <div className='col-lg-2 col-sm-5 container'>
+            <Link className='btn btn-link px-0 '  to={`/superadminBot/${x.id}`} style={{ textDecoration: 'underline', color: '#FFFFFF' }} >Details</Link>
+           </div>
                 </div>
               ))}
               <div className=' d-flex justify-content-center mt-3 fs-4'>
@@ -714,6 +751,8 @@ function abbrNum(number, decPlaces) {
 
       <div className='row col-11 mx-auto mt-4 d-flex '>
         <Card style={{ backgroundColor: '#212529' }} className='  d-flex rounded-4'>
+<h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-4 ' style={{ color: '#FFFFFF' }}>Client Payments</h3>
+
           <Card.Body className="d-flex flex-column" style={{}}>
             <div className='row'>
               <input className='fs-4 col-sm-12 col-lg-12 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"
@@ -764,11 +803,13 @@ function abbrNum(number, decPlaces) {
                   <div className='col-lg-3 col-sm-7'>
                     <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>{x.amount/100} {x.payment.currency}</p>
                   </div>
-                  <div className='col-lg-2 col-sm-5'>
-                    {/* <p className=' col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</p> */}
-                    {/* <Link to={``} style={{ textDecoration: 'none' }}><Nav.Link href="#link" className='col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</Nav.Link></Link> */}
-                    <a href="#" onClick={() => handleDetailsClick(x)} className='col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</a>
-                  </div>
+                  {/* <div className='col-lg-2 col-sm-5'>
+                    <a href="#" onClick={() => handleDetailsClick(x)} className=' d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</a>
+                  </div> */}
+                  <div className='col-lg-2 col-sm-5 container'>
+            <button className='btn btn-link px-0 ' style={{ textDecoration: 'underline', color: '#FFFFFF' }} onClick={() => handleDetailsClick(x)}  >Details</button>
+           </div>
+
                 </div>
               ))}
                  <div className=' d-flex justify-content-center mt-3 fs-4'>
@@ -858,12 +899,12 @@ function abbrNum(number, decPlaces) {
 
 
       <Card style={{ backgroundColor: '#171725', height: '100%' }} className='mx-auto mt-3 rounded-4  col-11'>
-      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Edit User Profile</h3>
+      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Edit Client Profile</h3>
                     <Card.Body className=' d-flex row justify-content-between'>
                         <label className='fs-5 d-flex justify-content-center container col-10 mt-1 text-center mb-1 ' style={{ color: 'white' }}>Enter/Edit Profile Name</label>
                         <input className='fs-5 d-flex justify-content-center container col-10 mt-1 text-center mb-3 ' value={name} placeholder='Name' onChange={(e) => setName(e.target.value)} />
                         <label className='fs-5 d-flex justify-content-center container col-10 mt-1 text-center mb-1' style={{ color: 'white' }}>Enter/Edit Profile Phone Number</label>
-                        <input className='fs-5 d-flex justify-content-center container col-10 mt-1 text-center mb-3' value={phone.replace(/[^0-9+]/g, '')} placeholder='Phone Number' onChange={(e) => setPhone(e.target.value)} />
+                        <input className='fs-5 d-flex justify-content-center container col-10 mt-1 text-center mb-3' value={phone} placeholder='Phone Number' onChange={(e) => setPhone(e.target.value)} />
                         <button onClick={(e) => handleProfile(e)} className=' btn btn-outline-warning col-sm-4 col-8 d-flex justify-content-center container text-center py-2 mb-1' style={{}} >Update</button>
                         <div className='form-group d-flex justify-content-center'>
                             {loading ? (
@@ -877,7 +918,7 @@ function abbrNum(number, decPlaces) {
 
 
 
-      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 pb-4 mb-4' style={{ color: '#FFFFFF' }}>Delete User - {dataUsername}</h3>
+      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 pb-4 mb-4' style={{ color: '#FFFFFF' }}>Delete Client - {dataUsername}</h3>
 <div className='form-group mt-3 d-flex justify-content-center'>
               <button className='btn btn-outline-danger px-5 ' onClick={(e) => handleDeleteToggle(e)}>Delete User</button>
             </div>

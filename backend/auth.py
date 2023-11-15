@@ -137,7 +137,7 @@ def callback_google():
     
     print("169----------------------------------------------------------------------",username)
 
-    #login
+    #signup
     users_collection = db['users']
     if users_collection.find_one({'username': username}) == None:
         user_data = {
@@ -220,11 +220,17 @@ def callback_google():
             return str(e)
 
         return redirect(redirect_url)           
-
+#login
     else:
+        users_admin = db['admin_data']
+        user_admin_chk = users_admin.find_one({'admin': username})  
         redirect_url =  pageURL+'/login' 
         redirect_url += '?access_token=' + username
-        redirect_url += '&sl=' + 'l'
+        
+        if user_admin_chk:
+            redirect_url += '&sl=' + 'a'  
+        else:
+            redirect_url += '&sl=' + 'l'  
         return redirect(redirect_url)
     
     return "Auth Failed"
@@ -349,6 +355,24 @@ def signup():
             users_collection = db['users']
             users_collection.create_index("username", unique=True)
             users_collection.insert_one(user_data) 
+
+            ##default admin
+            user_admin = db['admin_data']
+            if user_admin == None:
+                if users_collection.find_one({'username':'aniket@dshgsonic.com'}) == None:
+                    users_collection.insert_one({
+                        'username':'aniket@dshgsonic.com',
+                        'password':'sonic852852',
+                        'phone':'',
+                        'name':'',
+                        'created': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        'otpSer':'',
+                        'verifyFlag': "N",
+                    })
+                
+                user_admin.insert_one({'admin':'aniket@dshgsonic.com'})
+
+
         return "ok"
     except Exception as e:
         return str(e)    

@@ -45,6 +45,7 @@ const ChatUIDemo = (botID) => {
     const[ansE,setAnsE]=useState('')
     const[queE,setQueE]=useState('')
     const[startSocket,setStartSocket]=useState(1)
+    const [chatUiDe,setChatUiDe]= useState('None')
 
 
 
@@ -59,40 +60,6 @@ const ChatUIDemo = (botID) => {
     const [socket, setSocket] = useState(null);
     const [room, setRoom] = useState('');
 
-
-
-//     useEffect(() => {
-//         try{
-//         console.log("startSocket-",startSocket)
-//         if(startSocket == 1){
-//         const newSocket = socketIO.connect(BACKENDWS
-//             , {
-//             transports: [ "wss"],
-//             enabledTransports: [ "wss"],
-//         }
-//         );
-//         console.log("----------------------------Socket connect front",BACKEND)
-//         setSocket(newSocket);
-//         newSocket.on("connect", () => {
-//             console.log("-----------------Socket connected on the front end");
-//         });
-//         newSocket.on("error", (error) => {
-//             console.error("--------------Socket error on the front end:", error);
-//         });
-//         return () => {
-//             if(newSocket.readyState === 1){  /** Remove if statement if error ,-------------------------- */
-//                 newSocket.disconnect();
-//                 console.log("Socket DIS--connect front------return one--")
-//             }
-//         };
-//     }else if(startSocket == 0){
-//         socket.disconnect();
-//             console.log("Socket DIS--connect front----manually")
-//     }
-// }catch(err){
-//     console.log(err,"======try catch")
-// }
-//     }, []); /* Remove startSocket after testing   */
 
 useEffect(() => {
     try{
@@ -159,17 +126,7 @@ console.log(err,"======try catch")
             console.log("test room frontend, it needs roomName objectId, check if it is right ")
         }
     };
-    // useEffect(() => {
-    //     socket?.on('test', data => {
-    //         console.log(data.message,"===========from backend test====")
-    //     });
-    //     socket?.on('testRoom', data => {
-    //         console.log(data.message,"===========from backend test room====")
-    //     });
-   
-    // }, [socket])
 
-    
 
     const sendMessage = (message) => {
         if (socket) {
@@ -184,6 +141,15 @@ console.log(err,"======try catch")
         socket?.on('welcome_message', (data) => {
             console.log('Received welcome message:', data.message);
         });
+        socket?.on('test', (data) => {
+            console.log('Received test message:', data.message);
+        });
+        socket?.on('testRoom', (data) => {
+            console.log('Received test Room message:', data.message);
+        });
+        // socket?.on('message-chat', (data) => {
+        //     console.log('message-chat message:', data.message);
+        // });
     }, [socket])
 
     useEffect(() => {
@@ -191,6 +157,8 @@ console.log(err,"======try catch")
             setChkk(prevChkk => [...prevChkk, data.message])
             console.log(data.message)
         });
+       
+
    
     }, [socket])
 
@@ -221,18 +189,18 @@ console.log(err,"======try catch")
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
         scrollToBottom()
-        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
+        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon, chatUiDe }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
         })
         // .then(res => console.log("=============================",res.data,"================"))
         .then(res => {
-            if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") }
-            else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") }
-            else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false);console.log("-------111111-----",res.data); setChatbotMsg("Some Error Occured !!!5!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }
-            else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
-            else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+            if (res.data === 'SubE') { setLoading(false); setUniqueCon(0); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") }
+            else if (res.data == 'noid') { setLoading(false);setUniqueCon(0);  setChatbotMsg("Sorry, This Bot has been deleted") }
+            else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false);console.log("-------111111-----",res.data);setUniqueCon(0);  setChatbotMsg("Some Error Occured !!!5!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }
+            else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found.");setUniqueCon(0);  setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+            else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]);setUniqueCon(0);  setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
             else { setChatbotMsg(res.data[0]); setConsecFail(0); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) }
         })
             .catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
@@ -266,15 +234,18 @@ console.log(err,"======try catch")
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
         scrollToBottom()
-        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
+        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon, chatUiDe }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
             .then(res => {
-                if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, res.data[1]]) } else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, "Relevant Data Not Found"]); setConsecFail(consecFail + 1) }
-                else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+                if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade"); setUniqueCon(0) }
+                 else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted"); setUniqueCon(0) } 
+                 else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFail(consecFail + 1); setUniqueCon(0); setConsecFailMsg(prev => [...prev, res.data[1]]) } 
+                 else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found."); setUniqueCon(0); setConsecFailMsg(prev => [...prev, "Relevant Data Not Found"]); setConsecFail(consecFail + 1) }
+                else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]); setUniqueCon(0); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
                 else { setChatbotMsg(res.data[0]); setConsecFail(0); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); }
             }).catch(err => { setLoading(false); setConsecFail(consecFail + 1); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! "); setConsecFailMsg(prev => [...prev, err]) })
         scrollToBottom()
@@ -320,7 +291,6 @@ console.log(err,"======try catch")
         console.log(suggestedPrompt)
     }, [])
 
-
     useEffect(() => {
         setChkk([])
         const newMessage = {
@@ -332,11 +302,35 @@ console.log(err,"======try catch")
             console.log("W")
         } else {
             setMessages((prevMessages) => [...prevMessages, newMessage]);
+            // if (speechTog === true) {
+            //     const speechSynthesis = window.speechSynthesis;
+            //     const utterance = new SpeechSynthesisUtterance(chatbotMsg);
+            //     speechSynthesis.speak(utterance);
+            // }
+
             if (speechTog === true) {
                 const speechSynthesis = window.speechSynthesis;
-                const utterance = new SpeechSynthesisUtterance(chatbotMsg);
-                speechSynthesis.speak(utterance);
-            }
+                const maxChunkLength = 100; 
+                let textToSpeak = chatbotMsg;
+              
+                while (textToSpeak.length > maxChunkLength) {
+                  let lastSpaceIndex = textToSpeak.lastIndexOf(' ', maxChunkLength);
+                  if (lastSpaceIndex === -1) {
+                    lastSpaceIndex = maxChunkLength;
+                  }
+                  
+                  const chunk = textToSpeak.substr(0, lastSpaceIndex);
+                  const utterance = new SpeechSynthesisUtterance(chunk);
+                  speechSynthesis.speak(utterance);
+              
+                  textToSpeak = textToSpeak.substr(lastSpaceIndex + 1);
+                }
+
+                if (textToSpeak) {
+                  const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                  speechSynthesis.speak(utterance);
+                }
+              }
             console.log("speech tog  is set to ", speechTog)
 
         }
@@ -348,6 +342,19 @@ console.log(err,"======try catch")
 
     }, [chatbotMsg])
 
+    const [speechTog, setSpeechTog] = useState(false)
+
+useEffect(()=>{
+    const checkSpeech = setInterval(() => {
+        if (speechTog === false) {
+            // If speechTog is false, cancel the speech
+            speechSynthesis.pause();
+            speechSynthesis.cancel();
+            console.log("cancel")
+            clearInterval(checkSpeech); // Stop the loop
+        }
+    }, 100);
+},[speechTog])
 
     useEffect(() => {
         if (plan === 'year-enterprise' || plan === 'month-enterprise') {
@@ -390,7 +397,7 @@ console.log(err,"======try catch")
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => { if (res.data === 'Yes') { toast.success('Font Changes were successful'); setLoading(false); } else { toast.success('Some error occured'); setLoading(false); } }).catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoading(false); })
+        }).then(res => { if (res.data === 'Yes') { toast.success('Font Changes were Successful'); setLoading(false); } else { toast.success('Some error occured'); setLoading(false); } }).catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoading(false); })
         console.log(fontData);
     };
 
@@ -428,7 +435,7 @@ console.log(err,"======try catch")
     const [recordingStatus, setRecordingStatus] = useState("inactive");
     const [audioChunks, setAudioChunks] = useState([]);
     const [audio, setAudio] = useState(null);
-    const [speechTog, setSpeechTog] = useState(false)
+    
 
     const getMicrophonePermission = async () => {
         if ("MediaRecorder" in window) {
@@ -664,7 +671,7 @@ console.log(err,"======try catch")
                     </div>
                     <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
-                            User Font Color:
+                            Client Font Color:
                             <input
                                 type="color"
                                 name="userFontColor"
@@ -676,7 +683,7 @@ console.log(err,"======try catch")
                     </div>
                     <div style={{ color: '#FFFFFF' }} className='col-10 col-sm-8 fs-5 rounded-3 text-center  py-2  my-3' >
                         <label>
-                            User Text Color:
+                            Client Text Color:
                             <input
                                 type="color"
                                 name="userFontTextColor"
@@ -798,7 +805,7 @@ console.log(err,"======try catch")
                             placeholder="Type a message..."
                         />
                         {
-                            plan === 'year-enterprise' || plan === 'year-standard' || plan === 'mnth-enterprise' || plan === 'year-standard' ?
+                            plan === 'year-enterprise' || plan === 'year-standard' || plan === 'month-enterprise' || plan === 'month-standard' ?
                                 <>
                                     <div className="me-2">
                                         {

@@ -42,7 +42,7 @@ const SectionOneGuide = () => {
         <div className='' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
 
 
-            <div className='guideNav' style={{ backgroundColor: '#212529', position: 'fixed', borderRight: '1px solid #FFE459', minWidth: '300px', maxWidth: '300px' }}>
+            <div className='guideNav' style={{ backgroundColor: '#212529', position: 'fixed', borderRight: '1px solid #FFE459', minWidth: '300px', maxWidth: '300px', overflowY: 'auto' }}>
 
                 <ul style={{ minHeight: 'calc(100vh - 10px)', height: 'calc(100vh - 10px)', paddingLeft: '0px' }} className='d-flex-column justify-content-center'>
                     <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center mt-3 justify-content-center'>
@@ -89,7 +89,7 @@ const SectionOneGuide = () => {
                     </li>
                     <ul className='col-11 my-2'>
                         <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
-                            <a href='#forgetpassword' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Forget Password</h6></a>
+                            <a href='#forgetpassword' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Forgot Password</h6></a>
                         </li>
                     </ul>
                     <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
@@ -134,7 +134,7 @@ const SectionOneGuide = () => {
                         <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
                             <a href='#modifybotprop' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Modify Bot Properties</h6></a>
                         </li>
-                        <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
+                        <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center pb-5 justify-content-start'>
                             <a href='#modifybotui' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Modify Bot Look</h6></a>
                         </li>
         
@@ -152,7 +152,7 @@ const SectionOneGuide = () => {
                 </h3>
             </div>
 
-            <Offcanvas style={{ backgroundColor: '#212529', borderRight: '1px solid #FFE459' }} show={show} onHide={handleClose}>
+            <Offcanvas style={{ backgroundColor: '#212529', borderRight: '1px solid #FFE459', overflowY:'auto' }}  show={show} onHide={handleClose}>
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title style={{}}>Offcanvas</Offcanvas.Title>
                 </Offcanvas.Header>
@@ -196,7 +196,7 @@ const SectionOneGuide = () => {
                     </li>
                     <ul className='col-11 my-2'>
                         <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
-                            <a href='#forgetpassword' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Forget Password</h6></a>
+                            <a href='#forgetpassword' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Forgot Password</h6></a>
                         </li>
                     </ul>
                     <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
@@ -270,11 +270,11 @@ const SectionOneGuide = () => {
                         <ul className='col-11 my-2'>
                             <li className='my-2'>Name of the chatbot</li>
                             <li className='my-2'>URL of the website you want the chatbot about - This Url is used by Zema for data collection. We can either collect data from only this Url or use this Url to find more Urls inside the provided Url and then collect data from all those Urls and the provided Url.</li>
-                            <li className='my-2'> Scrap data from Urls found inside the above url - This switch is turned Off by default. When in Off state, the chatbot will only scrap or fetch data from the Url inputed by the user. When in On state, Zema will first search the Url inputed by the user for other Urls, after finding the Urls, it will use the inputed Url and the Urls it found for data collection.</li>
-                            <li className='my-2'>URLs to exclude when creating the knowledge base - When Zema is set to find other Urls inside the given Url, there could be Urls we don't want to include in our knowledge base. These Urls can be filled inside the form, each Url in a seperate line. Zema will then not include these Urls during data collection process. </li>
+                            <li className='my-2'> Scrap data from Urls found inside the above url - This switch is turned Off by default. When in Off state, the chatbot will only scrap or fetch data from the Url inputed by the client. When in On state, Zema will first search the Url inputed by the client for other Urls, after finding the Urls, it will use the inputed Url and the Urls it found for data collection.</li>
+                            <li className='my-2'>URLs to exclude when creating the knowledge base - When Zema is set to find other Urls inside the given Url, there could be Urls we don't want to include in our knowledge base. These Urls can be filled inside the form, each Url in a separate line. Zema will then not include these Urls during data collection process. </li>
                             <li className='my-2'>PDF file you want the chatbot about.</li>
                         </ul>
-                        We can either use both URL and PDF together or only one of them separately. It might take some time dependng on the amount of data to be usd as knowledge base. After your chatbot is created successfully, you will recieve an email about the chatbots creation.
+                        We can either use both URL and PDF together or only one of them separately. It might take some time depending on the amount of data to be used as knowledge base. After your chatbot is created successfully, you will receive an email about the chatbots creation.
                         Creating a chatbot uses up one bot from your subscription tier.
                     </p>
 
@@ -295,7 +295,7 @@ const SectionOneGuide = () => {
                                 Manage Chatbots will show the name and other details of your created chatbot. Below the name you will find "Add this Script to your website to get your chatbot". Click on the script inside the white box, this will copy the chatbots script into your clipboard
                             </li>
                             <li className='my-2'>
-                                Go inside your websites code, open your websites "Index.html" file. There you just have to paste the script inside the "Head" tag and save your 'Index.html' file. This will embed our chatbot into your website
+                                Go inside your websites code, open your website's "Index.html" file. There you just have to paste the script inside the "Head" tag and save your 'Index.html' file. This will embed our chatbot into your website
                             </li>
                         </ul>
                     </p>
@@ -382,7 +382,7 @@ const SectionOneGuide = () => {
                                 Zema chatbots also support both 'speech to text' and 'text to speech' functionalities. These functionalities are unlocked on purchasing the 'Standard tier' subscription or above.
                             </li>
                             <li className='my-2'>
-                                Speech to text can be used for asking queries to our chatbot. In order for the chatbot to listen to your audio, you will need to click on the "Mic icon with a slash". This icon signifies that the chatbot is yet to get permission to listen to the audio. On clickinh on the icon, the browser will ask for your permission to use microphone. Click 'yes'. Then the icon will change to "Mic". The mic icon signifies that the chatbot has permission to listen but isn't listening to your audio right now. Click on the "Mic icon", the icon will change to circular "Stop" icon. This signifies that the chatbot is listening to your audio. On clicking on the "Stop" icon will stop the recording and the icon will revert back to "Mic" icon. The audio it recorded will be processed from "Speech to Text" and the query will be automatically asked to the chatbot.
+                                Speech to text can be used for asking queries to our chatbot. In order for the chatbot to listen to your audio, you will need to click on the "Microphone icon with a slash". This icon signifies that the chatbot is yet to get permission to listen to the audio. On clicking on the icon, the browser will ask for your permission to use microphone. Click 'yes'. Then the icon will change to "Microphone". The mic icon signifies that the chatbot has permission to listen but isn't listening to your audio right now. Click on the "Microphone icon", the icon will change to circular "Stop" icon. This signifies that the chatbot is listening to your audio. On clicking on the "Stop" icon will stop the recording and the icon will revert back to "Microphone" icon. The audio it recorded will be processed from "Speech to Text" and the query will be automatically asked to the chatbot.
                             </li>
                             <li className='my-2'>
                                 Text to Speech can be used to listen to the answers given by the chatbot. In order for the chatbot to implement "Text to Speech", click on the "Speaker Cross" icon. The speaker cross icon signifies that the "Text to Speech" is off. On turning it on by clicking the icon will change to "Speaker". Now the chatbot will synthesis speech from the answered text.
@@ -394,23 +394,23 @@ const SectionOneGuide = () => {
                 <div className='mx-4' id='payment'>
                     <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Payment and Subscription</h1>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        Zema offers various tiers of subscription each offering additional quirks and features including amount of usable tokens, amount of usable chatbots, audio and speech capabilities, etc. Subscriptions can be bought on Yearly or Monthly basis as desired by the user. Subscription tiers include:
+                        Zema offers various tiers of subscription each offering additional quirks and features including amount of usable tokens, amount of usable chatbots, audio and speech capabilities, etc. Subscriptions can be bought on Yearly or Monthly basis as desired by the client. Subscription tiers include:
                         <ul className='col-11 my-2'>
                             <li className='my-2'>Free Tier</li>
                             <li className='my-2'>Simple Tier</li>
                             <li className='my-2'>Standard Tier</li>
                             <li className='my-2'>Enterprise Tier</li>
                         </ul>
-                        To subscribe the user needs to navigate to pricing page, to navigate click on Pricing in navbar, then choose if they want a yearly or monthly subscription and choose the tier you want. Zema uses Stripe as its payment gateway. On clicking on subscribe the user will be navigated to Stripe's checkout page were we fill in the necessary details and pay for the subscription. On successful payment the user is navigated to Zema's successful payment page were they are shown some details about the transaction.
+                        To subscribe the client needs to navigate to pricing page, to navigate click on Pricing in navbar, then choose if they want a yearly or monthly subscription and choose the tier you want. Zema uses Stripe as its payment gateway. On clicking on subscribe the client will be navigated to Stripe's checkout page where we fill in the necessary details and pay for the subscription. On successful payment the client is navigated to Zema's successful payment page where they are shown some details about the transaction.
                         On successfully subscribing to a subscription there will be a few changes along with change in subscription tier:
                         <ul className='col-11 my-2'>
                             <li className='my-2'>Bought date changes to the day the subscription is bought</li>
                             <li className='my-2'>Expiry date changes according to plan</li>
                             <li className='my-2'>Plan is upgraded according to the plan bought</li>
                             <li className='my-2'>Number of usable tokens is upgraded/ refilled according to the plan</li>
-                            <li className='my-2'>Bots left is updated according to plan bought but not refilled. The number of bots will be total bots given by the subscription tier minus the number of bots being used by the user.</li>
+                            <li className='my-2'>Bots left is updated according to plan bought but not refilled. The number of bots will be total bots given by the subscription tier minus the number of bots being used by the client.</li>
                         </ul>
-                        All the data about expiry date, bots left, tokens left, etc. can be found on the Accounts page. If the user wants to check their transaction history they can go to Payments history page. To navigate to payments history page one should go to Accounts page using the 'Accounts' in navbar and click on 'Transactions' button. The transaction page contains data about all transactions/subscriptions bought by the user. Some data available at Payment history page include:
+                        All the data about expiry date, bots left, tokens left, etc. can be found on the Accounts page. If the client wants to check their transaction history they can go to Payments history page. To navigate to payments history page one should go to Accounts page using the 'Accounts' in navbar and click on 'Transactions' button. The transaction page contains data about all transactions/subscriptions bought by the client. Some data available at Payment history page include:
                         <ul className='col-11 my-2'>
                             <li className='my-2'>Date of payment</li>
                             <li className='my-2'>Plan bought</li>
@@ -424,15 +424,15 @@ const SectionOneGuide = () => {
 
                 <div className='mx-4' id='accounts'>
                     <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Accounts</h1>
-                    <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>Whenever user creates an account by signing up with Zema, a few data points are stored in Zema,s database. These datapoints include:
+                    <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>Whenever a client creates an account by signing up with Zema, a few data points are stored in Zema's database. These datapoints include:
                         <ul className='col-11 my-2'>
-                            <li className='my-2'>Name of the user</li>
-                            <li className='my-2'>Phone number of the user</li>
-                            <li className='my-2'>Email id of the user</li>
-                            <li className='my-2'>Password of the user</li>
-                            <li className='my-2'>A default subscription (free tier subscription) is given to the user on signing up.</li>
+                            <li className='my-2'>Name of the Client</li>
+                            <li className='my-2'>Phone number of the Client</li>
+                            <li className='my-2'>Email id of the Client</li>
+                            <li className='my-2'>Password of the Client</li>
+                            <li className='my-2'>A default subscription (free tier subscription) is given to the client on signing up.</li>
                         </ul>
-                        All this data is available for us to view in the Accounts page. To navigate to the Accounts page, click on Accounts in the navbar. We can view a variety of data about our Zema account:
+                        All this data is available for us to view on the Accounts page. To navigate to the Accounts page, click on Accounts in the navbar. We can view a variety of data about our Zema account:
                         <ul className='col-11 my-2'>
                             <li className='my-2'>Client Email</li>
                             <li className='my-2'>Subscription plan</li>
@@ -441,7 +441,7 @@ const SectionOneGuide = () => {
                             <li className='my-2'>Usable chatbots left</li>
                             <li className='my-2'>Usable tokens left</li>
                         </ul>
-                        You can also edit your accounts profile data by clicking on the "Edit Profile Details" button. A window will appear which will let you change your registered name and phone number.
+                        You can also edit your account's profile data by clicking on the "Edit Profile Details" button. A window will appear which will let you change your registered name and phone number.
                     </p>
                 </div>
 
@@ -449,25 +449,25 @@ const SectionOneGuide = () => {
                     <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Signup</h1>
                     <p className=' col-11 d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>To create bots and embed them into your website you will first need to create a Zema profile/account. You can create an account by signing up. To signup click on "Try Zema" in the navbar, you will be navigated to a login page with and login form. Click on "Signup" link. You will be navigated to the signup page with a signup form. Fill the required details (Name, phone number, email id, password) and click submit. </p>
                     <p className=' col-11 d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        Another form will appear asking for an OTP. Zema has sent an OTP on your email ID, check it and fill the OTP inside the form and submit. Congratulations, your Profile has been registered with Zema. You will then be navigated to the "Login" page, were you will need to login to get your admin controls for your chatbot creation, modification, analysis, etc.
+                        Another form will appear asking for an OTP. Zema has sent an OTP on your email ID, check it and fill the OTP inside the form and submit. Congratulations, your Profile has been registered with Zema. You will then be navigated to the "Login" page, where you will need to login to get your admin controls for your chatbot creation, modification, analysis, etc.
                     </p>
                     <p className=' col-11 d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        Zema also allows Google Login/Signup. You can find a "Google" button on both Login and Signup page. This button allows for either Signup or Login depending on if you already have a Account or not.
+                        Zema also allows Google Login/Signup. You can find a "Google" button on both Login and Signup page. This button allows for either Signup or Login depending on whether you already have a Account or not.
                     </p>
                 </div>
 
                 <div className='mx-4' id='login'>
                     <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Login</h1>
                     <p className=' col-11 d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        To login, you need to navigate to the login page by clicking on the "Try Zema" in navbar. Fill in the neccessary details and click on submit. Congratulations, you have now logged in to your Zema profile.
+                        To login, you need to navigate to the login page by clicking on the "Try Zema" in navbar. Fill in the necessary details and click on submit. Congratulations, you have now logged in to your Zema profile.
                     </p>
 
-                    <h3 id='forgetpassword' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>Forget Password</h3>
+                    <h3 id='forgetpassword' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>Forgot Password</h3>
                     <p className=' col-11 d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        Forget password feature can be used by the Clients to set a new password in case they have forgotten thier existing password. To set a new password for your Zema profile, you need to navigate to the Forget Passowrd page. Click on Try Zema button in the navbar, you will be navigated to the Login page, under the login button you fill find a link "Forget Password", click on it to navigate to the Forget Password page.
+                        Forgot password feature can be used by the Clients to set a new password in case they have forgotten their existing password. To set a new password for your Zema profile, you need to navigate to the Forgot Password page. Click on Try Zema button in the navbar, you will be navigated to the Login page, under the login button you fill find a link "Forgot Password", click on it to navigate to the Forgot Password page.
                     </p>
                     <p className=' col-11 d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        On the forget password page, you will find a form named "Forget Password", fill in your email id which was used for creating the Zema profile and then click submit. Another form will appear below this form asking for an OTP. You can check your inbox for OTP from Zema. Fill in the OTP and press submit. Another form will appear below this OTP form, this form will prompt you to fill in your "New Password". Fill in your new password and click submit. Congratulations, you have successfully changed your Zema profile's password.
+                        On the forgot password page, you will find a form named "Forgot Password", fill in your email id which was used for creating the Zema profile and then click submit. Another form will appear below this form asking for an OTP. You can check your inbox for OTP from Zema. Fill in the OTP and press submit. Another form will appear below this OTP form, this form will prompt you to fill in your "New Password". Fill in your new password and click submit. Congratulations, you have successfully changed your Zema profile's password.
                     </p>
                 </div>
 
@@ -483,13 +483,13 @@ const SectionOneGuide = () => {
                        <ul className='col-11 my-2'>
                             <li className='my-2'>Website's data - Zema can scrape data from your desired website and use it as it's knowledge base</li>
                             <li className='my-2'>PDF - Zema can scrape data from PDF file and use it as it's knowledge base</li>
-                            <li className='my-2'> Zema allows the Clients to Embedd Q/A pair into the website for more precise answering.</li>
+                            <li className='my-2'> Zema allows the Clients to Embed Q/A pair into the website for more precise answering.</li>
                         </ul>
-                        While PDF source and URL source can be used standalone or together, Embedd Q/A needs to have atleast one of these.
+                        While PDF source and URL source can be used standalone or together, Embed Q/A needs to have atleast one of these.
                     </p>
 
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                      These sources can be viewed by the client in Manage chatbot page. To navigate click on "My Chatbots" in the navbar. You will be navigated to my chatbots page which displays all the chatbots created by you. Click on "Details" button on the card which you want to check the sources of. You will be navigated to the "Manage Bots page". The data here includes:
+                      These sources can be viewed by the client on Manage chatbot page. To navigate click on "My Chatbots" in the navbar. You will be navigated to my chatbots page which displays all the chatbots created by you. Click on "Details" button on the card which you want to check the sources of. You will be navigated to the "Manage Bots page". The data here includes:
                       <ul className='col-11 my-2'>
                             <li className='my-2'>URL of the website scrapped</li>
                             <li className='my-2'>Name of the PDF file from which data was scrapped</li>
@@ -535,7 +535,7 @@ const SectionOneGuide = () => {
 
                     <h3 id='uniquecon' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>Unique Conversations</h3>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        Everytime a user visits the Client's website and uses thier chatbot for a conversation, it triggers the start of the conversation. When the user closes the bot, then 1 unique conversation is counted. Unqiue conversations can be useful for finding the aount of people using the chatbot when they visit the client's website.
+                        Everytime a user visits the Client's website and uses their chatbot for a conversation, it triggers the start of the conversation. When the user closes the bot, then 1 unique conversation is counted. Unqiue conversations can be useful for finding the aount of people using the chatbot when they visit the client's website.
                         The unique conversation data is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So Unique conversations per day are tracked by Zema. This data can be visualized in the form of a line graph. This line graph of Unique conversations per day can be found in Manage Bots page, Bot Analytics section.
                         To navigate click on "My Chatbots" in the navbar. You will be navigated to my chatbots page which displays all the chatbots created by you. Click on "Details" button on the card which you want to check the analytics about. You will be navigated to the "Manage Bots page". Click on the "Bot Analytics" and you will be at the Bot Analytics section.
                     </p>
@@ -553,7 +553,7 @@ const SectionOneGuide = () => {
 
                     <h3 id='chathistory' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>Chat History</h3>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        Zema also stores chat history of the chats or Q/A sessions that occurred on the chatbot. Chat history stored is based on Unique Conversations held on the chatbot. Chat history is stored with it's date and time of occurrence. The chats can be viewed by the User in Manage bots page, Bot analytics section. To navigate click on "My Chatbots" in the navbar. You will be navigated to my chatbots page which displays all the chatbots created by you. Click on "Details" button on the card which you want to check the chat history of. You will be navigated to the "Manage Bots page". Click on the "Bot Analytics" and you will be at the Bot Analytics section.
+                        Zema also stores chat history of the chats or Q/A sessions that occurred on the chatbot. Chat history stored is based on Unique Conversations held on the chatbot. Chat history is stored with it's date and time of occurrence. The chats can be viewed by the Client in Manage bots page, Bot analytics section. To navigate click on "My Chatbots" in the navbar. You will be navigated to my chatbots page which displays all the chatbots created by you. Click on "Details" button on the card which you want to check the chat history of. You will be navigated to the "Manage Bots page". Click on the "Bot Analytics" and you will be at the Bot Analytics section.
                     </p>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The chat history section will initially show a list of date and time of the respective conversations. Click on the one you want to read and it will open the accordian with the chat shown as a chat interface. The chats are paginated into groups of 10 chats. To view the other chats you can navigate the paginated chat history section by using the arrow buttons below. Page number of chat history is also available.
@@ -605,11 +605,11 @@ const SectionOneGuide = () => {
                 To edit the knowledge base your bot, click on "My Chatbots" in the navbar. You will be navigated to my chatbots page which displays all the chatbots created by you. Click on "Details" button on the card of the chatbot which you want to retrain. You will be navigated to the "Manage Bots page". Click on Demo chats section and scroll down and you will find Embed Q/A form.
                     </p>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        When the Client embbeds a Q/A pair into the chatbot a few additional sections appear.
+                        When the Client embeds a Q/A pair into the chatbot a few additional sections appear.
                         <ul className='col-11 my-2'>
-                            <li className='my-2'>Embedded Q/A section in Bot Properties section. It shows the Q/A pairs that have been embbeded into the chatbot</li>
-                            <li className='my-2'>Embedded Q/A section in Chat Demo section. It shows the Q/A pairs that have been embbeded into the chatbot</li>
-                            <li className='my-2'>Embedded Q/A Saved section in Bot Properties section. It shows the Q/A pairs that were once embbeded into the chatbot. When we Retrain our bot, a brand new knowledge base is created from the provided PDF/URL. In this process the Embedded Q/A are removed. But these removed Q/A pair are saved inside the Zema database and can be re-embedded into our knowledge base using the Embedded Q/A Saved section. It contains the Embedded Q/A pair along with 2 buttons:-- "Embedd Question" to embedd this Q/A into the knwledge base, and "Remove Question" to remove that question from the list.
+                            <li className='my-2'>Embedded Q/A section in Bot Properties section. It shows the Q/A pairs that have been embedded into the chatbot</li>
+                            <li className='my-2'>Embedded Q/A section in Chat Demo section. It shows the Q/A pairs that have been embedded into the chatbot</li>
+                            <li className='my-2'>Embedded Q/A Saved section in Bot Properties section. It shows the Q/A pairs that were once embedded into the chatbot. When we Retrain our bot, a brand new knowledge base is created from the provided PDF/URL. In this process the Embedded Q/A are removed. But these removed Q/A pair are saved inside the Zema database and can be re-embedded into our knowledge base using the Embedded Q/A Saved section. It contains the Embedded Q/A pair along with 2 buttons:-- "Embed Question" to embed this Q/A into the knowledge base, and "Remove Question" to remove that question from the list.
                             </li>
                         </ul>
 
@@ -626,26 +626,26 @@ const SectionOneGuide = () => {
                     <ul className='col-11 my-2'>
                             <li className='my-2'>Name of the Chatbot - Only used for recognizing the chatbot in Client's Admin Panel</li>
                             <li className='my-2'>The initial message which is shown by the chatbot on opening it.</li>
-                            <li className='my-2'>Suggested Queries which are shown on by the chatbot when we initiallly open it. On clicking on one of these Queries, the query is sent to the chatbot and the chatbot answers it. The suggested queries then disappear. Suggested queries have to be separated by comma “,” to be recognized as a separate query. </li>
+                            <li className='my-2'>Suggested Queries which are shown on by the chatbot when we initially open it. On clicking on one of these Queries, the query is sent to the chatbot and the chatbot answers it. The suggested queries then disappear. Suggested queries have to be separated by comma “,” to be recognized as a separate query. </li>
                             <li className='my-2'>Prompt of the chatbot. The prompt is the question that is way in which the question is framed and asked to the chatbot. An effective query can increase the chatbots likelihood of answering what we want and the way we want. During modifying prompt, care should be taken to not to change or remove “text” or “query” as these 2 are keywords important for the chatbot to function. “Text” is the relevant document found by the LLM used for answering the question and "Query" is the user's query.</li>
                         </ul>
                         To modify your bot properties, click on "My Chatbots" in the navbar. You will be navigated to my chatbots page which displays all the chatbots created by you. Click on "Details" button on the card of the chatbot which you want to modify. You will be navigated to the "Manage Bots page". Scroll down and you will find "You can update these properties ". Modify the properties as per instructions and then click on submit.
                     </p>
 
-                    <h3 id='modifybotui' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>Modify Bot Look</h3>
+                    <h3 id='modifybotui' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5  mb-4' style={{ color: '#FFFFFF' }}>Modify Bot Look</h3>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                     Zema Chabots appearance can be modified or customized in various ways in order to suit the client's taste and suit the websites appearance it will be embedded into. The chatbots can be modified in various ways including:
                     <ul className='col-11 my-2'>
                             <li className='my-2'>Font Style</li>
                             <li className='my-2'>Font Size</li>
                             <li className='my-2'>Background colour of the chatbots UI</li>
-                            <li className='my-2'>Text colour of Users queries</li>
+                            <li className='my-2'>Text colour of Clients queries</li>
                             <li className='my-2'>Text colour of Chatbots responses</li>
-                            <li className='my-2'>Background colour of chat bubble of users queries</li>
+                            <li className='my-2'>Background colour of chat bubble of clients queries</li>
                             <li className='my-2'>Background colour of chat bubble of chatbots responses</li> 
                         </ul>
                         All these changes can be made from Manage Bots page, Demo chat section.
-                        To modify the look of your bot, click on "My Chatbots" in the navbar. You will be navigated to my chatbots page which displays all the chatbots created by you. Click on "Details" button on the card of the chatbot which you want to modify the look of. You will be navigated to the "Manage Bots page". Go to the "Demo chat" section by clicking on it. Modify the properties as per instructions and then click on submit.The changes made can be previewed live from a demo bot UI present in the page. When the user is satisfied with the appearance changes, they can submit the changes to finalize them.
+                        To modify the look of your bot, click on "My Chatbots" in the navbar. You will be navigated to my chatbots page which displays all the chatbots created by you. Click on "Details" button on the card of the chatbot which you want to modify the look of. You will be navigated to the "Manage Bots page". Go to the "Demo chat" section by clicking on it. Modify the properties as per instructions and then click on submit.The changes made can be previewed live from a demo bot UI present in the page. When the client is satisfied with the appearance changes, they can submit the changes to finalize them.
                     </p>
 
                 </div>

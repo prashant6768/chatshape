@@ -346,7 +346,7 @@ const PricingSection1 = () => {
                     </div>
                 </div>
                 <div style={{ paddingTop: '50px', marginTop: '100px' }}>
-                    <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pb-5' style={{ color: '#FFFFFF', borderBottom: '2px solid grey' }}>Pricing FAQ</h1>
+                    <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pb-5' style={{ color: '#FFFFFF', borderBottom: '2px solid grey' }}>Pricing FAQs</h1>
                     <div className='col-lg-10 row col-12 d-flex justify-content-center mx-auto'>
                         <div className='col-lg-5 col-10 me-lg-4   '>
                             <p className='fw-bold fs-5 col-12 container  break-words text-start mt-2 ' style={{ color: '#FFFFFF' }}><AiFillQuestionCircle className='me-2 mb-1' />What is counted towards a Token?</p>

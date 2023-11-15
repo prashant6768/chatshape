@@ -86,7 +86,7 @@ const SectionOneManageBotSA = () => {
 
     return (
         <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
-            <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Manage</h1>
+            <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Manage LLM</h1>
 
             <div className='form-group d-flex justify-content-center mt-4'>
        {apiload ? (
@@ -134,8 +134,9 @@ const SectionOneManageBotSA = () => {
                 <div className="form-group col-9 my-3">
                     <label className='d-flex justify-content-center fs-4' style={{ color: '#FFFFFF' }}>Semantic Search Similarity Metric</label>
                     <div className="input-group mb-3 mx-2 col-9" style={{  }}>
+                    <button className="btn btn-outline-secondary" type="button" id="button-addon2"  onClick={toggleDropdown}>Select</button>
+
                         <input type="text" value={ss}  className="form-control col-lg-6" placeholder="Semantic Search Similarity Metric" />
-                        <button className="btn btn-outline-secondary" type="button" id="button-addon2"  onClick={toggleDropdown}>Select</button>
                     </div>
                     <Dropdown ref={ref} show={isOpen}>
                         {/* <div className='fw-bolder mx-3 mt-2 underline-grow' style={{ color: '#FFFFFF' }} id="dropdown-basic">

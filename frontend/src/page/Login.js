@@ -86,7 +86,7 @@ await axios.get(`${BACKEND}auth/googlelogin`,{
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
   },
-}).then(res => {window.location.href = res.data ; console.log(res.data,"========hello g");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}).catch(err => console.log("GOOG ",err))
+}).then(res =>  {window.location.href = res.data ; console.log(res.data,"========hello g");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}).catch(err => console.log("GOOG ",err))
 setTimeout(() => { navigate('/account') }, 2000)
 }
 
@@ -113,7 +113,13 @@ setTimeout(() => { navigate('/account') }, 2000)
       console.log(param,"SSSSSSSSSSS")
     }else if(sl === 'l'){
       Cookies.set('accessToken', `${param}`)
-      toast.success("Login successful")
+      toast.success("Login Successful")
+      setTimeout(() => { navigate('/account') }, 2000)
+      console.log(param,"LLLLLLLLL")
+    }else if(sl === 'a'){
+      Cookies.set('accessToken', `${param}`)
+      Cookies.set('adminToken', `admin`)
+      toast.success("Login Successful")
       setTimeout(() => { navigate('/account') }, 2000)
       console.log(param,"LLLLLLLLL")
     }
@@ -123,6 +129,14 @@ setTimeout(() => { navigate('/account') }, 2000)
   }
 
   },[param])
+
+  const[togLog,setTogLog]=useState(false)
+
+  const logoutToggle = (e) => {
+    e.preventDefault()
+    setTogLog(!togLog)
+  }
+
 
   return (
 
@@ -164,7 +178,7 @@ setTimeout(() => { navigate('/account') }, 2000)
           className="form-control"
           placeholder="Email"
           id="emailFreelancer"
-          required
+          
           aria-label="email"
           value={username}
           onChange={(e)=>setUsername(e.target.value)}
@@ -181,7 +195,7 @@ setTimeout(() => { navigate('/account') }, 2000)
           className="form-control"
           placeholder="Password"
           id="passwordFreelancer"
-          required
+  
           aria-label="Password"
           value={password}
           onChange={(e)=>setPassword(e.target.value)}
@@ -208,10 +222,15 @@ setTimeout(() => { navigate('/account') }, 2000)
    </>
     :
     <div className="col-12">
-    <button type="button" onClick={()=> logout()} class="btn btn-outline-danger  mt-3 d-block w-100">Logout</button>
+    <button type="button" onClick={(e)=> logoutToggle(e)} class="btn btn-outline-danger  mt-3 d-block w-100">Logout</button>
     </div>
-
     }
+    {togLog ?
+    <div className='form-group mt-3 d-flex justify-content-center'>
+      <button className='btn btn-danger mx-1 ' onClick={()=> logout()}>Logout</button>
+      <button className='btn btn-secondary mx-1 ' onClick={(e) => logoutToggle(e)}>No</button>
+    </div> : ''
+  }
   </div>
   <div className='form-group d-flex justify-content-center mt-4'>
        {loading ? (

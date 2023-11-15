@@ -1,10 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState ,useEffect} from 'react'
 // import { AiFillCheckCircle, AiFillQuestionCircle } from 'react-icons/ai'
 import Accordion from 'react-bootstrap/Accordion';
 import './gradientCss.css'
+import axios from 'axios'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import ChatUIDe from '../ChatUiDe';
 
 const SectionTwoHome = () => {
+
+  // const BACKEND = 'http://localhost:5000/'
+    const BACKEND = 'https://zemaapi.zema.io/'
 
 
   const zemaFAQ = [
@@ -46,6 +52,16 @@ const SectionTwoHome = () => {
     setActiveKey(activeKey === eventKey ? null : eventKey);
   };
 
+  const [addBot, setAddBot] = useState('')
+
+  useEffect(()=>{
+    axios.post(`${BACKEND}api/gethomepagebot`, {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }).then(res =>{if(res.data[0] === "Error"){console.log("Error"); toast.success("Some Error Occured")}else {console.log(res.data,"==========166"); setAddBot(res.data)}}).catch(err => {console.log(err); toast.error("Some Error Occured") })
+  },[])
+
   return (
     <div style={{ backgroundColor: '#171725', height: '100%', width: '100vw' }} >
       <div style={{ paddingTop: '100px', paddingBottom: '100px' }}>
@@ -53,7 +69,7 @@ const SectionTwoHome = () => {
       <h2 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-2' style={{ color: '#FFFFFF' }}>This chatbot's trained to answer questions about Zema.
 Ask a question to get started.</h2>
 
-          <ChatUIDe botID={'64de180c5b480f1407874b45..'} />
+          <ChatUIDe botID={addBot} />
 
 
         <h2 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5' style={{ color: '#FFFFFF' }}>TRUSTED CUSTOMERS</h2>
@@ -110,7 +126,7 @@ Ask a question to get started.</h2>
 
 
       <div className='fs-4 col-12 row d-flex justify-content-center text-center  mt-3 mx-1' style={{ color: '#FFFFFF', paddingBottom: '100px' }}>
-        <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pb-5' style={{ color: '#FFFFFF' }}>FAQ</h1>
+        <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pb-5' style={{ color: '#FFFFFF' }}>FAQs</h1>
 
         {zemaFAQ.map((x) => (
           <Accordion

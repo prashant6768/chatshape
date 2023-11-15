@@ -50,9 +50,15 @@ const Signup = () => {
         setLoading(false);
         return;
       }
+      const passRegex = /\s{2,}/;
+      if (!passRegex.test(password)) {
+        toast.error("Invalid Password Format, 2 consecutive white spaces");
+        setLoading(false);
+        return;
+      }
 
       const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-      if (!emailRegex.test(username)) {
+      if (emailRegex.test(username)) {
         toast.error("Invalid Email Format");
         setLoading(false);
         return;
@@ -86,7 +92,8 @@ if(phone !== ''){
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*'
       },
-}).then(res => {window.location.href = res.data ; console.log(res.data);setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}).catch(err => console.log("GOOG ",err))
+})
+.then(res => {window.location.href = res.data ; console.log(res.data);setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}).catch(err => console.log("GOOG ",err))
 setTimeout(() => { navigate('/account') }, 2000)
     }
 

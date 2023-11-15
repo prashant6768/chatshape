@@ -139,6 +139,8 @@ const ManageBot = (id) => {
     setConDataGraph(dataArr.UniqueConData)
     console.log("------qqqqqqqq--", dataArr.urlsUsed)
     console.log(dataArr.tokenData, "------", dataArr.UniqueConData)
+    console.log("------qqqpdfffffqqqqq--", dataArr.pdf)
+
     //   setUrl(dataArr.url)
   }, [dataArr])
 
@@ -154,7 +156,7 @@ const ManageBot = (id) => {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then((res) => { if (res.data === 'noname') { toast.error('Bot name can,t be empty'); setLoading(false); } else { toast.success('Updated successfully!'); setLoading(false); } }).catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoading(false); })
+    }).then((res) => { if (res.data === 'noname') { toast.error("Bot name can't be empty"); setLoading(false); } else { toast.success('Updated Successfully!'); setLoading(false); } }).catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoading(false); })
   }
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
@@ -195,6 +197,13 @@ const ManageBot = (id) => {
       textarea.style.height = textarea.scrollHeight + 20 + "px";
     }
   }, [prompt, screenWidth, resizer])
+  useEffect(() => {
+    const textarea = document.getElementById("textareapdf");
+    if (textarea !== null) {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + 20 + "px";
+    }
+  }, [prompt, screenWidth, resizer])
 
   const handleDelete = async (e) => {
     e.preventDefault()
@@ -204,7 +213,7 @@ const ManageBot = (id) => {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then((res) => { if (res.data === 'suc') { toast.success('Bot Deleted'); setLoadingdel(false); } else if (res.data === 'fail') { toast.error('Some Error Occured, Try Again'); setLoadingdel(false); } })
+    }).then((res) => { if (res.data === 'suc') { toast.success('Bot Deleted'); setLoadingdel(false); } else if (res.data === 'fail') { toast.error('Some Error Occured, Try Again'); setLoadingdel(false); } else{ toast.error('Some Error Occured, Try Again'); setLoadingdel(false); console.log(res.data)} })
       .then(setTimeout(() => { navigate('/mychatbots') }, 2000))
       .catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoadingdel(false); })
     //  await navigate('/mychatbots');
@@ -230,6 +239,16 @@ const ManageBot = (id) => {
     }
   };
 
+  const [addPdf, setAddPdf] = useState(false);
+  const handleCheckboxChangePdf = (event) => {
+    const checkbox = event.target;
+    if (checkbox.checked) {
+      setAddPdf("Y")
+    } else {
+      setAddPdf("N")
+    }
+  };
+
   const handleRetrain = async (e) => {
     e.preventDefault()
     setLoadingre(true);
@@ -247,8 +266,16 @@ const ManageBot = (id) => {
       const formData = new FormData();
       formData.append('sendLink', sendLink);
       formData.append('exclude', exclude);
-      formData.append('pdfFile', pdfFile);
       formData.append('multiLink', multiLink);
+
+      // formData.append('pdfFile', pdfFile);
+      if (pdfFile) {
+        for (let i = 0; i < pdfFile.length; i++) {
+          formData.append(`pdfFile[]`, pdfFile[i]);
+          console.log(`pdfFile[]`, pdfFile[i])
+        }
+      }
+
 
 
       for (let pair of formData.entries()) {
@@ -261,7 +288,7 @@ const ManageBot = (id) => {
         'Access-Control-Allow-Origin': '*',
       })
         // .then(res =>console.log("FROM BACKEND = ",res.data)).catch(err => console.log(err))
-        .then(res => { if (res.data == 'BotF') { toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoadingre(false); } else if (res.data == 'FillOne') { toast.error('Atleast fill one of these, PDF or website URL'); console.log("ressssssssssssss", res.data); setLoadingre(false); } else if (res.data == 'SubE') { toast.error('Your Subscription has Expired, renew subscription for more'); setLoadingre(false); } else if (res.data == 'noname') { toast.error('Botname is compulsary'); setLoadingre(false); } else if (res.data === 'ok') { toast.success('Bot Retrained successfully!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoadingre(false); setTimeout(() => { window.location.reload(true) }, 2000) } else { toast.error('Some Error Occured!!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoading(false); } })
+        .then(res => { if (res.data == 'BotF') { toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoadingre(false); } else if (res.data == 'FillOne') { toast.error('Atleast fill one of these, PDF or website URL'); console.log("ressssssssssssss", res.data); setLoadingre(false); } else if (res.data == 'SubE') { toast.error('Your Subscription has Expired, renew subscription for more'); setLoadingre(false); } else if (res.data == 'noname') { toast.error('Botname is compulsary'); setLoadingre(false); } else if (res.data === 'ok') { toast.success('Bot Retrained Successfully!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoadingre(false); setTimeout(() => { window.location.reload(true) }, 2000) } else { toast.error('Some Error Occured!!'); console.log(res.data, "CHKKKKKKKKKKKK"); setLoading(false); } })
         .catch(err => { console.log("error  botsection 1 ", err); toast.error('API request failed!'); setLoadingre(false); })
       console.log(formData)
     }
@@ -462,11 +489,17 @@ const ManageBot = (id) => {
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URL Used</label>
           <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='URL Used' value={url} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >PDF Used</label>
-          <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='PDF Used' value={pdf} />
+          {
+            pdf == undefined || pdf.length == 0  ?
+            <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='PDF Used' value={pdf} />
+:
+<textarea id='textareapdf' className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='PDF Used' value={Array.isArray(pdf) ? pdf.map(String).join('\n') : ''} />
+
+          }
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URLs Scrapped</label>
-          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%', height: '150px' }} readOnly placeholder='Urls scrapped' value={Array.isArray(urlsUsed) ? urlsUsed.join('\n') : ''} />
+          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%', height: '150px' }} readOnly placeholder='URLs scrapped' value={Array.isArray(urlsUsed) ? urlsUsed.join('\n') : ''} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URLs Excluded</label>
-          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%' }} readOnly placeholder='Urls excluded' value={Array.isArray(urlsEx) ? urlsEx.join('\n') : ''} />
+          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%' }} readOnly placeholder='URLs excluded' value={Array.isArray(urlsEx) ? urlsEx.join('\n') : ''} />
 
           {/* {
             embeddedQA && embeddedQA.length > 0 && (
@@ -609,7 +642,7 @@ const ManageBot = (id) => {
                   onChange={handleCheckboxChange}
                 />
                 <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
-                  Scrap data from Urls found inside the above url
+                  Scrap data from URLs found inside the above url
                 </label>
               </div>
               <div className="form-group">
@@ -623,8 +656,21 @@ const ManageBot = (id) => {
                   accept=".pdf"
                   style={{ backgroundColor: 'white', color: 'black', borderRadius: '0px' }}
                   className="btn custom-file-input w-100 me-auto"
-                  onChange={(e) => setPdfFile(e.target.files[0])}
+                  onChange={(e) => setPdfFile(e.target.files)}
+                  multiple
                 />
+              </div>
+              <div className="form-check form-switch mt-1 d-flex justify-content-center mb-3">
+                <input
+                  className="form-check-input me-4"
+                  type="checkbox"
+                  role="switch"
+                  id="flexSwitchCheckDefault"
+                  onChange={handleCheckboxChangePdf}
+                />
+                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
+                 Add PDF data to existing knowledge base
+                </label>
               </div>
               <div className='form-group'>
                 <button className='btn btn-outline-warning px-5 ' onClick={(e) => handleRetrainToggle(e)}>Retrain Bot</button>
@@ -674,7 +720,7 @@ const ManageBot = (id) => {
         </div>
         : ''
       }
-      {vis === 'Bot Analytics' ?
+      {vis === 'Bot Analytics' && apiload == false ?
         <div >
           {/* <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }} >Analytics</label> */}
           <label className='fs-4 d-flex justify-content-center container text-center mt-5 mb-5' style={{ height: '100%', color: '#FFFFFF' }} >Tokens used</label>
@@ -730,7 +776,7 @@ const ManageBot = (id) => {
           <div className='fs-4 col-12 row d-flex justify-content-center text-center  mb-5 mt-3 mx-1 ' style={{ color: '#FFFFFF' }}>
             <label className='fs-4 d-flex justify-content-center  col-11 text-center mt-5 mb-5 mx-2' style={{ height: '100%', color: '#FFFFFF' }}>Chat History</label>
 
-            <input className='fs-4 col-sm-8 col-lg-10 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"
+            <input className='fs-4 col-sm-8 col-lg-10 col-11 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"
               placeholder="Search..."
               value={searchTermPay}
               onChange={handleSearchPay}

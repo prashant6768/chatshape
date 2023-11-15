@@ -113,7 +113,7 @@ const GuidePageSA = () => {
                         <a href='#userdatabotpage' style={{ textDecoration: 'none' }}> <h5 style={{ color: 'white' }}>Chatbot Page</h5></a>
                     </li>
                     <ul className='col-11 my-2'>
-                       
+
                         <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
                             <a href='#udbtable' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Chatbot Table</h6></a>
                         </li>
@@ -147,11 +147,30 @@ const GuidePageSA = () => {
                         <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
                             <a href='#udbdeletebot' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Delete Bot</h6></a>
                         </li>
-                        
+
                     </ul>
-                    <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center pb-5  justify-content-start'>
+                    <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
                         <a href='#managellm' style={{ textDecoration: 'none' }}> <h5 style={{ color: 'white' }}>Manage LLM</h5></a>
                     </li>
+                    <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
+                        <a href='#superadmin' style={{ textDecoration: 'none' }}> <h5 style={{ color: 'white' }}>Super Admins</h5></a>
+                    </li>
+                    <ul className='col-11 my-2'>
+
+<li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center justify-content-start'>
+    <a href='#addremovesuperadmin' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Add / Remove Super Admin</h6></a>
+</li>
+<li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
+    <a href='#ckbsuperadmin' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Change homepage chatbot</h6></a>
+</li>
+<li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
+    <a href='#errsuperadmin' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Error Log</h6></a>
+</li>
+<li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center pb-5 justify-content-start'>
+    <a href='#isssuperadmin' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Issue Log</h6></a>
+</li>
+
+</ul>
                 </ul>
 
             </div>
@@ -233,7 +252,7 @@ const GuidePageSA = () => {
                         <a href='#userdatabotpage' style={{ textDecoration: 'none' }}> <h5 style={{ color: 'white' }}>Chatbot Page</h5></a>
                     </li>
                     <ul className='col-11 my-2'>
-                        
+
                         <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
                             <a href='#udbtable' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Chatbot Table</h6></a>
                         </li>
@@ -267,11 +286,31 @@ const GuidePageSA = () => {
                         <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
                             <a href='#udbdeletebot' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Delete Bot</h6></a>
                         </li>
-                        
+
                     </ul>
                     <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
                         <a href='#managellm' style={{ textDecoration: 'none' }}> <h5 style={{ color: 'white' }}>Manage LLM</h5></a>
                     </li>
+                    <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
+                        <a href='#superadmin' style={{ textDecoration: 'none' }}> <h5 style={{ color: 'white' }}>Super Admins</h5></a>
+                    </li>
+                    <ul className='col-11 my-2'>
+
+<li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
+    <a href='#addremovesuperadmin' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Add / Remove Super Admins</h6></a>
+</li>
+<li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
+    <a href='#ckbsuperadmin' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Change homepage chatbot</h6></a>
+</li>
+<li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
+    <a href='#errsuperadmin' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Error Log</h6></a>
+</li>
+<li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center pb-5 justify-content-start'>
+    <a href='#isssuperadmin' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Issue Log</h6></a>
+</li>
+
+
+</ul>
                 </Offcanvas.Body>
             </Offcanvas>
 
@@ -294,9 +333,9 @@ const GuidePageSA = () => {
                 <div className='mx-4' id='userdatapage'>
                     <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>User Data Page</h1>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                       User Data Page contains various information regarding the Zema clients including subscription plan, chatbots used, etc. This page also has lets us navigate to Individual user's data page which contains more information about one specific user.
-                       </p> 
-                       <h3 id='udpcard' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
+                        User Data Page contains various information regarding the Zema clients including subscription plan, chatbots used, etc. This page also has lets us navigate to Individual user's data page which contains more information about one specific user.
+                    </p>
+                    <h3 id='udpcard' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Data Cards
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
@@ -315,7 +354,7 @@ const GuidePageSA = () => {
                                 Conversations - Total number of Unique conversations that occured across all Zema chatbots.
                             </li>
                         </ul>
-                      Whenever a chatbot is opened by the user and a query is asked, a new Unique conversation starts. Now whenever the user closes the chatbot, that unique conversation will end.
+                        Whenever a chatbot is opened by the user and a query is asked, a new Unique conversation starts. Now whenever the user closes the chatbot, that unique conversation will end.
                     </p>
 
                     <h3 id='udptable' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
@@ -337,7 +376,7 @@ const GuidePageSA = () => {
                                 Details - Navigates to User Data Individual page, which contains more detailed data about the specific Client.
                             </li>
                         </ul>
-                     The table is paginated with page number and navigation options at the bottom of the table.
+                        The table is paginated with page number and navigation options at the bottom of the table.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The table has a search input at the top. This search can be used both as a search and filter. Type the data you are looking for, Zema will use Regex to find the pattern and display only the relevant data. The table also has a sort button used for sorting data in ascending or descending order. In this case it uses number of chatbots as metric for sorting.
@@ -347,22 +386,22 @@ const GuidePageSA = () => {
                         Unique Conversation Graph
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    Everytime a user visits the Client's website and uses thier chatbot for a conversation, it triggers the start of the conversation. When the user closes the bot, then 1 unique conversation is counted. Unqiue conversations can be useful for finding the aount of people using the chatbot when they visit the client's website. The unique conversation data is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So Unique conversations per day for every bot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows the total number of unique conversations that took place across all the chatbots issued by Zema per day.
+                        Everytime a user visits the Client's website and uses their chatbot for a conversation, it triggers the start of the conversation. When the user closes the bot, then 1 unique conversation is counted. Unqiue conversations can be useful for finding the amount of people using the chatbot when they visit the client's website. The unique conversation data is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So Unique conversations per day for every bot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows the total number of unique conversations that took place across all the chatbots issued by Zema per day.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
-                    <ul className='col-11 my-2'>
+                        The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            YYYY-MM-DD: Display data from that specific day
+                                YYYY-MM-DD: Display data from that specific day
                             </li>
                             <li className='my-2'>
-                            YYYY-MM: Display data from that specific month
+                                YYYY-MM: Display data from that specific month
                             </li>
                             <li className='my-2'>
-                            YYYY: Display data from that specific year
+                                YYYY: Display data from that specific year
                             </li>
                             <li className='my-2'>
-                            Empty: Display all the data available
+                                Empty: Display all the data available
                             </li>
                         </ul>
                     </p>
@@ -371,31 +410,31 @@ const GuidePageSA = () => {
                         Token Usage Graph
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    Tokens are used by the chatbots for answering queries. The amount of tokens used by the chatbots depend on:
-                    <ul className='col-11 my-2'>
+                        Tokens are used by the chatbots for answering queries. The amount of tokens used by the chatbots depend on:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            Amount of data used for answering the query
+                                Amount of data used for answering the query
                             </li>
                             <li className='my-2'>
-                            Length of answer given by the chatbot
+                                Length of answer given by the chatbot
                             </li>
                         </ul>
-                    The tokens used from your chatbot for answering queries is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So tokens used per day for every chatbot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows total number of tokens used across all the chtabots issued by zZema per day.
+                        The tokens used by your chatbot for answering queries is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So tokens used per day for every chatbot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows total number of tokens used across all the chtabots issued by zZema per day.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
-                    <ul className='col-11 my-2'>
+                        The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            YYYY-MM-DD: Display data from that specific day
+                                YYYY-MM-DD: Display data from that specific day
                             </li>
                             <li className='my-2'>
-                            YYYY-MM: Display data from that specific month
+                                YYYY-MM: Display data from that specific month
                             </li>
                             <li className='my-2'>
-                            YYYY: Display data from that specific year
+                                YYYY: Display data from that specific year
                             </li>
                             <li className='my-2'>
-                            Empty: Display all the data available
+                                Empty: Display all the data available
                             </li>
                         </ul>
                     </p>
@@ -410,7 +449,7 @@ const GuidePageSA = () => {
                                 Tokens Used - Total number of tokens used by chatbots issued by Zema
                             </li>
                             <li className='my-2'>
-                               Payments - Total number of payment that have been made by Clients
+                                Payments - Total number of payment that have been made by Clients
                             </li>
                             <li className='my-2'>
                                 Total Payments - Total Sum of Payments made by Clients
@@ -419,9 +458,9 @@ const GuidePageSA = () => {
                                 Conversations - Total number of Unique conversations that occured across all Zema chatbots.
                             </li>
                         </ul>
-                    </p>     
+                    </p>
 
-                     <h3 id='udpptable' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
+                    <h3 id='udpptable' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Payments Data Table
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
@@ -440,7 +479,7 @@ const GuidePageSA = () => {
                                 Email Id - Email ID of the respective Client.
                             </li>
                         </ul>
-                     The table is paginated with page number and navigation options at the bottom of the table.
+                        The table is paginated with page number and navigation options at the bottom of the table.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The table has a search input at the top. This search can be used both as a search and filter. Type the data you are looking for, Zema will use Regex to find the pattern and display only the relevant data.
@@ -450,38 +489,38 @@ const GuidePageSA = () => {
                         Payments Data Graph
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    This graph shows information about the Total amount (in USD) of payments made on a particular day.
+                        This graph shows information about the Total amount (in USD) of payments made on a particular day.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
-                    <ul className='col-11 my-2'>
+                        The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            YYYY-MM-DD: Display data from that specific day
+                                YYYY-MM-DD: Display data from that specific day
                             </li>
                             <li className='my-2'>
-                            YYYY-MM: Display data from that specific month
+                                YYYY-MM: Display data from that specific month
                             </li>
                             <li className='my-2'>
-                            YYYY: Display data from that specific year
+                                YYYY: Display data from that specific year
                             </li>
                             <li className='my-2'>
-                            Empty: Display all the data available
+                                Empty: Display all the data available
                             </li>
                         </ul>
                     </p>
-               
+
                 </div>
 
                 <div className='mx-4' id='userdataindipage'>
                     <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>User Data Individual Page</h1>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                       User Data Individual Page contains various information regarding one specific Client including subscription plan, chatbots used, etc. This page also lets the Super Admins to edit certain parts of the Clients profile and to Delete a Clients profile from Zema. To navigate to this page go to Users Data page, in the first table showing data about Client's profile, click on details to navigate to User Data Individual Page of that specific Client's Profile.
-                       </p> 
-                       <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                      On the top of the page is the Email ID of the Client whose profile we are viewing about.
-                       </p> 
+                        User Data Individual Page contains various information regarding one specific Client including subscription plan, chatbots used, etc. This page also lets the Super Admins to edit certain parts of the Clients profile and to Delete a Clients profile from Zema. To navigate to this page go to Users Data page, in the first table showing data about Client's profile, click on details to navigate to User Data Individual Page of that specific Client's Profile.
+                    </p>
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+                        On the top of the page is the Email ID of the Client whose profile we are viewing about.
+                    </p>
 
-                       <h3 id='udipcard' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
+                    <h3 id='udipcard' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Data Cards
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
@@ -500,7 +539,7 @@ const GuidePageSA = () => {
                                 Conversations - Total number of Unique conversations that occured across all the chatbots of this particular Client.
                             </li>
                         </ul>
-                      Whenever a chatbot is opened by the user and a query is asked, a new Unique conversation starts. Now whenever the user closes the chatbot, that unique conversation will end.
+                        Whenever a chatbot is opened by the user and a query is asked, a new Unique conversation starts. Now whenever the user closes the chatbot, that unique conversation will end.
                     </p>
 
                     <h3 id='udiptable' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
@@ -522,7 +561,7 @@ const GuidePageSA = () => {
                                 Details - Navigates to Bot Data page, which contains more detailed data about the specific Chatbot.
                             </li>
                         </ul>
-                     The table is paginated with page number and navigation options at the bottom of the table.
+                        The table is paginated with page number and navigation options at the bottom of the table.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The table has a search input at the top. This search can be used both as a search and filter. Type the data you are looking for, Zema will use Regex to find the pattern and display only the relevant data. The table also has a sort button used for sorting data in ascending or descending order. In this case it uses number of chatbots as metric for sorting.
@@ -532,22 +571,22 @@ const GuidePageSA = () => {
                         Unique Conversation Graph
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    Everytime a user visits the Client's website and uses thier chatbot for a conversation, it triggers the start of the conversation. When the user closes the bot, then 1 unique conversation is counted. Unqiue conversations can be useful for finding the aount of people using the chatbot when they visit the client's website. The unique conversation data is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So Unique conversations per day for every bot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows the total number of unique conversations that took place across all the chatbots issued by Zema for one specific Client per day.
+                        Everytime a user visits the Client's website and uses their chatbot for a conversation, it triggers the start of the conversation. When the user closes the bot, then 1 unique conversation is counted. Unqiue conversations can be useful for finding the amount of people using the chatbot when they visit the client's website. The unique conversation data is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So Unique conversations per day for every bot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows the total number of unique conversations that took place across all the chatbots issued by Zema for one specific Client per day.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
-                    <ul className='col-11 my-2'>
+                        The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            YYYY-MM-DD: Display data from that specific day
+                                YYYY-MM-DD: Display data from that specific day
                             </li>
                             <li className='my-2'>
-                            YYYY-MM: Display data from that specific month
+                                YYYY-MM: Display data from that specific month
                             </li>
                             <li className='my-2'>
-                            YYYY: Display data from that specific year
+                                YYYY: Display data from that specific year
                             </li>
                             <li className='my-2'>
-                            Empty: Display all the data available
+                                Empty: Display all the data available
                             </li>
                         </ul>
                     </p>
@@ -556,31 +595,31 @@ const GuidePageSA = () => {
                         Token Usage Graph
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    Tokens are used by the chatbots for answering queries. The amount of tokens used by the chatbots depend on:
-                    <ul className='col-11 my-2'>
+                        Tokens are used by the chatbots for answering queries. The amount of tokens used by the chatbots depend on:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            Amount of data used for answering the query
+                                Amount of data used for answering the query
                             </li>
                             <li className='my-2'>
-                            Length of answer given by the chatbot
+                                Length of answer given by the chatbot
                             </li>
                         </ul>
-                    The tokens used from your chatbot for answering queries is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So tokens used per day for every chatbot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows total number of tokens used across all the chtabots issued by Zema for one specific Client per day.
+                        The tokens used from your chatbot for answering queries is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So tokens used per day for every chatbot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows total number of tokens used across all the chtabots issued by Zema for one specific Client per day.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
-                    <ul className='col-11 my-2'>
+                        The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            YYYY-MM-DD: Display data from that specific day
+                                YYYY-MM-DD: Display data from that specific day
                             </li>
                             <li className='my-2'>
-                            YYYY-MM: Display data from that specific month
+                                YYYY-MM: Display data from that specific month
                             </li>
                             <li className='my-2'>
-                            YYYY: Display data from that specific year
+                                YYYY: Display data from that specific year
                             </li>
                             <li className='my-2'>
-                            Empty: Display all the data available
+                                Empty: Display all the data available
                             </li>
                         </ul>
                     </p>
@@ -595,7 +634,7 @@ const GuidePageSA = () => {
                                 Plan - Subscription plan the Client is subscribed to
                             </li>
                             <li className='my-2'>
-                               Payments - Total number of payment that have been made by the Client
+                                Payments - Total number of payment that have been made by the Client
                             </li>
                             <li className='my-2'>
                                 Total Payments - Total Sum of Payments made by the Client
@@ -604,9 +643,9 @@ const GuidePageSA = () => {
                                 Conversations - Total number of Unique conversations that occured across all the chatbots issued for this Client.
                             </li>
                         </ul>
-                    </p>     
+                    </p>
 
-                     <h3 id='udipptable' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
+                    <h3 id='udipptable' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Payments Data Table
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
@@ -622,40 +661,40 @@ const GuidePageSA = () => {
                                 Amount payed - The amount in USD payed for buying the respective subscription plan
                             </li>
                             <li className='my-2'>
-                               Details - When we click on this "Detail", a card is made visisble with details about the transaction. The card can be closed by clicking on "Close" button. The Details card has the following data:
-                               <ul className='col-11 my-2'>
-                            <li className='my-2'>
-                                Date - It shows the date when the respective payment was made
+                                Details - When we click on this "Detail", a card is made visisble with details about the transaction. The card can be closed by clicking on "Close" button. The Details card has the following data:
+                                <ul className='col-11 my-2'>
+                                    <li className='my-2'>
+                                        Date - It shows the date when the respective payment was made
+                                    </li>
+                                    <li className='my-2'>
+                                        Product ID - It shows the subscription plan
+                                    </li>
+                                    <li className='my-2'>
+                                        Amount - It shows the amount payed
+                                    </li>
+                                    <li className='my-2'>
+                                        Zema A/c - It shows the email ID registered with Zema by whom the payment was made
+                                    </li>
+                                    <li className='my-2'>
+                                        Email for payment - It shows the email ID used for making payment on Stripe
+                                    </li>
+                                    <li className='my-2'>
+                                        ID
+                                    </li>
+                                    <li className='my-2'>
+                                        Created
+                                    </li>
+                                    <li className='my-2'>
+                                        Invoice prefix
+                                    </li>
+                                    <li className='my-2'>
+                                        Name - Name of the person who made the payment
+                                    </li>
+
+                                </ul>
                             </li>
-                            <li className='my-2'>
-                                Product ID - It shows the subscription plan
-                            </li>
-                            <li className='my-2'>
-                                Amount - It shows the amount payed
-                            </li>
-                            <li className='my-2'>
-                                Zema A/c - It shows the email ID registered with Zema by whom the payment was made
-                            </li>
-                            <li className='my-2'>
-                                Email for payment - It shows the email ID used for making payment on Stripe
-                            </li>
-                            <li className='my-2'>
-                                ID
-                            </li>
-                            <li className='my-2'>
-                               Created
-                            </li>
-                            <li className='my-2'>
-                               Invoice prefix
-                            </li>
-                            <li className='my-2'>
-                               Name - Name of the person who made the payment
-                            </li>
-                           
                         </ul>
-                            </li>
-                        </ul>
-                     The table is paginated with page number and navigation options at the bottom of the table.
+                        The table is paginated with page number and navigation options at the bottom of the table.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The table has a search input at the top. This search can be used both as a search and filter. Type the data you are looking for, Zema will use Regex to find the pattern and display only the relevant data.
@@ -665,22 +704,22 @@ const GuidePageSA = () => {
                         Payments Data Graph
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    This graph shows information about the Total amount (in USD) of payments made by a single Client on a particular day.
+                        This graph shows information about the Total amount (in USD) of payments made by a single Client on a particular day.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph. Let's explain the inputs in the generate graph form:
-                    <ul className='col-11 my-2'>
+                        The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph. Let's explain the inputs in the generate graph form:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            YYYY-MM-DD: Display data from that specific day
+                                YYYY-MM-DD: Display data from that specific day
                             </li>
                             <li className='my-2'>
-                            YYYY-MM: Display data from that specific month
+                                YYYY-MM: Display data from that specific month
                             </li>
                             <li className='my-2'>
-                            YYYY: Display data from that specific year
+                                YYYY: Display data from that specific year
                             </li>
                             <li className='my-2'>
-                            Empty: Display all the data available
+                                Empty: Display all the data available
                             </li>
                         </ul>
                     </p>
@@ -689,14 +728,14 @@ const GuidePageSA = () => {
                         Edit Client Profile
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                   This form can be used to modify details of Client's profile i.e. name and phone number.
+                        This form can be used to modify details of Client's profile i.e. name and phone number.
                     </p>
 
                     <h3 id='udiprofiledel' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Delete Client
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                   This can be used to delete all data of a Client's profile from Zema, including their Chatbots, Payment data, etc.
+                        This can be used to delete all data of a Client's profile from Zema, including their Chatbots, Payment data, etc.
                     </p>
 
                 </div>
@@ -705,18 +744,18 @@ const GuidePageSA = () => {
 
                     <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Chatbot Page</h1>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                       Chatbot Page contains various information regarding one specific chatbot. This page contains information on various topics including Token usage, Unique Conversations, Chat History, Issue Logs, Error Logs, Bot data, etc.
+                        Chatbot Page contains various information regarding one specific chatbot. This page contains information on various topics including Token usage, Unique Conversations, Chat History, Issue Logs, Error Logs, Bot data, etc.
                         To navigate to this page go to Users Data page, in the first table showing data about Client's profile, click on details to navigate to User Data Individual Page of that specific Client's Profile. There in the first table you will see information about various chatbots of that specific client. Click on "Details" on the one you would like to know more about. You will be navigated to Chatbot page for that specific Chatbot.
-                       </p> 
-                       <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                      The title at the top of that page shows the name of the chatbot whose data is being shown on the page. Next it shows the name of the sources used as knowledge base for the chatbot.
-                       </p>
+                    </p>
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+                        The title at the top of that page shows the name of the chatbot whose data is being shown on the page. Next it shows the name of the sources used as knowledge base for the chatbot.
+                    </p>
 
-                       <h3 id='udbtable' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
+                    <h3 id='udbtable' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Chatbot Table
                     </h3>
-                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>s
-                        The table contains the information about cumilative stats of a specific chatbot per day:
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+                        The table contains the information about cumulative stats of a specific chatbot per day:
                         <ul className='col-11 my-2'>
                             <li className='my-2'>
                                 Date - Date when data was stored
@@ -728,32 +767,32 @@ const GuidePageSA = () => {
                                 Conversations - Total number of Unique Conversations that occured on that specific chatbot
                             </li>
                         </ul>
-                     The table is paginated with page number and navigation options at the bottom of the table.
+                        The table is paginated with page number and navigation options at the bottom of the table.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The table has a search input at the top. This search can be used both as a search and filter. Type the data you are looking for, Zema will use Regex to find the pattern and display only the relevant data. The table also has a sort button used for sorting data in ascending or descending order. In this case it uses conversations and tokens as metric for sorting.
                     </p>
-                       
+
                     <h3 id='udbcong' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Unique Conversation Graph
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    Everytime a user visits the Client's website and uses thier chatbot for a conversation, it triggers the start of the conversation. When the user closes the bot, then 1 unique conversation is counted. Unqiue conversations can be useful for finding the aount of people using the chatbot when they visit the client's website. The unique conversation data is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So Unique conversations per day for every bot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows the total number of unique conversations that took place on a chatbot per day.
+                        Everytime a user visits the Client's website and uses their chatbot for a conversation, it triggers the start of the conversation. When the user closes the bot, then 1 unique conversation is counted. Unqiue conversations can be useful for finding the amount of people using the chatbot when they visit the client's website. The unique conversation data is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So Unique conversations per day for every bot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows the total number of unique conversations that took place on a chatbot per day.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
-                    <ul className='col-11 my-2'>
+                        The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            YYYY-MM-DD: Display data from that specific day
+                                YYYY-MM-DD: Display data from that specific day
                             </li>
                             <li className='my-2'>
-                            YYYY-MM: Display data from that specific month
+                                YYYY-MM: Display data from that specific month
                             </li>
                             <li className='my-2'>
-                            YYYY: Display data from that specific year
+                                YYYY: Display data from that specific year
                             </li>
                             <li className='my-2'>
-                            Empty: Display all the data available
+                                Empty: Display all the data available
                             </li>
                         </ul>
                     </p>
@@ -762,43 +801,43 @@ const GuidePageSA = () => {
                         Token Usage Graph
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    Tokens are used by the chatbots for answering queries. The amount of tokens used by the chatbots depend on:
-                    <ul className='col-11 my-2'>
+                        Tokens are used by the chatbots for answering queries. The amount of tokens used by the chatbots depend on:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            Amount of data used for answering the query
+                                Amount of data used for answering the query
                             </li>
                             <li className='my-2'>
-                            Length of answer given by the chatbot
+                                Length of answer given by the chatbot
                             </li>
                         </ul>
-                    The tokens used from your chatbot for answering queries is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So tokens used per day for every chatbot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows total number of tokens used by a chtabot per day.
+                        The tokens used from your chatbot for answering queries is registered and stored by Zema for every bot. This data is then stored in the database on a daily basis. So tokens used per day for every chatbot is tracked by Zema. This data can be visualized in the form of a line graph. This graph shows total number of tokens used by a chtabot per day.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
-                    <ul className='col-11 my-2'>
+                        The graph initially will not be displayed. The graph comes with a form which acts as the input or filter for the graph. The inputs can be YYYY-MM-DD or YYYY-MM or YYYY or empty. After filling the graph click on Generate graph button to generate a line graph.Let's explain the inputs in the generate graph form:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>
-                            YYYY-MM-DD: Display data from that specific day
+                                YYYY-MM-DD: Display data from that specific day
                             </li>
                             <li className='my-2'>
-                            YYYY-MM: Display data from that specific month
+                                YYYY-MM: Display data from that specific month
                             </li>
                             <li className='my-2'>
-                            YYYY: Display data from that specific year
+                                YYYY: Display data from that specific year
                             </li>
                             <li className='my-2'>
-                            Empty: Display all the data available
+                                Empty: Display all the data available
                             </li>
                         </ul>
                     </p>
 
                     <h3 id='udbhistory' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Chat History
-                        </h3>
+                    </h3>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         Zema also stores chat history of the chats or Q/A sessions that occurred on the chatbot. Chat history stored is based on Unique Conversations held on the chatbot. Chat history is stored with it's date and time of occurrence. The chats can be viewed by the User in Manage bots page, Bot analytics section. .
                     </p>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        The chat history section will initially show a list of date and time of the respective conversations. Click on the one you want to read and it will open the accordian with the chat shown as a chat interface. The chats are paginated into groups of 10 chats. To view the other chats you can navigate the paginated chat history section by using the arrow buttons below. Page number of chat history is also available.
+                        The chat history section will initially show a list of date and time of the respective conversations. Click on the one you want to read and it will open the accordion with the chat shown as a chat interface. The chats are paginated into groups of 10 chats. To view the other chats you can navigate the paginated chat history section by using the arrow buttons below. Page number of chat history is also available.
                         You can also filter and search for the chat history using date and time. Just put the required date/time in the search bar and it will filter the relevant data.
                         This technique helps filter and visualize relevant data.
                     </p>
@@ -814,14 +853,14 @@ const GuidePageSA = () => {
                                 Chatbot failed to answer a query as it could not find the answer in the knowledge base
                             </li>
                             <li className='my-2'>
-                               Chatbot although gave an answer but did not use knowledge base, it gave the answer by hallucinating
+                                Chatbot although gave an answer but did not use knowledge base, it gave the answer by hallucinating
                             </li>
                             <li className='my-2'>
                                 Error occured in API of chatbot
                             </li>
                         </ul>
-                        The error is logged whenever any one of these errors occur 5 consecutive times.
-                     The table is paginated with page number and navigation options at the bottom of the table.
+                        The error is logged whenever any one of these error occurs 5 consecutive times.
+                        The table is paginated with page number and navigation options at the bottom of the table.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The table has a search input at the top. This search can be used both as a search and filter. Type the data you are looking for, Zema will use Regex to find the pattern and display only the relevant data. The table also has a sort button used for sorting data in ascending or descending order. In this case it uses conversations and tokens as metric for sorting.
@@ -833,7 +872,7 @@ const GuidePageSA = () => {
                                 Date and Time - Date and time when the error occured
                             </li>
                             <li className='my-2'>
-                               Error ID - Id of the error from the database
+                                Error ID - Id of the error from the database
                             </li>
                             <li className='my-2'>
                                 Name of the Bot - Name of the bot in which the error occured
@@ -846,19 +885,19 @@ const GuidePageSA = () => {
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The details table contains the following information about the error:
                         <ul className='col-11 my-2'>
-                        <li className='my-2'>
+                            <li className='my-2'>
                                 Name of the Bot - Name of the bot in which the error occured
                             </li>
                             <li className='my-2'>
-                               Error ID - Id of the error from the database
+                                Error ID - Id of the error from the database
                             </li>
                             <li className='my-2'>
-                               Bot ID - Id of the chatbot from the database
+                                Bot ID - Id of the chatbot from the database
                             </li>
                             <li className='my-2'>
                                 Date and Time - Date and time when the error occured
                             </li>
-                             
+
                             <li className='my-2'>
                                 Error and chat - The error is displayed and at the bottom is the user's query and the answer given by our chatbot
                             </li>
@@ -874,13 +913,13 @@ const GuidePageSA = () => {
                         The table contains the information about issues / feedbacks submitted by the Clients. The information shown is:
                         <ul className='col-11 my-2'>
                             <li className='my-2'>
-                               Name of the Bot - Name of the Bot the issue / feedback was submitted from
+                                Name of the Bot - Name of the Bot the issue / feedback was submitted from
                             </li>
                             <li className='my-2'>
-                               Title - Title of the issue
+                                Title - Title of the issue
                             </li>
                             <li className='my-2'>
-                               Date and time - Date and time when the issue / feedback was submitted
+                                Date and time - Date and time when the issue / feedback was submitted
                             </li>
                             <li className='my-2'>
                                 Details - On clicking on Details, a card will appear showing more details about the issue / feedback
@@ -889,16 +928,16 @@ const GuidePageSA = () => {
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The table has a search input at the top. This search can be used both as a search and filter. Type the data you are looking for, Zema will use Regex to find the pattern and display only the relevant data. The table also has a sort button used for sorting data in ascending or descending order. In this case it uses conversations and tokens as metric for sorting.
-                     The table is paginated with page number and navigation options at the bottom of the table.
+                        The table is paginated with page number and navigation options at the bottom of the table.
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         The details table contains the following information about the error:
                         <ul className='col-11 my-2'>
-                        <li className='my-2'>
-                                Name of the Bot - Name of the bot 
+                            <li className='my-2'>
+                                Name of the Bot - Name of the bot
                             </li>
                             <li className='my-2'>
-                               Bot ID - Id of the chatbot from the database
+                                Bot ID - Id of the chatbot from the database
                             </li>
                             <li className='my-2'>
                                 Username - Email ID of the Client who submitted the issue / feedback
@@ -915,17 +954,17 @@ const GuidePageSA = () => {
 
                     <h3 id='udbembeddquestion' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Edit Knowledge Base
-                        </h3>
+                    </h3>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         Sometimes, the knowledge base of a chatbot needs little modifications or additions instead of retraining it from the scratch.
-                   Zema chatbots let new data be added into the knowledge base using the Embed Q/A functionality. This feature is useful when the LLM fails to recognize the answer or doesn't give optimal or desired answer to a specific question.
+                        Zema chatbots let new data be added into the knowledge base using the Embed Q/A functionality. This feature is useful when the LLM fails to recognize the answer or doesn't give optimal or desired answer to a specific question.
                     </p>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         When the Client embbeds a Q/A pair into the chatbot a few additional sections appear.
                         <ul className='col-11 my-2'>
-                            <li className='my-2'>Embedded Q/A section in Bot Properties section. It shows the Q/A pairs that have been embbeded into the chatbot</li>
-                            <li className='my-2'>Embedded Q/A section in Chat Demo section. It shows the Q/A pairs that have been embbeded into the chatbot</li>
-                            <li className='my-2'>Embedded Q/A Saved section in Bot Properties section. It shows the Q/A pairs that were once embbeded into the chatbot. When we Retrain our bot, a brand new knowledge base is created from the provided PDF/URL. In this process the Embedded Q/A are removed. But these removed Q/A pair are saved inside the Zema database and can be re-embedded into our knowledge base using the Embedded Q/A Saved section. It contains the Embedded Q/A pair along with 2 buttons:-- "Embedd Question" to embedd this Q/A into the knwledge base, and "Remove Question" to remove that question from the list.
+                            <li className='my-2'>Embedded Q/A section in Bot Properties section. It shows the Q/A pairs that have been embedded into the chatbot</li>
+                            <li className='my-2'>Embedded Q/A section in Chat Demo section. It shows the Q/A pairs that have been embedded into the chatbot</li>
+                            <li className='my-2'>Embedded Q/A Saved section in Bot Properties section. It shows the Q/A pairs that were once embedded into the chatbot. When we Retrain our bot, a brand new knowledge base is created from the provided PDF/URL. In this process the Embedded Q/A are removed. But these removed Q/A pair are saved inside the Zema database and can be re-embedded into our knowledge base using the Embedded Q/A Saved section. It contains the Embedded Q/A pair along with 2 buttons:-- "Embedd Question" to embedd this Q/A into the knowledge base, and "Remove Question" to remove that question from the list.
                             </li>
                         </ul>
 
@@ -933,10 +972,10 @@ const GuidePageSA = () => {
 
                     <h3 id='udbbotsource' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Chatbot Knowledge Base
-                        </h3>
+                    </h3>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                       A chatbot answers questions in the context of it's knowledge base. The knowledge base of a chatbot can comprise of:
-                       <ul className='col-11 my-2'>
+                        A chatbot answers questions in the context of it's knowledge base. The knowledge base of a chatbot can comprise of:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>Website's data - Zema can scrape data from your desired website and use it as it's knowledge base</li>
                             <li className='my-2'>PDF - Zema can scrape data from PDF file and use it as it's knowledge base</li>
                             <li className='my-2'> Zema allows the Clients to Embedd Q/A pair into the website for more precise answering.</li>
@@ -944,8 +983,8 @@ const GuidePageSA = () => {
                         While PDF source and URL source can be used standalone or together, Embedd Q/A needs to have atleast one of these.
                     </p>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                      The data here includes:
-                      <ul className='col-11 my-2'>
+                        The data here includes:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>URL of the website scrapped</li>
                             <li className='my-2'>Name of the PDF file from which data was scrapped</li>
                             <li className='my-2'>URLs scrapped - Zema can either scrape only the URL you provide it or scrape the URL you provided for additional URLs and then scrape all of them together. In URLs scrapped in the latter case are displayed in this section.</li>
@@ -956,46 +995,149 @@ const GuidePageSA = () => {
 
                     <h3 id='udbmodifybotprop' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Modify Bot Properties
-                        </h3>
+                    </h3>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    Various properties of a chatbot can be modified by the Client to customize it's working and user experience:
-                    <ul className='col-11 my-2'>
+                        Various properties of a chatbot can be modified by the Client to customize it's working and user experience:
+                        <ul className='col-11 my-2'>
                             <li className='my-2'>Name of the Chatbot - Only used for recognizing the chatbot in Client's Admin Panel</li>
                             <li className='my-2'>The initial message which is shown by the chatbot on opening it.</li>
-                            <li className='my-2'>Suggested Queries which are shown on by the chatbot when we initiallly open it. On clicking on one of these Queries, the query is sent to the chatbot and the chatbot answers it. The suggested queries then disappear. Suggested queries have to be separated by comma “,” to be recognized as a separate query. </li>
+                            <li className='my-2'>Suggested Queries which are shown on by the chatbot when we initially open it. On clicking on one of these Queries, the query is sent to the chatbot and the chatbot answers it. The suggested queries then disappear. Suggested queries have to be separated by comma “,” to be recognized as a separate query. </li>
                             <li className='my-2'>Prompt of the chatbot. The prompt is the question that is way in which the question is framed and asked to the chatbot. An effective query can increase the chatbots likelihood of answering what we want and the way we want. During modifying prompt, care should be taken to not to change or remove “text” or “query” as these 2 are keywords important for the chatbot to function. “Text” is the relevant document found by the LLM used for answering the question and "Query" is the user's query.</li>
                         </ul>
-                         Modify the properties as per instructions and then click on submit.
+                        Modify the properties as per instructions and then click on submit.
                     </p>
 
                     <h3 id='udbretrain' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Retrain Bots
-                        </h3>
+                    </h3>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                   Zema chatbots can be retrained from scratch with new data, using the Retrain bot functionality. On retraining the chatbot, previous knowledge base is replaced by new Knowledge base. The retraining of chatbot canbe done with URL and Pdf, or either one of them. Your Bots left in your subscription tier remains unchanged for it is modification in already existing bot. It takes in URL, PDF and exclude URL as parameters.
+                        Zema chatbots can be retrained from scratch with new data, using the Retrain bot functionality. On retraining the chatbot, previous knowledge base is replaced by new Knowledge base. The retraining of chatbot canbe done with URL and PDF, or either one of them. Your Bots left in your subscription tier remains unchanged for it is modification in already existing bot. It takes in URL, PDF and exclude URL as parameters.
                     </p>
 
                     <h3 id='udbdeletebot' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
                         Delete Bots
-                        </h3>
+                    </h3>
                     <p className=' col-11 flex-wrap d-flex justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                    Used to delte a chatbot. This frees up one bot from your allowed bots in your subscription tier.
+                        Used to delete a chatbot. This frees up one bot from your allowed bots in your subscription tier.
                     </p>
 
 
-                       </div>
+                </div>
 
-                       <div className='mx-4' id='managellm'>
+                <div className='mx-4' id='managellm'>
                     <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Manage LLM</h1>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                         This page is used for modifying some properties of the LLM:
                         <ul className='col-11 my-2'>
                             <li className='my-2'>Embedd Script - This script is used for embedding our chatbot into the Client's websites. The script property called "cred" which is the unique Id of the chatbot in the database. The script in itself is a CDN jsDelivr script.</li>
                             <li className='my-2'>Model Temperature - Used to change / modify the creativity of the LLM. 0  is least while 1 is most creative</li>
-                            <li className='my-2'>No of Document - Number of documents used by the chatbot / LLM to answer. This parameter is the number of documents that vector search fetches which in turn are used as context to answer queries.</li>
-                            <li className='my-2'>Sematic Search Similarity Metric - Change the SSSM used by the chatbot. We have L2, Cosine, IP SSSM availabe.</li>
+                            <li className='my-2'>Number of Documents - Number of documents used by the chatbot / LLM to answer. This parameter is the number of documents that vector search fetches which in turn are used as context to answer queries.</li>
+                            <li className='my-2'>Sematic Search Similarity Metric - Change the SSSM used by the chatbot. We have L2, Cosine, IP SSSM available.</li>
                         </ul>
                     </p>
+                </div>
+
+                <div className='mx-4' id='superadmin'>
+                    <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Super Admins</h1>
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+                        This page is used for various functions:
+                        <ul className='col-11 my-2'>
+                            <li className='my-2'>Add / Remove Super Admins </li>
+                            <li className='my-2'>Change the knowledge base of chatbot on homepage </li>
+                            <li className='my-2'>Error Logs </li>
+                            <li className='my-2'>Issue Logs </li>
+                        </ul>
+                    </p>
+
+                    <h3 id='addremovesuperadmin' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
+                    Add / Remove Super Admins
+                    </h3>
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+                        Super Admins are the users that that are given extra functionalities so as to handle the working of Zema. This table shows the usernames/ emails of the users who are given super admin powers. Super Admins are the only ones that can access the Admin dropdown and the pages inside it. 
+                    </p>
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+                      To add a new Super Admin, just fill in the email of the Zema user inside the form and click on 'Add Admin'. To become a Super admin, one must have a Zema account. 
+                    </p>
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+                  To remove a Super Admin, simply press 'Remove' button adjacent to the one you want to remove. Zema needs atleast one Super Admin, so it won't allow you to remove Super Admin if only one remains. If by chance there is no Super Admin then Zema will create one user 'aniket@dshgsonic.com' and make it a Super Admin.
+                    </p>
+
+                    <h3 id='ckbsuperadmin' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
+                    Change the knowledge base of chatbot on homepage
+                    </h3>
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+                        A chatbot / Chat interface is available on the homepage. It is functional and can be used as a regular chatbot. We can modify it's knowledge base from this form. Just paste the script used for embedding the chatbot into this form and press 'Add Chatbot' button. Zema will automatically find the the cred value inside the script which is used as a unique identity of the chatbot. After submittin the script only the cred value will be visible in the form, along with the name of the chatbot.
+                    </p>
+
+                    <h3 id='errsuperadmin' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
+                    Error Log
+                    </h3>
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+
+The table contains the information about Errors caught by the chatbot during it's working. The different types of error caught are as follows:
+<ul className='col-11 my-2'>
+    <li className='my-2'>
+        Chatbot failed to answer a query as it could not find the answer in the knowledge base
+    </li>
+    <li className='my-2'>
+        Chatbot although gave an answer but did not use knowledge base, it gave the answer by hallucinating
+    </li>
+    <li className='my-2'>
+        Error occured in API of chatbot
+    </li>
+</ul>
+The error is logged whenever any one of these error occurs 5 consecutive times.
+The table is paginated with page number and navigation options at the bottom of the table.
+</p>
+<p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+The table has a search input at the top. This search can be used both as a search and filter. Type the data you are looking for, Zema will use Regex to find the pattern and display only the relevant data. The table also has a sort button used for sorting data in ascending or descending order. In this case it uses conversations and tokens as metric for sorting.
+</p>
+<p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+The table contains the following information about the error:
+<ul className='col-11 my-2'>
+    <li className='my-2'>
+        Date and Time - Date and time when the error occured
+    </li>
+    <li className='my-2'>
+        Error ID - Id of the error from the database
+    </li>
+    <li className='my-2'>
+        Name of the Bot - Name of the bot in which the error occured
+    </li>
+    <li className='my-2'>
+        Details - Navigate to Individual Chatbots page for more details.
+    </li>
+</ul>
+</p>
+
+
+                    <h3 id='isssuperadmin' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>
+                   Issue Log
+                    </h3>
+                    <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+
+The table contains the information about issues / feedbacks submitted by the Clients. The information shown is:
+<ul className='col-11 my-2'>
+    <li className='my-2'>
+        Name of the Bot - Name of the Bot the issue / feedback was submitted from
+    </li>
+    <li className='my-2'>
+        Title - Title of the issue
+    </li>
+    <li className='my-2'>
+        Date and time - Date and time when the issue / feedback was submitted
+    </li>
+    <li className='my-2'>
+        Details - Navigate to Individual Chatbot page for further details
+    </li>
+</ul>
+</p>
+<p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
+The table has a search input at the top. This search can be used both as a search and filter. Type the data you are looking for, Zema will use Regex to find the pattern and display only the relevant data. The table also has a sort button used for sorting data in ascending or descending order. In this case it uses conversations and tokens as metric for sorting.
+The table is paginated with page number and navigation options at the bottom of the table.
+</p>
+           
+
                 </div>
 
 

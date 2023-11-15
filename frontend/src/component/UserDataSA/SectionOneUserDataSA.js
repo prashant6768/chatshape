@@ -9,6 +9,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import { BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill } from 'react-icons/bs'
 import { Link } from 'react-router-dom';
 import {ThreeDots} from 'react-loader-spinner';
+import { ToastContainer, toast } from 'react-toastify';
 // import '../../css/chartCss.css'
 
 function CustomTooltip2({ payload, label, active }) {
@@ -64,7 +65,7 @@ const SectionOneUserDataSA = () => {
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { console.log(res.data," all data"); setData(res.data[0]); setData2(res.data[1]);setData3(res.data[2]); console.log("llll", res.data[0].length); setApiload(false) })
+      .then(res => {if(res.data === 'You Are Not Authorized'){console.log(res.data); setApiload(false);toast.error("You Are Not Authorized")}else if(res.data[0] == 'error'){console.log(res.data[1]);toast.error("Some Error Occured!!!");setApiload(false)}else{ console.log(res.data," all data"); setData(res.data[0]); setData2(res.data[1]);setData3(res.data[2]); console.log("llll", res.data[0].length); setApiload(false) }})
       .catch(err => {console.log(err); setApiload(false)})
   }, [])
 
@@ -225,6 +226,9 @@ const SectionOneUserDataSA = () => {
       return itemDate.startsWith(inputDateCon);
     });
     setFilteredDataCon(filtered);
+    if(filtered.length == 0){
+      toast.error("Data Doesn't exist for this date ")
+    }
   };
 
   const [inputDateToken, setInputDateToken] = useState('');
@@ -242,6 +246,9 @@ const SectionOneUserDataSA = () => {
       return itemDate.startsWith(inputDateToken);
     });
     setFilteredDataToken(filtered);
+    if(filtered.length == 0){
+      toast.error("Data Doesn't exist for this date ")
+    }
   };
 
 
@@ -333,6 +340,9 @@ const handleSubmitPay = (e) => {
   }));
   setFilteredDataPayG(filtered100);
   console.log("filter 100 ",filtered100)
+  if(filtered100.length == 0){
+    toast.error("Data Doesn't exist for this date ")
+  }
 };
 
 
@@ -419,7 +429,7 @@ function abbrNum(number, decPlaces) {
 
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
-      <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>User Data</h1>
+      <h1 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Client Data</h1>
 
       <div className='form-group d-flex justify-content-center mt-4'>
        {apiload ? (
@@ -434,7 +444,7 @@ function abbrNum(number, decPlaces) {
         <div className='col-lg-3 col-sm-6 col-11 my-3 d-flex mx-auto justify-content-center'>
           <Card style={{ backgroundColor: '#212529', width: '270px' }} className='mx-xxl-2 mx-2  d-flex rounded-4'>
             <Card.Body className="d-flex flex-column" style={{}}>
-              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}> Users</Card.Title>
+              <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}> Clients</Card.Title>
               <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-3 text-break' style={{ color: '#FFFFFF' }}>  {abbrNum(tUser,2)}</Card.Title>
 
             </Card.Body>
@@ -472,7 +482,10 @@ function abbrNum(number, decPlaces) {
       </div>
 
       <div className='row col-11 mx-auto mt-4 d-flex '>
+
         <Card style={{ backgroundColor: '#212529' }} className='  d-flex rounded-4'>
+      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-4 ' style={{ color: '#FFFFFF' }}>Zema Clients</h3>
+          
           <Card.Body className="d-flex flex-column" style={{}}>
             <div className='row'>
               <input className='fs-4 col-sm-8 col-lg-10 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"
@@ -506,11 +519,12 @@ function abbrNum(number, decPlaces) {
                   <div className='col-lg-3 col-sm-7'>
                     <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>Bots used: {x.bots}</p>
                   </div>
-                  <div className='col-lg-2 col-sm-5'>
-                    {/* <p className=' col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</p> */}
+                  {/* <div className='col-lg-2 col-sm-5'>
                   <Link to={`/superadminUserDataIndi/${x.id}`} style={{ textDecoration: 'none' }}><Nav.Link href="#link" className='col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</Nav.Link></Link>
- 
-                  </div>
+                  </div> */}
+                  <div className='col-lg-2 col-sm-5 container'>
+            <Link className='btn btn-link px-0 '  to={`/superadminUserDataIndi/${x.id}`} style={{ textDecoration: 'underline', color: '#FFFFFF' }}   >Details</Link>
+           </div>
                 </div>
               ))}
 
@@ -633,7 +647,10 @@ function abbrNum(number, decPlaces) {
 
 
 <div className='row col-11 mx-auto mt-4 d-flex '>
+
 <Card style={{ backgroundColor: '#212529' }} className='  d-flex rounded-4'>
+<h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-4 ' style={{ color: '#FFFFFF' }}>Zema Clients Payments</h3>
+
           <Card.Body className="d-flex flex-column" style={{}}>
             <div className='row'>
               <input className='fs-4 col-sm-12 col-lg-12 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"

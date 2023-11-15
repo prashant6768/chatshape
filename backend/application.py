@@ -89,6 +89,7 @@ from dateutil.relativedelta import relativedelta
 import ast
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 #### import for method 2 ######################33
 
@@ -114,6 +115,16 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from sentence_transformers import SentenceTransformer
 from langchain.embeddings import OpenAIEmbeddings
+
+from langchain.llms import CTransformers ###################33
+from llama_cpp import Llama ######################
+
+from langchain.llms import LlamaCpp
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+
 # __import__('pysqlite3')
 import sys
 # print("----------117",sys.modules['sqlite3'],"---------117")  # <module 'sqlite3' from 'C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python310\\lib\\sqlite3\\__init__.py'>
@@ -163,8 +174,15 @@ os.environ['PATH'] = f'{ffmpeg_path};' + os.environ['PATH']
 scheduler = BackgroundScheduler()
 scheduler.start()
 
+
+
 application = Flask(__name__)
 CORS(application) 
+
+# import eventlet
+# import gevent
+# gevent.monkey_patch()
+# eventlet.monkey_patch()
 
 application.register_blueprint(auth, url_prefix="/auth")
 application.register_blueprint(stripepay,url_prefix="/stripepay")
@@ -191,7 +209,10 @@ from langchain.callbacks.base import BaseCallbackHandler
 from langchain.schema import AgentAction, AgentFinish, LLMResult
 from flask_socketio import SocketIO , send , emit , join_room , leave_room
 
-socketio = SocketIO(application, cors_allowed_origins="*")
+
+
+
+socketio = SocketIO(application, cors_allowed_origins="*", async_mode="threading")
 
 
 ###################################  socket io 
@@ -223,10 +244,13 @@ def on_test(data):
 
 
 def handle_message(data):
-    roomID = data['room']
-    print("  room-------292- ",roomID)
-    message = data['msg']
-    socketio.emit('message-chat',{'message':message},room=str(roomID))
+    try:
+        roomID = data['room']
+        print(" ----------------292- ",roomID)
+        message = data['msg']
+        socketio.emit('message-chat',{'message':message},room=str(roomID))
+    except Exception as e:
+        print(str(e),"====================240")    
 
 ##################################3  socket io end
 
@@ -244,9 +268,16 @@ class StreamingHandle(BaseCallbackHandler):
 
 
     def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
-        sys.stdout.write(token)
-        handle_message({'msg':token, 'room':self.objId})
-        sys.stdout.flush()  
+        try:
+            # status = '200 OK'
+            # response_headers = [('Content-type', 'text/plain')]
+            # start_response(status, response_headers)
+       ####################################3 remove if error
+            sys.stdout.write(token)
+            handle_message({'msg':token, 'room':self.objId})
+            sys.stdout.flush()  
+        except Exception as e:
+            print(str(e),"================264")    
     
 
     def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
@@ -363,14 +394,10 @@ def monthly_task():
     user_subs = user_su.find()
     for user_sub in user_subs:
         username = user_sub["username"]
-        NoOfCharacters = user_sub["plan-Info"]['NoOfCharacters']
         plan = user_sub["plan-Info"]["plan"]
         print("187-------",plan)
         msg = choose_option(plan)
-        # user_su.update_many({"username": username}, {"$set": {"plan-Info.NoOfMsg": msg['NoOfMsg']}})
         user_su.update_many({"username": username}, {"$set": {"plan-Info.tokens": msg['tokens']}})
-        user_crawl.update_many({"email": username}, {"$set": {"NoOfCharacters": NoOfCharacters}})
-        # print("---------", msg['NoOfMsg'])
     print("Monthly task completed.")
 
 scheduler.add_job(monthly_task, 'cron', day='1', hour='0', minute='0')  
@@ -380,16 +407,17 @@ scheduler.add_job(monthly_task, 'cron', day='1', hour='0', minute='0')
 
 def daily_task():
     dataCrawl = db['users_website_crawl_data']
-    today_date = datetime.now().strftime("%Y-%m-%d")- timedelta(days=1)
+    today_date = (datetime.now()- timedelta(days=1)).strftime("%Y-%m-%d")
+   
     for x in dataCrawl.find():
         # NoOfCharacters = x['NoOfCharacters']
         username = x['email']
-        print("--268",username)
+        # print("--268",x)
         subDb = db['user_subscription']
         subData = subDb.find_one({'username':username})
         uniqueCon = x['UniqueCon']
         tokenU = x['TokenUsed']
-        print("--271",subData)
+        # print("--271",subData)
         # todayUseChar = subData - NoOfCharacters
         tokenData = {
             'usage':tokenU,
@@ -419,8 +447,13 @@ def daily_task():
         {'username':username},
         {'$set': {'tokensUsed': 0}}
         )
-    print("daily task-------")    
+    print("daily task-------")  
+    print("--------424---------chk scheduler instances-----", scheduler.get_jobs())  
 
+# trigger = CronTrigger(
+#         year="*", month="*", day="*", hour="3", minute="0", second="5"
+#     )
+# scheduler.add_job(daily_task,trigger=trigger , day='*', hour='0', minute='0')     
 # scheduler.add_job(daily_task, 'interval', minutes=1)  
 scheduler.add_job(daily_task,'cron' , day='*', hour='0', minute='0')  
 
@@ -535,6 +568,13 @@ def start_ai(query,userData,uniqueCon):
     dataDb_i = users_collection.find_one({'_id':objId})
     dataManage_i = db['manage']
     dataManage = dataManage_i.find_one({})
+    if dataManage == None:
+        dataManage = {
+           'embedScript':'<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js" defer id="popup" cred="${id.id}"></script>',
+            'model_temp':0.3,
+            'docSrch':2,
+            'sssm':'cosine' ,
+        }
 
     # return "this is a fake answer"
 
@@ -584,8 +624,11 @@ def start_ai(query,userData,uniqueCon):
     resultText = [item for sublist in results['documents'] for item in sublist]
 
     prompt = str(dataDb['prompt'])
-    text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=200, length_function=len)
+    text_splitter = TokenTextSplitter(chunk_size=1900,  chunk_overlap=300, length_function=len)
+    # text_splitter = CharacterTextSplitter(separator='\n\n', chunk_size=400, chunk_overlap=50, length_function=len)
     text = text_splitter.create_documents(resultText)
+    # print(text,"--------602")
+    # return text 
 
     content = str(text)
 
@@ -606,21 +649,46 @@ def start_ai(query,userData,uniqueCon):
 
       try:
           llm = ChatOpenAI(model_name="gpt-4",temperature=dataManage['model_temp'],openai_api_key=OPENAI_API_KEY ,streaming=True,callbacks=[StreamingHandle(objId)])
+      
+        #   config = {'max_new_tokens': 216, 'repetition_penalty': 1.1, 'context_length':1096,'temperature':0.9,'stream':True}
+        #   llm = CTransformers(model='c:/Users/DELL/Desktop/apni/LLAMA 2 model/llama-2-7b-chat.Q2_K.gguf', model_type='llama', config=config ,callbacks=[StreamingHandle(objId), StreamingStdOutCallbackHandler()]) 
+
+#           callback_manager = CallbackManager([StreamingHandle(objId)])
+#           llm = LlamaCpp(
+#     model_path="c:/Users/DELL/Desktop/apni/LLAMA 2 model/llama-2-7b-chat.Q2_K.gguf",
+#     temperature=0.75,
+#     max_tokens=2000,
+#     top_p=1,
+#     n_ctx=1012,
+#     callback_manager=callback_manager,
+#     verbose=True,  # Verbose is required to pass to the callback manager
+# )
+
           template=prompt
           prompt_template = PromptTemplate(input_variables=["text","query"],template=template)
+          print("================prompt tem")
           summarize_chain = LLMChain(llm=llm, prompt=prompt_template,verbose=False)
           print("-----741-----",text,"------741-------")
+          print(sys.getrecursionlimit(),"============",socketio.async_mode)
 
       except Exception as e:
           print("-----453-----",str(e))
           return str(e)
-
-      answer = summarize_chain.predict(text=text,query=query)
-      print(type(answer),"==answer")
       try:
+        answer = summarize_chain.predict(text=text,query=query)
+        print(answer,"=============answer")
+      except Exception as e:
+        print(str(e),"===============644")  
+      
+
+      try:
+        # config = {'max_new_tokens': 216, 'repetition_penalty': 1.1, 'context_length':1096}
+        # config = { 'repetition_penalty': 1.1}
         template_DNF = "Does this {answer} is roughly means 'Couldn't find the specific info to answer'? Answer in yes or no only"
         prompt_template_DNF = PromptTemplate(input_variables=["answer"],template=template_DNF)
-        llm_DNF = ChatOpenAI(model_name="gpt-4",temperature=1)
+        llm_DNF = ChatOpenAI(model_name="gpt-4",temperature=1,openai_api_key=OPENAI_API_KEY)
+        # llm_DNF = CTransformers(model='c:/Users/DELL/Desktop/apni/LLAMA 2 model/llama-2-7b-32k-instruct.Q2_K.gguf', model_type='llama', config=config) 
+
         chain_DNF = LLMChain(llm=llm_DNF, prompt=prompt_template_DNF,verbose=False)
         with get_openai_callback() as cb_DNF:
            answer_DNF = chain_DNF.predict(answer=answer)
@@ -659,6 +727,9 @@ def user_msg():
     data = request.get_json()['inputValue']
     userData = request.get_json()['botID']['botID']
     uniqueCon = request.get_json()['uniqueCon']
+    if request.get_json()['chatUiDe']:
+        chatUiDe = request.get_json()['chatUiDe']
+
     getid_1  = db['users_website_crawl_data']
     try:
         getid_2 = getid_1.find_one({'_id': ObjectId(userData)})
@@ -680,7 +751,67 @@ def user_msg():
     CharNo_1 = db['users_website_crawl_data']
     CharNo_2 = CharNo_1.find_one({'_id': ObjectId(userData)})
     print("133---------------------",CharNo_2['NoOfCharacters'])
+    if plan_2['status'] == 'Expired':
+        return 'SubE'
     if datetime.strptime(datasub['expiration'], "%Y-%m-%d").date() < datetime.now().date()  or CharNo_2['NoOfCharacters'] < 1 or plan_2['plan-Info']['tokens'] < 1:
+        plan_1.update_one({"username": userName}, {"$set": {"status":'Expired'}})
+        smtp_server = "smtp.gmail.com"
+        port = 587  # For starttls
+        # port = 465 #-----------------------------------------------for SSL
+        sender_email = "thedummydog@gmail.com"
+        password = EMAILPASS
+        email_headers = f"Subject: Zema Subscription Expired\r\n"
+        email_headers += f"From: {sender_email}\r\n"
+        email_headers += "Content-Type: text/html; charset=utf-8\r\n" 
+        email_headers += "\r\n"
+        image_url = "https://raw.githubusercontent.com/Aniket-Shival/popup/Aniket-Shival-mic-2/Zema_Bird_Transperent.png"
+            # logo_img = None
+
+            # with open('assets/Zema_Logo_Transperent.png', 'rb') as image_file:
+            #     logo_img = base64.b64encode(image_file.read()).decode()
+        message = f"""
+            <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+                <div style="margin:50px auto;width:70%;padding:20px 0">
+                    <div style="border-bottom:1px solid #eee">
+                         <img src="{image_url}" style="max-width: 100px; display: block; margin: 10px auto;" alt='Zema Logo'/>
+                         <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">Zema</a>
+                     </div>
+                    <p style="font-size:1.1em">Hi,</p>
+                    <p>Your Zema subscription has expired. Kindly renew your subscription to resume the services.</p>
+                    <p style="font-size:0.9em;">Regards,<br />Zema</p>
+                    <hr style="border:none;border-top:1px solid #eee" />
+                    <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+                      <p>Zema</p>
+                    </div>
+                </div>
+            </div>
+            """
+
+            # email_message = email_headers + message
+
+
+            # message = "Your OTP for Zemo signup is "+str(otp)
+        email_message = email_headers + message
+
+        # Create a secure SSL context
+        context = ssl.create_default_context()
+
+        # Try to log in to server and send email
+        try:
+            server = smtplib.SMTP(smtp_server,port)
+            # server = smtplib.SMTP_SSL(smtp_server,port)
+            server.ehlo() # Can be omitted
+            server.starttls(context=context) # Secure the connection   # REMOVE FOR SSL
+            server.ehlo() # Can be omitted
+            server.login(sender_email, password)
+            server.sendmail(sender_email, userName, email_message)
+            # TODO: Send email here
+        except Exception as e:
+            # Print any error messages to stdout
+            print(e)
+        finally:
+            server.quit()     
+
         print("EXpire---------------------------------------")
         return "SubE"
 
@@ -689,25 +820,31 @@ def user_msg():
     plan_info_1 = db['user_subscription']
     if summariesCb[1] == 'RDNF':
         cb = summariesCb[0]
+        summaries = summariesCb[1]
         print("---------676--could work------")
-
+        
+        if chatUiDe != 'True':
         # plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.NoOfMsg":-1}})
-        plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.tokens":int(-cb)}})
-        plan_info_1.update_one({"username": userName}, {"$inc": {"tokensUsed":int(cb)}})
+            plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.tokens":int(-cb)}})
+            plan_info_1.update_one({"username": userName}, {"$inc": {"tokensUsed":int(cb)}})
 
-        users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
+            users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"TokenUsed": int(cb)}})
+            users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
         users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"UniqueCon": int(uniqueCon)}})
-        users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"TokenUsed": int(cb)}})
+        
         return 'RDNF'
     if summariesCb[1] == 'RDN':
         cb = summariesCb[2]
+        summaries = summariesCb[0]
         # plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.NoOfMsg":-1}})
-        plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.tokens":int(-cb)}})
-        plan_info_1.update_one({"username": userName}, {"$inc": {"tokensUsed":int(cb)}})
+        if chatUiDe != 'True':
+            plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.tokens":int(-cb)}})
+            plan_info_1.update_one({"username": userName}, {"$inc": {"tokensUsed":int(cb)}})
 
-        users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
+            users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"TokenUsed": int(cb)}})
+            users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
         users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"UniqueCon": int(uniqueCon)}})
-        users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"TokenUsed": int(cb)}})
+        
 
         return [summariesCb[0],summariesCb[1]]    
     if summariesCb[2] == "OK":    
@@ -715,14 +852,15 @@ def user_msg():
         cb = summariesCb[1]
         print("-------479 ", summaries,"----tokens--" ,int(cb))
     
-
+        if chatUiDe != 'True':    
         # plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.NoOfMsg":-1}})
-        plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.tokens":int(-cb)}})
-        plan_info_1.update_one({"username": userName}, {"$inc": {"tokensUsed":int(cb)}})
+            plan_info_1.update_one({"username": userName}, {"$inc": {"plan-Info.tokens":int(-cb)}})
+            plan_info_1.update_one({"username": userName}, {"$inc": {"tokensUsed":int(cb)}})
 
-        users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
+            users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"TokenUsed": int(cb)}})
+            users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"NoOfCharacters": -len(str(summaries))}})
         users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"UniqueCon": int(uniqueCon)}})
-        users_collection.update_one({"_id":ObjectId(userData) }, {"$inc": {"TokenUsed": int(cb)}})
+        
 
         print("-------502-------", planname)
 
@@ -743,9 +881,11 @@ def get_link_data():
     exclude = request.form.get('exclude')
     userData = request.form.get('decoded')
     botName = request.form.get('botName')
-    pdfFile = request.files.get('pdfFile')
+    # pdfFile = request.files.get('pdfFile')
+    pdfFile = request.files.getlist('pdfFile[]') 
     multiLink = request.form.get('multiLink')
     print("-------pdf",pdfFile)
+    # return 'ok'
     print(multiLink,"-----------url",len(urll))
     # return multiLink
     if botName == '':
@@ -755,21 +895,41 @@ def get_link_data():
         print("-------------------NO ENtry")
         return "FillOne"
     print("-------------------------Entry")
-    pdf = ''
-    unique = ''
-    if pdfFile:
+    # pdf = ''
+    # unique = ''
+    # if pdfFile:
+    #     try:
+    #        unique = pdfFile.filename.split('.')[0] + str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', '')+ '.' + pdfFile.filename.split('.')[1] 
+    #        pdf = os.path.join(os.path.abspath(os.path.dirname(__file__)),application.config['PDF'],secure_filename(unique))
+    #        print("------------------------344----------ok",pdf)
+    #        return 'ok'
+    #        pdfFile.save(pdf)
+    #        print("-----------351----------",str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', ''))
+    #     except Exception as e:
+    #         print("-----------346------------NO",e) 
+    #         return e        
+
+    pdf = []
+    unique = []
+    uniqueStr = ''
+    for i, pdf_file in enumerate(pdfFile):
         try:
-           unique = pdfFile.filename.split('.')[0] + str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', '')+ '.' + pdfFile.filename.split('.')[1] 
-           pdf = os.path.join(os.path.abspath(os.path.dirname(__file__)),application.config['PDF'],secure_filename(unique))
-           pdfFile.save(pdf)
-           print("------------------------344----------ok",pdf)
-           print("-----------351----------",str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', ''))
+            uniqueStr = f"{pdf_file.filename.split('.')[0]}_{i}_{str(datetime.now().date()).replace('-', '')}_{str(datetime.now().time()).replace(':', '').replace('.', '')}.{pdf_file.filename.split('.')[1]}"
+            unique = unique+ [uniqueStr]
+            print("1266----------",[uniqueStr])
+            pdf_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), application.config['PDF'], secure_filename(uniqueStr))
+            pdf.append(pdf_path)
+            print(f"-----------File {i + 1} saved successfully: {pdf_path}")
+            pdf_file.save(pdf_path)
+
         except Exception as e:
-            print("-----------346------------NO",e) 
-            return e     
+            print(f"-----------Error saving file {i + 1}: {e}")
+            return str(e)
+
     print("---------336----------",urll,exclude,userData,botName,pdf)
     print("299------exclude initial-------",exclude)
     print("288-------------",pdf)
+    
     sub = db['user_subscription'] 
     # return jsonify(sub)
     datasub_i = sub.find_one({'username':userData})
@@ -794,9 +954,19 @@ def get_link_data():
     value = get_data(urll,userData,botName,pdf,unique,exclude,multiLink,datasub['plan-Info']['NoOfCharacters'])
     # return value + "This is return at wrong place , fix it"
     # print("-------------567----remove a = get_data() ",a)
-    if os.path.exists(pdf):
-        print("os path -------568",pdf)
-        os.remove(pdf)
+
+    # if os.path.exists(pdf):
+    #     print("os path -------568",pdf)
+    #     os.remove(pdf)
+    for pdf_path in pdf:
+        if os.path.exists(pdf_path):
+            try:
+                os.remove(pdf_path)
+                print(f"File removed successfully: {pdf_path}")
+            except Exception as e:
+                print(f"Error removing file {pdf_path}: {e}")
+        else:
+            print(f"File does not exist: {pdf_path}")
     if value == "OK":  
         smtp_server = "smtp.gmail.com"
         port = 587  # For starttls
@@ -854,10 +1024,7 @@ def get_link_data():
             # Print any error messages to stdout
             print(e)
         finally:
-            server.quit()   
-
-
-       
+            server.quit()     
         return "ok"
     else:
         return value   
@@ -872,9 +1039,9 @@ def get_data(urls ,userData ,botName ,pdf ,unique ,exclude , multiLink ,NoOfChar
   try:  
     print("364---------------------",len(urls))
     data=''
-    docs=''
+    docs=[]
     page_links = []
-    page_links_x = []
+    page_links_x=[]
     if len(urls) == 0:
         print("378-------------------")
         data = ''
@@ -938,47 +1105,6 @@ def get_data(urls ,userData ,botName ,pdf ,unique ,exclude , multiLink ,NoOfChar
             pass         
         driver.quit()
 
-
-        # url_counter = 0
-        # batch_size = 5
-        # WebDriverWait(driver, timeout=10)
-
-        # while url_counter < len(page_links_x):
-        #     driver = webdriver.Chrome(options=options)
-    
-        #     try:
-        #         for _ in range(batch_size):
-        #             if url_counter >= len(page_links_x):
-        #                 break
-
-        #             url = page_links_x[url_counter]
-
-        #             try:
-        #                 driver.get(url)
-        #                 page_content = driver.page_source
-        #                 elements = partition_html(text=page_content)
-        #                 text = "\n\n".join([str(el) for el in elements])
-        #                 metadata = {"source": url}
-        #                 docsSel.append(Document(page_content=text, metadata=metadata))
-        #                 print("======================================================================================")
-        #             except Exception as e:
-        #                 print(str(e))
-
-        #             url_counter += 1
-        #         print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-        #         driver.close()
-        #     except exceptions.StaleElementReferenceException as e:
-        #         print(str(e))
-        #     finally:
-        #         driver.quit()
-
-                        # process = psutil.Process()
-                        # memory_usage = process.memory_info().rss  # Get the memory usage in bytes
-                        # ram_usage = psutil.virtual_memory()         # Get RAM usage statistics
-
-                        # print(f"Memory Usage (RSS): {memory_usage / (1024 ** 2):.2f} MB--------------------------------------------")
-                        # print(f"RAM Usage: {ram_usage.percent}%")
-
         data = docsSel
         # return "Wrong place to return. just for testing-------"
 
@@ -986,15 +1112,29 @@ def get_data(urls ,userData ,botName ,pdf ,unique ,exclude , multiLink ,NoOfChar
     
     if len(pdf) != 0 :  #CHange this to not equal to after testing------------------------------------------------------------------  
         print("381--------------",pdf)   
-        loaderPDF = OnlinePDFLoader(
-        pdf
-        )
+        # loaderPDF = OnlinePDFLoader(
+        # pdf
+        # )
         
-        print("382--------------",loaderPDF) 
-        docs = loaderPDF.load()
+        # print("382--------------",loaderPDF) 
+        # docs = loaderPDF.load()
         # print(docs,"--------------------336 pdf")
+
+        
+
+        for pdf_path in pdf:
+            print("Processing PDF:", pdf_path)
+            try:
+                loaderPDF = OnlinePDFLoader(pdf_path)
+                # docs = loaderPDF.load()
+                docs = docs + loaderPDF.load()
+
+                # print(docs,"--------------------336 pdf")
+            except Exception as e:
+                print("Error loading PDF:", pdf_path, "-", e)
+                return str(e)
     else:
-        docs = ''  
+        docs = []  
         print("______-----------------386")  
     print("------------410",type(urls))
     # return docs
@@ -1095,7 +1235,8 @@ def retrain(id):
     objId= ObjectId(id)
     urll = request.form.get('sendLink')
     exclude = request.form.get('exclude')
-    pdfFile = request.files.get('pdfFile')
+    # pdfFile = request.files.get('pdfFile')
+    pdfFile = request.files.getlist('pdfFile[]') 
     multiLink = request.form.get('multiLink')
     print("-------pdf",pdfFile)
     print("-----------url",len(urll))
@@ -1104,19 +1245,38 @@ def retrain(id):
         print("-------------------NO ENtry")
         return "FillOne"
     print("-------------------------Entry")
-    pdf = ''
-    unique = ''
-    if pdfFile:
+    # pdf = ''
+    # unique = ''
+
+    # if pdfFile:
+    #     try:
+    #        unique = pdfFile.filename.split('.')[0] + str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', '')+ '.' + pdfFile.filename.split('.')[1] 
+    #        pdf = os.path.join(os.path.abspath(os.path.dirname(__file__)),application.config['PDF'],secure_filename(unique))
+    #        pdfFile.save(pdf)
+    #        print("------------------------568----------ok",pdf)
+    #        print("-----------569----------",str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', ''))
+    #     except Exception as e:
+    #         print("-----------571------------NO",e) 
+    #         return e     
+
+    pdf = []
+    unique = []
+    uniqueStr = ''
+    for i, pdf_file in enumerate(pdfFile):
         try:
-           unique = pdfFile.filename.split('.')[0] + str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', '')+ '.' + pdfFile.filename.split('.')[1] 
-           pdf = os.path.join(os.path.abspath(os.path.dirname(__file__)),application.config['PDF'],secure_filename(unique))
-           pdfFile.save(pdf)
-           print("------------------------568----------ok",pdf)
-           print("-----------569----------",str(datetime.now().date()).replace('-', '')  + str(datetime.now().time()).replace(':', '').replace('.', ''))
+            uniqueStr = f"{pdf_file.filename.split('.')[0]}_{i}_{str(datetime.now().date()).replace('-', '')}_{str(datetime.now().time()).replace(':', '').replace('.', '')}.{pdf_file.filename.split('.')[1]}"
+            unique = unique+ [uniqueStr]
+            print("1266----------",[uniqueStr])
+            pdf_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), application.config['PDF'], secure_filename(uniqueStr))
+            pdf.append(pdf_path)
+            print(f"-----------File {i + 1} saved successfully: {pdf_path}")
+            pdf_file.save(pdf_path)
+
         except Exception as e:
-            print("-----------571------------NO",e) 
-            return e     
-    print("---------573----------",urll,exclude,pdf)
+            print(f"-----------Error saving file {i + 1}: {e}")
+            return str(e)
+
+    print(unique,"---------573----------",urll,exclude,pdf)
     print("574------exclude initial-------",exclude)
     print("575-------------",pdf)
     userDb = db['users_website_crawl_data']
@@ -1127,7 +1287,7 @@ def retrain(id):
     userData = userData_i.get('email')
     botName = userData_i.get('botname')
 
-    print("----------579--------------",userData)
+    # print("----------579--------------",userData_i)
     sub = db['user_subscription'] 
     datasub_i = sub.find_one({'username':userData})
 
@@ -1144,9 +1304,20 @@ def retrain(id):
 
     print(multiLink,"-----593-----------exclude----------",exclude)
     value = get_data_retrain(urll,userData,objId,pdf,unique,exclude,multiLink,NoOfCharacters)
-    if os.path.exists(pdf):
-        print("os path -------721",pdf)
-        os.remove(pdf)
+    # if os.path.exists(pdf):
+    #     print("os path -------721",pdf)
+    #     os.remove(pdf)
+
+    for pdf_path in pdf:
+        if os.path.exists(pdf_path):
+            try:
+                os.remove(pdf_path)
+                print(f"File removed successfully: {pdf_path}")
+            except Exception as e:
+                print(f"Error removing file {pdf_path}: {e}")
+        else:
+            print(f"File does not exist: {pdf_path}")
+
     if value == 'OK':   
 
         smtp_server = "smtp.gmail.com"
@@ -1219,10 +1390,10 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude,multiLink, NoOfChara
   try:  
     print("600---------------------",len(urls))
     data=''
-    docs=''
+    docs=[]
     page_links = []
     page_links_x=[]
-    print("======1015")
+    print("======1015",multiLink)
     if len(urls) == 0:
         print("604-------------------")
         data = ''
@@ -1240,7 +1411,10 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude,multiLink, NoOfChara
         print("====1030===",page_links)    
         # return page_links              
         # print("------------------929--------",page_links)
-        page_links_x = [link for link in page_links if link not in exclude.split(",")]
+        if len(page_links) == 1:
+            page_links_x = page_links
+        else:    
+            page_links_x = [link for link in page_links if link not in exclude.split(",")]
         print("Page links x: -------937---", page_links_x)
         # return page_links_x
         # loader = SeleniumURLLoader(urls=page_links_x)
@@ -1249,7 +1423,9 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude,multiLink, NoOfChara
         options.add_argument('--headless')  
         options.add_argument('--disable-gpu')
         driver = webdriver.Chrome(options=options) 
-        docsSel= []
+        docsSel: List[Document] = list()
+        # docsSel = []
+        WebDriverWait(driver, timeout=10)
         
         try:
             for url in page_links_x:
@@ -1268,19 +1444,31 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude,multiLink, NoOfChara
 
         driver.quit()
         data = docsSel
-        return data
     
     if len(pdf) != 0 :  #CHange this to not equal to after testing------------------------------------------------------------------  
         print("626--------------",pdf)   
-        loaderPDF = OnlinePDFLoader(
-        pdf
-        )
+        # loaderPDF = OnlinePDFLoader(
+        # pdf
+        # )
         
-        print("631--------------",loaderPDF) 
-        docs = loaderPDF.load()
+        # print("631--------------",loaderPDF) 
+        # docs = loaderPDF.load()
         # print(docs,"--------------------336 pdf")
+        
+        for pdf_path in pdf:
+            print("Processing PDF:", pdf_path)
+            try:
+                loaderPDF = OnlinePDFLoader(pdf_path)
+                # docs = loaderPDF.load()
+                docs = docs + loaderPDF.load()
+
+                # print(docs,"--------------------336 pdf")
+            except Exception as e:
+                print("Error loading PDF:", pdf_path, "-", e)
+                return str(e)
+
     else:
-        docs = ''  
+        docs = []  
         print("______-----------------386")  
     print("------------637",type(urls))
 
@@ -1290,8 +1478,22 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude,multiLink, NoOfChara
     mainDoc = docsUrl + docsPdf
 
 
-    embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-    dba = Chroma.from_documents(documents=mainDoc, embedding=embeddings)
+    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+
+    try:
+        textM = [doc.metadata for doc in mainDoc]
+        # return mainDoc
+        textD = [doc.page_content for doc in mainDoc]
+        # print("======846======",textD)
+         ##########################################################3import import uuid
+        textI = [str(uuid.uuid1()) for _ in textD]
+        # textE = embeddings.embed_documents(texts=textD)
+        textE = model.encode(textD).tolist()
+        # print(embeddings,"==========850")
+        # return
+    except Exception as e:
+        print(str(e))  
+        return str(e)  
     
     users_collection = db['users_website_crawl_data']
     user_sub = db['user_subscription']
@@ -1302,7 +1504,12 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude,multiLink, NoOfChara
         'NoOfCharacters': NoOfCharacters,
         # 'crawldata': str(data),
         # 'crawldataPdf':str(docs),
-        'crawl':dba.get(include=['embeddings','metadatas','documents']),
+        'crawl':{
+           'ids':textI,
+           'metadatas':textM,
+           'embeddings':textE,
+           'documents':textD,
+        },
         'url':urls,
         'pdf':unique,
         'urlsUsed':page_links_x,
@@ -1502,6 +1709,11 @@ def updatefontdata(id):
 def deletebot(id):
     objId= ObjectId(id) 
     users_collection = db['users_website_crawl_data']
+
+    error_log = db['error_log']
+    issue_log = db['issue_log']
+    user_history = db['user_history']
+
     user_sub = db['user_subscription']
     del_user = users_collection.find_one({'_id':objId})
     username = del_user['email']
@@ -1509,9 +1721,16 @@ def deletebot(id):
     try:
         users_collection.delete_one({'_id':objId})
         user_sub.update_one({'username': username}, {"$inc": {"plan-Info.NoOfBots":1}})
+        print(objId,"=============1555")
+        error_log.delete_many({'bot_id':str(objId)})
+        issue_log.delete_many({'bot_id':str(objId)})
+        user_history.delete_many({'botId':str(objId)})
+        
+        
         return "suc"
-    except:
-        return "fail"
+    except Exception as e:
+        print(str(e),"================1562")
+        return str(e)
 
 ######################################################### update individual bot data    
 @application.route('/api/updatebot/<id>',methods=['PUT'])
@@ -1634,8 +1853,6 @@ def subdata():
 ########################################################### send payment history data back to frontend
 @application.route('/api/paymenthistory',methods=['POST'])
 def paymentdata():
-    # data =  request.get_json()['decoded']['username']
-    
     data =  request.get_json()['decoded']
     print("319------",data)
     users_collection = db['user_payment']
@@ -1670,30 +1887,36 @@ def paymentdata():
 #################################################################send name and phone to account page
 @application.route('/api/profiledata',methods=['POST'])
 def profileget():
-    data =  request.get_json()['decoded']
-    print("526----------",data)
-    user_collection = db['users']
-    user = user_collection.find_one({'username':data})
-    phone = ''
-    name = ''
-    if user['phone'] != None or user['phone'] != '' :
-        phone = user['phone']   
-    if user['name'] != None or user['name'] != '' :   
-        name = user['name']
-    userdata = {
-            'phone': phone,
-            'name': name
-        }   
-    print("528---------------",userdata)
-    return userdata
+    try:
+        data =  request.get_json()['decoded1']
+        print("1802----------",data)
+        user_collection = db['users']
+        user = user_collection.find_one({'username':data})
+        print(data,'--------------1805------',user)
+        phone = ''
+        name = ''
+        print(user['phone'],"====1807=====",user['name'])
+        if user['phone'] != None or user['phone'] != '' :
+            phone = user['phone']   
+        if user['name'] != None or user['name'] != '' :   
+            name = user['name']
+        userdata = {
+                'phone': phone,
+                'name': name
+            }   
+        print("528---------------",userdata,"===================",datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        return userdata
+    except Exception as e:
+        print("------1818--------",str(e)) 
+        return [str(e),'error']   
 
 ################################################################# update name and phone to account page
 @application.route('/api/profiledata',methods=['PUT'])
 def profileupdate():
-    username =  request.get_json()['decoded']
+    username =  request.get_json()['decoded1']
     name =  request.get_json()['name']
     phone =  request.get_json()['phone']
-    print("526----------",name)
+    print("1829----------",name)
     user_collection = db['users']
     try:
          result = user_collection.update_one({'username': username}, {'$set': {'name':name, 'phone':phone}})
@@ -1804,7 +2027,7 @@ def consecFailure():
             server.starttls(context=context) # Secure the connection   # REMOVE FOR SSL
             server.ehlo() # Can be omitted
             server.login(sender_email, password)
-            server.sendmail(sender_email,["aniketshival007@gmail","aniket@dshgsonic.com"], email_message)
+            server.sendmail(sender_email,["aniketshival007@gmail.com","aniket@dshgsonic.com"], email_message)
             print("---------304")
             # TODO: Send email here
         except Exception as e:
@@ -1820,52 +2043,55 @@ def consecFailure():
 ############################################################   admin get user details
 @application.route('/api/admin/data',methods=['POST'])
 def admingetdata():
-    username =  request.get_json()['decoded']
-    admin =  request.get_json()['adminToken']
-    adminData = db['admin_data']
-    chkAdmin = adminData.find_one({'admin':username})
-    if chkAdmin == None or admin == None:
-        return "You Are Not Authorized"
+    try:
+        username =  request.get_json()['decoded']
+        admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
 
-    userSub_i = db['user_subscription'] 
-    user_subscriptions = list(userSub_i.find())
+        userSub_i = db['user_subscription'] 
+        user_subscriptions = list(userSub_i.find())
 
-    user_data_i = db['users_website_crawl_data']
-    user_data_i2 = list(user_data_i.find())
+        user_data_i = db['users_website_crawl_data']
+        user_data_i2 = list(user_data_i.find())
 
-    userPay_i = db['user_payment']
-    userPay = list(userPay_i.find())
+        userPay_i = db['user_payment']
+        userPay = list(userPay_i.find())
 
-    result2 = []
+        result2 = []
 
-    for d in user_data_i2:
-        result2.append({
-            'username':d['email'],
-            'tokensUsed':d['tokenData'],
-            'UniqueCon':d['UniqueConData']
-        })
+        for d in user_data_i2:
+            result2.append({
+                'username':d['email'],
+                'tokensUsed':d['tokenData'],
+                'UniqueCon':d['UniqueConData']
+            })
 
-    result = []
-    for subscription in user_subscriptions:
-        result.append({
-            'username': subscription['username'],
-            'plan':subscription['plan-Info']['plan'],
-            'bots': dataOfSubs[subscription['plan-Info']['plan']]['NoOfBots'] - subscription['plan-Info']['NoOfBots'],
-            'id': str(subscription['_id'])
-        })
-        print(chkAdmin,"526----------",subscription['_id'])
+        result = []
+        for subscription in user_subscriptions:
+            result.append({
+                'username': subscription['username'],
+                'plan':subscription['plan-Info']['plan'],
+                'bots': dataOfSubs[subscription['plan-Info']['plan']]['NoOfBots'] - subscription['plan-Info']['NoOfBots'],
+                'id': str(subscription['_id'])
+            })
+            print(chkAdmin,"1990----------",subscription['_id'])
 
-    result3 = []
-    for p in userPay:
-        result3.append({
-           'date':p['created'],
-           'amount':p['product']['amount'],
-           'username':p['username'],
-           'plan':p['product']['product_id'],
+        result3 = []
+        for p in userPay:
+            result3.append({
+               'date':p['created'],
+               'amount':p['product']['amount'],
+               'username':p['username'],
+               'plan':p['product']['product_id'],
+    
+            })
 
-        })
-
-    return [result,result2,result3]
+        return [result,result2,result3]
+    except Exception as e:
+        return ["error",str(e)]    
 
 
 ############################################################   admin get user details Individual
@@ -1937,7 +2163,7 @@ def admingetdataindi(id):
             }
             userBot.append(dataBot) 
         print(type(userSub),type(userPay),type(userBot)) 
-        return [userSub,userPay,userBot,user]
+        return [userSub,userPay,userBot,user,'ok']
     except Exception as e:
         print(str(e),"--------1513")    
 
@@ -1949,6 +2175,10 @@ def admingetdatabot(id):
         print(objId)
         username =  request.get_json()['decoded']
         admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
         botData_i = db['users_website_crawl_data']
         bot = botData_i.find_one({'_id':objId})
         # print(botData,"-----------------1604")
@@ -1968,13 +2198,15 @@ def admingetdatabot(id):
            'font':bot.get('FontData'),
            'prompt':bot.get('prompt'),
            'urlsUsed':bot.get('urlsUsed'),
+           'embeddedQA':bot.get('embeddedQA'),
            'urlsEx':bot.get('urlsEx'),
 
         }
-        return botData
+        return [botData,'ok']
         
     except Exception as e:
-        print(str(e),"--------1513")    
+        print(str(e),"--------1513") 
+        return str(e)   
 
 ############################################################   admin get admin details
 @application.route('/api/admin/dataAdmin',methods=['POST'])
@@ -1982,6 +2214,10 @@ def admindata():
     try:
         username =  request.get_json()['decoded']
         admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
         adminData_i = db['admin_data']
         admin_i = list(adminData_i.find())
         print(admin_i,"===========1623")
@@ -1994,7 +2230,7 @@ def admindata():
         }       
             admin.append(adminD)     
         print(admin,"===========1623")
-        return admin
+        return [admin,'ok']
     except Exception as e:
         print(str(e),"==========1743")   
 
@@ -2004,6 +2240,10 @@ def addadmindata():
     try:
         username =  request.get_json()['decoded']
         admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
         dataUsername = request.get_json()['addAdmin']
         adminData_i = db['admin_data']
         userExist_i = db['users']
@@ -2027,6 +2267,10 @@ def deleteadmindata():
     try:
         username =  request.get_json()['decoded']
         admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
         dataUsername = request.get_json()['e']
         adminData_i = db['admin_data']
 
@@ -2051,13 +2295,17 @@ def errorLog():
     try:
         username =  request.get_json()['decoded']
         admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
         
         err_i = db['error_log']
         bot_db_i = db['users_website_crawl_data']
         errData_i = list(err_i.find())
 
         errData = []
-        print('----1804',errData_i)
+        # print('----1804',errData_i)
         if errData_i != None:
             for a in errData_i:
                 d =  {
@@ -2068,9 +2316,9 @@ def errorLog():
                 'bot_id':a.get('bot_id'),
                 'bot':bot_db_i.find_one({'_id': ObjectId(str(a.get('bot_id')))}).get('botname'),
             } 
-                print("=====1814==",d)
+                # print("=====1814==",d)
                 errData.append(d) 
-        return errData
+        return [errData,'ok']
     except Exception as e:
         print(str(e),"=========1816")  
         return str(e)  
@@ -2081,6 +2329,10 @@ def errorLogIndi(id):
     try:
         username =  request.get_json()['decoded']
         admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
         objId = str(id)
         print(objId)
         
@@ -2100,7 +2352,7 @@ def errorLogIndi(id):
         } 
             # print(d)
             errData.append(d) 
-        return errData
+        return [errData,'ok']
     except Exception as e:
         print(str(e),"==========1846")  
         return str(e)       
@@ -2111,6 +2363,10 @@ def deleteUserdata():
     try:
         username =  request.get_json()['decoded']
         admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
         userToDel = request.get_json()['dataUsername']
         
         adminDb_i = db['admin_data']
@@ -2137,10 +2393,12 @@ def deleteUserdata():
         
         histDb_i = db['user_history']
         errDb_i = db['error_log']
+        issDb_i = db['issue_log']
 
         for x in botArr:
             histDb = histDb_i.delete_many({'botID':str(x)})
             errDb = errDb_i.delete_many({'bot_id':str(x)})
+            issDb = issDb_i.delete_many({'bot_id':str(x)})
 
         botDb = botDb_i.delete_many({'email':userToDel})  #3333333333333
         return "Del"
@@ -2151,6 +2409,12 @@ def deleteUserdata():
 ######################################################### update individual bot data Admin   
 @application.route('/api/admin/updatebot/<id>',methods=['POST'])
 def updatebotadmin(id):
+    username =  request.get_json()['decoded']
+    admin =  request.get_json()['adminToken']
+    adminData = db['admin_data']
+    chkAdmin = adminData.find_one({'admin':username})
+    if chkAdmin == None or admin == None:
+        return "You Are Not Authorized"
     print("KKKKKKKKKK")
     users_collection = db['users_website_crawl_data']
     objId= ObjectId(id)
@@ -2209,6 +2473,10 @@ def issueLog():
     try:
         username =  request.get_json()['decoded']
         admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
         
         issue_i = db['issue_log']
         bot_db_i = db['users_website_crawl_data']
@@ -2226,7 +2494,7 @@ def issueLog():
             'time':a.get('time'),
         } 
             issueData.append(d) 
-        return issueData
+        return [issueData,'ok']
     except Exception as e:
         print(str(e),"==========1972")  
         return str(e)
@@ -2238,6 +2506,10 @@ def issueLogIndi(id):
     try:
         username =  request.get_json()['decoded']
         admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
         objId = str(id)
         print(objId)
         
@@ -2258,7 +2530,7 @@ def issueLogIndi(id):
         } 
             # print(d)
             issueData.append(d) 
-        return issueData
+        return [issueData,'ok']
     except Exception as e:
         print(str(e),"==========2004")  
         return str(e) 
@@ -2337,9 +2609,66 @@ def editmanagesa():
         print(str(e),"---------1001")    
         return str(e)        
 
+############################################################   admin set chatot home page
+@application.route('/api/admin/addBot',methods=['POST'])
+def adminaddbot():
+    try:
+        username =  request.get_json()['decoded']
+        admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
+        bot =  request.get_json()['credMatch']   
+        print("====2481===",bot)
+        manage_i = db['manage']
+        manage_i.update_one({},{"$set":{'chatbot':str(bot)}})
+        return "ok"
+    except Exception as e:
+        return str(e)     
+
+############################################################   admin get chatot home page
+@application.route('/api/admin/gethomepagebot',methods=['POST'])
+def admingethomepagebot():
+    try:
+        username =  request.get_json()['decoded']
+        admin =  request.get_json()['adminToken']
+        adminData = db['admin_data']
+        chkAdmin = adminData.find_one({'admin':username})
+        if chkAdmin == None or admin == None:
+            return "You Are Not Authorized"
+        botData_i = db['manage'].find_one({})
+        botData = botData_i['chatbot']
+        print(botData_i,"=====2501=====",botData)
+
+        botname_db = db['users_website_crawl_data']
+        botname_i = botname_db.find_one({'_id':ObjectId(botData)})
+        if botname_i == None:
+            botname = "None"
+        else:    
+            botname = botname_i['botname']
+        print("--2506=======",botname)
+        return [str(botData),botname]    
+    except Exception as e:
+        print("---------2503-------",str(e))
+        return ["Error",str(e)]     
+
+############################################################    get chatot home page
+@application.route('/api/gethomepagebot',methods=['POST'])
+def gethomepagebot():
+    try:
+        botData_i = db['manage'].find_one({})
+        botData = botData_i['chatbot']
+        print(botData_i,"=====2501=====",botData)
+        return str(botData)    
+    except Exception as e:
+        print("---------2503-------",str(e))
+        return ["Error",str(e)]     
+
+
 
 # if __name__ == '__main__':
 #     app.run(debug=True)
 if __name__ == '__main__':
-    socketio.run(application, debug=True)
+    socketio.run(application, debug=True, use_reloader=False)
    

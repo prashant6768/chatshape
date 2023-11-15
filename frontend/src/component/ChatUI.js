@@ -54,6 +54,9 @@ const ChatUI = (botID) => {
   const[ck,setCk]=useState([])
   const[consecFail,setConsecFail]=useState(0)
   const[consecFailMsg,setConsecFailMsg]=useState([])
+  const [chatUiDe,setChatUiDe] = useState("None")
+
+  // <script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js" defer id="popup" cred="65427cf9e8dcb18a5750fb1e"></script>
 
   // const BACKEND = 'http://localhost:5000/'
   const BACKEND = 'https://zemaapi.zema.io/'
@@ -140,13 +143,21 @@ const ChatUI = (botID) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setLoading(true);
     scrollToBottom()
-    axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
+    axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon, chatUiDe }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]);  setUniqueCon(0); console.log(res.data, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
-      scrollToBottom()
+    .then(res => {
+      if (res.data === 'SubE') { setLoading(false); setUniqueCon(0); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") }
+      else if (res.data == 'noid') { setLoading(false);setUniqueCon(0);  setChatbotMsg("Sorry, This Bot has been deleted") }
+      else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false);console.log("-------111111-----",res.data);setUniqueCon(0);  setChatbotMsg("Some Error Occured !!!5!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }
+      else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found.");setUniqueCon(0);  setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+      else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]);setUniqueCon(0);  setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+      else { setChatbotMsg(res.data[0]); setConsecFail(0); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) }
+  })
+      .catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+  scrollToBottom()
   }
 
   const handleInputChange = async (e) => {
@@ -179,13 +190,20 @@ const ChatUI = (botID) => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setLoading(true);
     scrollToBottom()
-    axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
+    axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon,chatUiDe }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") } else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); console.log(res.data, "=== backend www", res.data[0]); setUniqueCon(0); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
-      scrollToBottom()
+    .then(res => {
+      if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade"); setUniqueCon(0) }
+       else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted"); setUniqueCon(0) } 
+       else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFail(consecFail + 1); setUniqueCon(0); setConsecFailMsg(prev => [...prev, res.data[1]]) } 
+       else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found."); setUniqueCon(0); setConsecFailMsg(prev => [...prev, "Relevant Data Not Found"]); setConsecFail(consecFail + 1) }
+      else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]); setUniqueCon(0); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+      else { setChatbotMsg(res.data[0]); setConsecFail(0); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); }
+  }).catch(err => { setLoading(false); setConsecFail(consecFail + 1); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! "); setConsecFailMsg(prev => [...prev, err]) })
+scrollToBottom()
     };
 
     useEffect(()=>{
@@ -234,11 +252,35 @@ const ChatUI = (botID) => {
       console.log("W")
     } else {
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-      if (speechTog === true) {
-        const speechSynthesis = window.speechSynthesis;
-        const utterance = new SpeechSynthesisUtterance(chatbotMsg);
+    //   if (speechTog === true) {
+    //     const speechSynthesis = window.speechSynthesis;
+    //     const utterance = new SpeechSynthesisUtterance(chatbotMsg);
+    //     speechSynthesis.speak(utterance);
+    //     console.log("should have spoken")
+    // }
+
+    if (speechTog === true) {
+      const speechSynthesis = window.speechSynthesis;
+      const maxChunkLength = 100; 
+      let textToSpeak = chatbotMsg;
+    
+      while (textToSpeak.length > maxChunkLength) {
+        let lastSpaceIndex = textToSpeak.lastIndexOf(' ', maxChunkLength);
+        if (lastSpaceIndex === -1) {
+          lastSpaceIndex = maxChunkLength;
+        }
+        
+        const chunk = textToSpeak.substr(0, lastSpaceIndex);
+        const utterance = new SpeechSynthesisUtterance(chunk);
         speechSynthesis.speak(utterance);
-        console.log("should have spoken")
+    
+        textToSpeak = textToSpeak.substr(lastSpaceIndex + 1);
+      }
+
+      if (textToSpeak) {
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        speechSynthesis.speak(utterance);
+      }
     }
     console.log("speech tog  is set to ",speechTog)
     }
@@ -248,6 +290,20 @@ const ChatUI = (botID) => {
     scrollToBottom()
 
   }, [chatbotMsg])
+
+  const [speechTog, setSpeechTog] = useState(false)
+
+  useEffect(()=>{
+      const checkSpeech = setInterval(() => {
+          if (speechTog === false) {
+              // If speechTog is false, cancel the speech
+              speechSynthesis.pause();
+              speechSynthesis.cancel();
+              console.log("cancel")
+              clearInterval(checkSpeech); // Stop the loop
+          }
+      }, 100);
+  },[speechTog])
 
   useEffect(() => {
     if  (plan === 'year-enterprise' || plan === 'month-enterprise' ) {
@@ -313,7 +369,7 @@ const ChatUI = (botID) => {
   const [audioChunks, setAudioChunks] = useState([]);
   const [audio, setAudio] = useState(null);
   const [audioSub, setAudioSub] = useState(false)
-  const [speechTog, setSpeechTog] = useState(false)
+  // const [speechTog, setSpeechTog] = useState(false)
 
 
   const getMicrophonePermission = async () => {

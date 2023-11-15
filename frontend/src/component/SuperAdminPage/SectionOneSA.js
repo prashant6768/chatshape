@@ -7,6 +7,8 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { Link } from 'react-router-dom';
 import {ThreeDots} from 'react-loader-spinner';
+import { HashLink } from 'react-router-hash-link';
+import { Tooltip as Tp}  from 'react-tooltip'
 
 const SectionOneSA = () => {
 
@@ -27,11 +29,11 @@ const SectionOneSA = () => {
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
     })
-      .then(res => {
-        console.log(res.data, "all the data");
-        setData(res.data);
+      .then(res => {if(res.data[1] == 'ok'){
+        console.log(res.data[0], "all the data");
+        setData(res.data[0]);
         setApiload(false)
-      })
+      }else if(res.data == 'You Are Not Authorized'){console.log('You Are Not Authorized');toast.error('You Are Not Authorized');setApiload(false)}else{console.log(res.data);toast.error("Some Error Occured");setApiload(false)}})
       .catch(err => {console.log(err);setApiload(false)})
   }, [])
 
@@ -42,7 +44,7 @@ const SectionOneSA = () => {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then(res =>{if(res.data === 'No User'){console.log("NO SUCH USER EXISTS"); toast.error("NO SUCH USER EXISTS")}else if(res.data === 'Already Admin'){console.log("Already an ADMIN"); toast.error("Already an ADMIN")}else if(res.data === "OK"){console.log("OK"); toast.success("Added New Admin")}else {console.log(res.data); toast.error("Error")}}).then(res => setAddAdmin('')).catch(err => {console.log(err); toast.error("Some Error") })
+    }).then(res =>{if(res.data === 'No User'){console.log("NO SUCH USER EXISTS"); toast.error("NO SUCH USER EXISTS")}else if(res.data =='You Are Not Authorized'){console.log("Not authorized"); toast.error("You Are Not Authorized")}else if(res.data === 'Already Admin'){console.log("Already an ADMIN"); toast.error("Already an ADMIN")}else if(res.data === "OK"){console.log("OK"); toast.success("Added New Admin")}else {console.log(res.data); toast.error("Error")}}).then(res => setAddAdmin('')).catch(err => {console.log(err); toast.error("Some Error") })
   }
 
   const handleRemoveAdmin =(e)=>{
@@ -51,7 +53,7 @@ const SectionOneSA = () => {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then(res => {if(res.data == 'Only1'){toast.error("Atleast One admin is needed")}else if(res.data == 'OK'){ toast.success("Deleted")}else{toast.error("Error")}}).catch(err => {console.log(err); toast.error("Some Error") })
+    }).then(res => {if(res.data == 'Only1'){toast.error("Atleast One admin is needed")}else if(res.data == 'You Are Not Authorized'){toast.error('You Are Not Authorized')}else if(res.data == 'OK'){ toast.success("Deleted")}else{toast.error("Error")}}).catch(err => {console.log(err); toast.error("Some Error") })
   }
 
 const[errData,setErrData]=useState([])
@@ -65,22 +67,25 @@ const [filteredData, setFilteredData] = useState(data);
     'Access-Control-Allow-Origin': '*'
   })
     .then(res => {
-      console.log(res.data, "all the error data");
+      // console.log(res.data, "all the error data");
       if(res.data === null){
         setErrData([])
         console.log("MMMMMMMMMMMTY")
       }
-      else{
-        setErrData(res.data)
-        console.log("FULL")
+      else if(res.data[1] == 'ok'){
+        setErrData(res.data[0])
+        console.log("FULL",res.data[0])
       }
+      else if(res.data == 'You Are Not Authorized'){toast.error('You Are Not Authorized')}
+      else{toast.error('Some Error Occured')}
       
     })
-    .catch(err => console.log(err))
+    .catch(err => console.log(err,"--------------what"))
  },[])
 
  useEffect(()=>{
     setFilteredData(errData)
+    console.log("filtered data ",errData)
  },[errData])
 
  const handleSearch = (e) => {
@@ -111,15 +116,16 @@ useEffect(()=>{
     'Accept': 'application/json',
     'Access-Control-Allow-Origin': '*'
   })
-    .then(res => {
-      console.log(res.data, "all the issue data");
-      setIssueData(res.data)
-    })
+    .then(res => {if(res.data[1] == 'ok'){
+      console.log(res.data[0], "all the issue data");
+      setIssueData(res.data[0])
+    }else if(res.data == 'You Are Not Authorized'){toast.error('You Are Not Authorized')}else{toast.error('Some Error Occured')}})
     .catch(err => console.log(err))
  },[])
 
  useEffect(()=>{
   setFilteredDataIssue(issueData)
+  console.log("filter data issuue -------",issueData)
  },[issueData])
 
  const handleSearchIssue = (e) => {
@@ -138,6 +144,34 @@ useEffect(()=>{
 
   setFilteredDataIssue(filtered);
 };
+
+const scrollWidthOffset = (el) => {
+  const yCoordinate = el.getBoundingClientRect().top + window.pageYOffset;
+  const yOffset = -100; 
+  window.scrollTo({ top: yCoordinate + yOffset, behavior: 'smooth' }); 
+}
+
+const [addBot, setAddBot] = useState('')
+const [botname,setBotname] = useState('')
+
+const handleAddBot = (e) => {
+  const credMatch = addBot.match(/cred="(.*?)"/)[1];
+  console.log(credMatch[1],"=======credMatch")
+
+  axios.post(`${BACKEND}api/admin/addBot`, { decoded, adminToken,credMatch}, {
+    'Content-type': 'application/json',
+    'Accept': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+  }).then(res =>{if(res.data === 'You Are Not Authorized'){console.log("You Are Not Authorized"); toast.error("You Are Not Authorized")}else if(res.data === "ok"){console.log("OK"); toast.success("Homepage Chatbot changed");setTimeout(() => { window.location.reload(true) }, 2000)}else {console.log(res.data); toast.error("Some Error Occured!!!")}}).catch(err => {console.log(err); toast.error("Some Error Occured") })
+}
+
+useEffect(()=>{
+  axios.post(`${BACKEND}api/admin/gethomepagebot`, { decoded, adminToken}, {
+    'Content-type': 'application/json',
+    'Accept': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+  }).then(res =>{if(res.data === 'You Are Not Authorized'){console.log("You Are Not Authorized"); toast.error("You Are Not Authorized")}else if(res.data[0] === "Error"){console.log("Error"); toast.success("Some Error Occured")}else {console.log(res.data,"==========166"); setAddBot(res.data[0]);setBotname(res.data[1])}}).catch(err => {console.log(err); toast.error("Some Error Occured") })
+},[])
 
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
@@ -194,6 +228,39 @@ useEffect(()=>{
         </Card>
       </div>
 
+      <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 pb-4 mb-4' style={{ color: '#FFFFFF' }}>Zema Homepage chatbot</h3>
+
+      <div className='row col-11 mx-auto mt-4 d-flex '>
+        <Card style={{ backgroundColor: '#212529' }} className='  d-flex rounded-4'>
+          <Card.Body className="d-flex flex-column" style={{}}>
+          <Card.Title className='fw-bolder col-12 d-flex justify-content-center container text-center mb-1 mt-3 fs-5 text-break' style={{ color: '#FFFFFF' }}>{botname}</Card.Title>
+
+          <div className='row col-12 mt-3 justify-content-start justify-content-sm-between' style={{ display: 'flex', flexWrap: 'wrap' }}>
+              {/* <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>Create</p> */}
+              <input
+                className='fs-4 col-sm-9 d-flex rounded-4 justify-content-center my-2 text-center my-anchor-element'
+                placeholder='Add Chatbot ID'
+                value={addBot}
+                onChange={(e) => setAddBot(e.target.value)}
+              />
+              <button
+                className='btn btn-outline-warning d-flex justify-content-center col-lg-2 col-sm-3 my-2'
+                style={{ maxWidth: '300px' }}
+                onClick={handleAddBot}
+              >Add Chatbot</button>
+               <Tp anchorSelect=".my-anchor-element" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000",fontWeight:'bolder',width:'90vw' }} place="top">
+     Paste the script tag used for embedding the chatbot in this form.<br/>
+     The form will automatically take out the cred value from the script to use it in the chatbot.<br/>
+     Only the cred value will be visible inside the form after submitting the script.
+</Tp>
+
+
+            </div>
+          
+          </Card.Body>
+        </Card>
+      </div>
+
 
       <h3 className='fw-bolder col-12 d-flex justify-content-center container text-center pt-5 pb-4 mb-4' style={{ color: '#FFFFFF' }}>Error Logs</h3>
 
@@ -231,11 +298,12 @@ useEffect(()=>{
                   <div className='col-lg-3 col-sm-6'>
                     <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>Bots used: {x.bot}</p>
                   </div>
-                  <div className='col-lg-3 col-sm-6'>
-                    {/* <p className=' col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</p> */}
-                  <Link to={`/superadminBot/${x.bot_id}`} style={{ textDecoration: 'none' }}><Nav.Link href="#link" className='col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</Nav.Link></Link>
- 
-                  </div>
+                  {/* <div className='col-lg-3 col-sm-6'>
+                  <HashLink to={`/superadminBot/${x.bot_id}#${x.err_id}`} scroll={el => scrollWidthOffset(el)} style={{ textDecoration: 'none' }}><Nav.Link href="#link" className='col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</Nav.Link></HashLink>
+                  </div> */}
+                  <div className='col-xl-1 col-sm-6 container'>
+            <HashLink className='btn btn-link px-0 ' to={`/superadminBot/${x.bot_id}#${x.err_id}`} scroll={el => scrollWidthOffset(el)} style={{ textDecoration: 'underline', color: '#FFFFFF' }}   >Details</HashLink>
+           </div>
                 </div>
               ))}
           
@@ -256,7 +324,7 @@ useEffect(()=>{
                 onChange={handleSearchIssue} />
             </div>
             {
-                  filteredDataIssue.length === 0?
+                  filteredDataIssue.length == 0 ?
                   <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>No Data Available</p>
                   :
               filteredDataIssue.map(x => (
@@ -273,11 +341,12 @@ useEffect(()=>{
                   <div className='col-xl-2 col-sm-6'>
                     <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}> {x.time}</p>
                   </div>
-                  <div className='col-xl-1 col-sm-6'>
-                    {/* <p className=' col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</p> */}
-                  <Link to={`/superadminBot/${x.bot_id}`} style={{ textDecoration: 'none' }}><Nav.Link href="#link" className='col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</Nav.Link></Link>
- 
-                  </div>
+                  {/* <div className='col-xl-1 col-sm-6'>
+                  <HashLink to={`/superadminBot/${x.bot_id}#${x.issue_id}`} scroll={el => scrollWidthOffset(el)} style={{ textDecoration: 'none' }}><Nav.Link href="#link" className='col-12 d-flex justify-content-start text-start text-decoration-underline' style={{ color: '#FFFFFF' }}>Details</Nav.Link></HashLink>
+                  </div> */}
+                  <div className='col-xl-1 col-sm-6 container'>
+            <HashLink className='btn btn-link px-0 ' to={`/superadminBot/${x.bot_id}#${x.issue_id}`} scroll={el => scrollWidthOffset(el)} style={{ textDecoration: 'underline', color: '#FFFFFF' }}   >Details</HashLink>
+           </div>
                 </div>
               ))}
           </Card.Body>

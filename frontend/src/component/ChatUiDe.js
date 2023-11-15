@@ -39,85 +39,126 @@ const ChatUIDe = (botID) => {
     const[ck,setCk]=useState([])
     const[consecFail,setConsecFail]=useState(0)
     const[consecFailMsg,setConsecFailMsg]=useState([])
+    const[chatUiDe,setChatUiDe]= useState('True')
 
-//  const BACKEND = 'http://localhost:5000/'
- const BACKEND = 'https://zemaapi.zema.io/'
+    // const BACKEND = 'http://localhost:5000/'
+    // const BACKENDWS = 'ws://localhost:5000/'
+    const BACKEND = 'https://zemaapi.zema.io/'
+    const BACKENDWS = 'wss://zemaapi.zema.io/'
 
-    const handleInputChange = async (e) => {
-        await setInputValue(e.target.value)
-    };
 
 
     const [socket, setSocket] = useState(null);
     const [room, setRoom] = useState('');
-   
-  
-    useEffect(() => {
-        const newSocket = socketIO.connect(BACKEND);
-  
-    
-        setSocket(newSocket);
-    
-        return () => {
-          newSocket.disconnect();
-        };
-      }, []);
-    
-      const joinRoom = (roomName) => {
-        if (socket) {
-          socket.emit('join', { room: roomName });
-          setRoom(roomName);
+
+
+useEffect(() => {
+    try{
+    const newSocket = socketIO.connect(BACKENDWS
+        , {
+        transports: [ "websocket"],
+        enabledTransports: [ "websocket"],
+    },
+    {secure:true},
+    // ,{transports: ['wss'], enabledTransports: ['wss'],}
+    );
+    console.log("----------------------------Socket connect front",BACKEND)
+    setSocket(newSocket);
+    newSocket.on("connect", () => {
+        console.log("-----------------Socket connected on the front end");
+    });
+    newSocket.on("error", (error) => {
+        console.error("--------------Socket error on the front end:", error);
+    });
+    return () => {
+        if(newSocket.readyState === 1){  /** Remove if statement if error ,-------------------------- */
+            newSocket.disconnect();
+            console.log("Socket DIS--connect front------return one--")
         }
-      };
-    
-      const leaveRoom = () => {
+    };
+}catch(err){
+console.log(err,"======try catch")
+}
+}, [inputValue]);
+
+
+
+    const joinRoom = (roomName) => {
+        console.log("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
         if (socket) {
-          socket.emit('leave', { room });
-          setRoom('');
-          setI(1)
-          
+            try{
+                socket.emit('join', { room: roomName });
+                setRoom(roomName);
+                console.log("-------------------------Room joined ", roomName)
+            }catch(err){
+                console.log("ERR on join room frontend code == ",err)
+            }
+           
         }
-      };
-    
-      const sendMessage = (message) => {
+    };
+
+    const leaveRoom = () => {
         if (socket) {
-          socket.emit('message', { room, msg: message });
-        }else{
+            socket.emit('leave', { room });
+            setRoom('');
+            console.log("Left the room")
+        }
+    };
+
+    const test = () => {
+        if (socket) {
+            socket.emit('test');
+            console.log("test room frontend ")
+        }
+    };
+    const testRoom = (roomName) => {
+        if (socket) {
+            socket.emit('testRoom', { room: roomName });
+            console.log("test room frontend, it needs roomName objectId, check if it is right ")
+        }
+    };
+
+
+    const sendMessage = (message) => {
+        if (socket) {
+            socket.emit('message', { room, msg: message });
+        } else {
             console.log("no room joined")
         }
-      };
-  
-      socket?.on('welcome_message', (data) => {
-        console.log('Received welcome message:', data.message);
-      });
-      
-      const[i,setI]=useState(1)
-      var t = 0
-  
-      socket?.on('message-chat', data => {  
-        setI(prevI => prevI + 1);    
-        if (i === 1) {    
-            setI(prevI => prevI + 1);         
-           setCk(data.message)          
-        }else{
-        }
-        if(ck !== ''){
-            setChkk(prevChkk => [...prevChkk, ck])
-        }else{
-            setChkk(ck)
-        }  
-      });
-  
+    };
 
+    useEffect(() => {
+        console.log("Socket changeeeeeeeeeeeeeee ssssssssssssss")
+        socket?.on('welcome_message', (data) => {
+            console.log('Received welcome message:', data.message);
+        });
+    }, [socket])
+
+    useEffect(() => {
+        socket?.on('message-chat', data => {
+            setChkk(prevChkk => [...prevChkk, data.message])
+            console.log(data.message)
+        });
+   
+    }, [socket])
+
+
+
+    const handleInputChange = async (e) => {
+        test()
+        testRoom("Roonmane")
+        await setInputValue(e.target.value)
+    };
 
     const handleSubmitP = (x) => {
 
         if (x.trim() === '') {
             return;
         }
+
         setSpromptHide(true)
         joinRoom(botID.botID)
-
+        console.log("BBBBBBBBBBBBBBBBBBBBBB",botID.botID)
         const newMessage = {
             id: messages.length + 1,
             text: x,
@@ -128,12 +169,23 @@ const ChatUIDe = (botID) => {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
         scrollToBottom()
-        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
+        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon, chatUiDe }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted") }else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
+        })
+        // .then(res => console.log("=============================",res.data,"================"))
+        .then(res => {
+            if (res.data === 'SubE') { setLoading(false); setUniqueCon(0); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") }
+            else if (res.data == 'noid') { setLoading(false);setUniqueCon(0);  setChatbotMsg("Sorry, This Bot has been deleted") }
+            else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false);console.log("-------111111-----",res.data);setUniqueCon(0);  setChatbotMsg("Some Error Occured !!!5!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }
+            else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found.");setUniqueCon(0);  setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+            else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]);setUniqueCon(0);  setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+            else { setChatbotMsg(res.data[0]); setConsecFail(0); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) }
+        })
+            .catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
         scrollToBottom()
+
     }
 
 
@@ -148,8 +200,6 @@ const ChatUIDe = (botID) => {
             e.preventDefault();
         }
         joinRoom(botID.botID)
-        
-
         setSpromptHide(true)
         if (inputValue.trim() === '') {
             return;
@@ -164,33 +214,42 @@ const ChatUIDe = (botID) => {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setLoading(true);
         scrollToBottom()
-        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon }, {
+        axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon, chatUiDe }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
-            .then(res => { if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade") } else if (res.data == 'noid') { setLoading(false); setChatbotMsg("WORK IN PROGRESS") }else if (res.data == 'RDNF'){setLoading(false); setChatbotMsg("Relevant Data Not Found."); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) } else { setChatbotMsg(res.data[0]); setPlan(res.data[1]); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); } }).catch(err => { setLoading(false); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
-            scrollToBottom()
-        };
+            .then(res => {
+                if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade"); setUniqueCon(0) }
+                 else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted"); setUniqueCon(0) } 
+                 else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFail(consecFail + 1); setUniqueCon(0); setConsecFailMsg(prev => [...prev, res.data[1]]) } 
+                 else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found."); setUniqueCon(0); setConsecFailMsg(prev => [...prev, "Relevant Data Not Found"]); setConsecFail(consecFail + 1) }
+                else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]); setUniqueCon(0); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
+                else { setChatbotMsg(res.data[0]); setConsecFail(0); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); }
+            }).catch(err => { setLoading(false); setConsecFail(consecFail + 1); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! "); setConsecFailMsg(prev => [...prev, err]) })
+        scrollToBottom()
 
-        useEffect(()=>{
-            console.log("Consecutive failure",consecFail)
-            if(consecFail >= 5 && messages[messages.length -1]['sender'] == '' ){
-              console.log("AAAAAAAAAAAAAAAALLLLLLLEEEEEEEERRRRRRRTTTTTTTTT")
-               const failmsg = messages.filter(message => message.text !== '').slice(-10)
-               const consecFailMsgF = consecFailMsg.slice(-5)
-              // console.log("------------",messages.filter(message => message.text !== ''))
-              console.log("-----10message-------",messages.filter(message => message.text !== '').slice(-10))
-              axios.post(`${BACKEND}api/consecFailure`, { botID , failmsg ,consecFailMsgF}, {
-                  'Content-type': 'application/json',
-                  'Accept': 'application/json',
-                  'Access-Control-Allow-Origin': '*'
-              })
-                  .then(res =>{setConsecFailMsg([]); setConsecFail(0); console.log(res.data," === from backend ")}).catch(err => console.log(err))
-                  // .then()
-            }
-          },[ messages])
+    };
+
+    useEffect(() => {
+        console.log("Consecutive failure", consecFail)
+        if (consecFail >= 5 && messages[messages.length - 1]['sender'] == '') {
+            console.log("AAAAAAAAAAAAAAAALLLLLLLEEEEEEEERRRRRRRTTTTTTTTT")
+            const failmsg = messages.filter(message => message.text !== '').slice(-10)
+            const consecFailMsgF = consecFailMsg.slice(-5)
+            setConsecFail(0);
+            // console.log("------------",messages.filter(message => message.text !== ''))
+            console.log("-----10message-------", messages.filter(message => message.text !== '').slice(-10))
+            axios.post(`${BACKEND}api/consecFailure`, { botID, failmsg, consecFailMsgF }, {
+                'Content-type': 'application/json',
+                'Accept': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            })
+                .then(res => { setConsecFailMsg([]); console.log(res.data, " === from backend ") }).catch(err => console.log(err))
+            // .then()
+        }
+    }, [messages])
 
     useEffect(() => {
         console.log("111111==", messages)
@@ -204,40 +263,88 @@ const ChatUIDe = (botID) => {
         }).then(res => console.log(res.data, " === from backend message history ")).catch(err => console.log(err))
     }, [chatbotMsg])
 
+    const[apiload,setApiload] = useState(false)
+
     useEffect(() => {
-        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); console.log(res.data.initialMsg, "=font api init") }).catch(err => console.log(err))
+        setApiload(true)
+        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); setPlan(res.data.plan); console.log(res.data.initialMsg, "=font api init"); setApiload(false) }).catch(err => {console.log(err); setApiload(false)})
         console.log(suggestedPrompt)
-    }, [])
+    }, [botID.botID])
 
 
     useEffect(() => {
         setChkk([])
-
         const newMessage = {
             id: messages.length + 1,
             text: chatbotMsg,
             sender: '',
         };
-        // if (chatbotMsg === '' && chatbotMsg === null && chatbotMsg === []) {
-            if (chatbotMsg === '' && chatbotMsg === null ) {
+        if (chatbotMsg === '' && chatbotMsg === null ) {
             console.log("W")
         } else {
             setMessages((prevMessages) => [...prevMessages, newMessage]);
+            // if (speechTog === true) {
+            //     const speechSynthesis = window.speechSynthesis;
+            //     const utterance = new SpeechSynthesisUtterance(chatbotMsg);
+            //     speechSynthesis.speak(utterance);
+            // }
+
             if (speechTog === true) {
                 const speechSynthesis = window.speechSynthesis;
-                const utterance = new SpeechSynthesisUtterance(chatbotMsg);
-                speechSynthesis.speak(utterance);
-            }
-            console.log("speech tog  is set to ",speechTog)
+                const maxChunkLength = 100; 
+                let textToSpeak = chatbotMsg;
+              
+                while (textToSpeak.length > maxChunkLength) {
+                  let lastSpaceIndex = textToSpeak.lastIndexOf(' ', maxChunkLength);
+                  if (lastSpaceIndex === -1) {
+                    lastSpaceIndex = maxChunkLength;
+                  }
+                  
+                  const chunk = textToSpeak.substr(0, lastSpaceIndex);
+                  const utterance = new SpeechSynthesisUtterance(chunk);
+                  speechSynthesis.speak(utterance);
+              
+                  textToSpeak = textToSpeak.substr(lastSpaceIndex + 1);
+                }
+
+                if (textToSpeak) {
+                  const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                  speechSynthesis.speak(utterance);
+                }
+              }
+            console.log("speech tog  is set to ", speechTog)
 
         }
         setInputValue('');
         setChatbotMsg('')
+        console.log("lllllllllllll")
         leaveRoom()
         scrollToBottom()
-
     }, [chatbotMsg])
 
+    const [speechTog, setSpeechTog] = useState(false)
+
+    useEffect(()=>{
+        const checkSpeech = setInterval(() => {
+            if (speechTog === false) {
+                // If speechTog is false, cancel the speech
+                speechSynthesis.pause();
+                speechSynthesis.cancel();
+                console.log("cancel")
+                clearInterval(checkSpeech); // Stop the loop
+            }
+        }, 100);
+    },[speechTog])
+
+
+    useEffect(() => {
+        if (plan === 'year-enterprise' || plan === 'month-enterprise') {
+            setMark(false)
+        } else {
+            setMark(true)
+        }
+        console.log("mark = ", mark, " and plan ", plan)
+    }, [plan])
 
 
     const [fontData, setFontData] = useState({
@@ -250,8 +357,30 @@ const ChatUIDe = (botID) => {
         fontSize: '12px',
     });
 
+    const handleFontChange = (event) => {
+        const { name, value } = event.target;
+        if (name === 'fontSize') {
+            // Prevent font size from being negative
+            const fontSize = parseInt(value, 10);
+            if (fontSize >= 0 && fontSize <= 32) {
+                setFontData((prevData) => ({ ...prevData, [name]: fontSize }));
+            }
+        } else {
+            setFontData((prevData) => ({ ...prevData, [name]: value }));
+        }
+    };
 
+    const handleFontSubmit = (event) => {
+        event.preventDefault();
 
+        setLoading(true);
+        axios.put(`${BACKEND}api/fontdata/${botID.botID}`, { fontData }, {
+            'Content-type': 'application/json',
+            'Accept': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }).then(res => { if (res.data === 'Yes') { toast.success('Font Changes were successful'); setLoading(false); } else { toast.success('Some error occured'); setLoading(false); } }).catch((err) => { console.log("error manage bots ", err); toast.error('API request failed!'); setLoading(false); })
+        console.log(fontData);
+    };
 
     const messageStyleSend = {
         backgroundColor: fontData.userFontColor,
@@ -269,6 +398,17 @@ const ChatUIDe = (botID) => {
 
     };
 
+    const fontOptions = [
+        'Arial',
+        'Times New Roman',
+        'Helvetica',
+        'Courier New',
+        'Verdana',
+    ];
+
+    // const handleAudio=()=>{
+
+    // }   
 
     const [permission, setPermission] = useState(false);
     const [stream, setStream] = useState(null);
@@ -276,7 +416,7 @@ const ChatUIDe = (botID) => {
     const [recordingStatus, setRecordingStatus] = useState("inactive");
     const [audioChunks, setAudioChunks] = useState([]);
     const [audio, setAudio] = useState(null);
-    const [speechTog, setSpeechTog] = useState(false)
+    // const [speechTog, setSpeechTog] = useState(false)
 
     const getMicrophonePermission = async () => {
         if ("MediaRecorder" in window) {
@@ -325,7 +465,6 @@ const ChatUIDe = (botID) => {
         };
     };
 
-
     useEffect(() => {
         if (audio !== null) {
             const formData = new FormData();
@@ -333,7 +472,7 @@ const ChatUIDe = (botID) => {
             for (let pair of formData.entries()) {
                 console.log(pair[0] + ', ' + pair[1]);
             }
-
+            scrollToBottom()
             axios.post(`${BACKEND}api/audio`, formData, {
                 'Content-type': 'application/json',
                 'Accept': 'application/json',
@@ -356,11 +495,12 @@ const ChatUIDe = (botID) => {
     };
 
     const chatContainerRef = useRef(null);
-const scrollToBottom = () => {
-  setTimeout(() => {
-    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-  }, 10);
-  };
+    const scrollToBottom = () => {
+        setTimeout(() => {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            console.log(chatContainerRef.current.scrollHeight, "chatContainerRef.current.scrollHeight")
+        }, 10);
+    };
 
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
@@ -372,10 +512,10 @@ const scrollToBottom = () => {
             <div className='d-flex justify-content-center my-5 col-lg-10 col-11' style={{}}>
 
                 <div className='d-flex  ' style={{ position: 'relative', height: '600px', minWidth: '240px', maxWidth: '90vw', width: '100%', marginTop:'30px', backgroundColor:'#171725' }}>
-                    {
+                    {/* {
                         mark ?
                             <h1 className='bg-primary mx-3' style={{ position: 'absolute', opacity: '15%', left: '20px', bottom: '50px' }}>Powered by Zema</h1> : <p></p>
-                    }
+                    } */}
                     <div className="chat-container rounded-4 px-0" ref={chatContainerRef}  style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '90vw', minWidth: '240px', width: '100%', borderWidth: '0px' }}>
                         <div className="chat-messages " >
                             {messages.map((message) => (
@@ -414,6 +554,7 @@ const scrollToBottom = () => {
                             onChange={handleInputChange}
                             placeholder="Type a message..."
                         />
+                        {/* Text to speech */}
                         <div className="me-2">
                             {
                                 speechTog === false ?
@@ -426,7 +567,8 @@ const scrollToBottom = () => {
                             }
                         </div>
 
-                        <div className="audio-controls me-2">
+{/* speech to text */}
+                        {/* <div className="audio-controls me-2">
                             {!permission ? (
                                 <button onClick={getMicrophonePermission} type="button">
                                     <FaMicrophoneSlash />
@@ -442,7 +584,7 @@ const scrollToBottom = () => {
                                     <BsStopCircle />
                                 </button>
                             ) : null}
-                        </div>
+                        </div> */}
 
                         <button type="submit" ><img src={sendIcon} alt='Send' style={{ height: '22px', width: '25px', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} /></button>
                         {/* <button type="submit" ><img src="https://icons.veryicon.com/png/o/internet--web/iview-3-x-icons/ios-send.png" style={{ height:'25px', width:'40px', backgroundSize:'contain', backgroundRepeat:'no-repeat'}}/></button> */}

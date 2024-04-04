@@ -16,7 +16,8 @@ const PaymentSection1 = () => {
   const [apiload,setApiload] = useState(false)
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://zemaapi.zema.io/'
+  // const BACKEND = 'https://zemaapi.zema.io/'
+  const BACKEND = process.env.REACT_APP_BACKEND
 
   useEffect(() => {
     setApiload(true)
@@ -49,6 +50,9 @@ const PaymentSection1 = () => {
           ''
         )}
         </div>
+        {dataArr.length === 0 ?
+      <h6 className='fw-bolder col-12 d-flex justify-content-center container text-center mb-5 pt-5 mb-4' style={{ color: '#FFFFFF' }}>No Payments yet</h6>:
+      <> 
      {dataArr.sort((a, b) => new Date(b.created) - new Date(a.created)).map(x=>(
 
 <Accordion
@@ -96,8 +100,8 @@ style={{marginRight:'0px'}}
 </Accordion>
 
 
-))}
-
+))}</> 
+  }
 
     </div>
   )

@@ -13,7 +13,7 @@ import f3 from '../../assets/feature3z.PNG'
 const SectionOneFeature = () => {
   return (
     <div className='pb-5 px-3 ' style={{ backgroundColor: '#171725', height: '100%',minHeight:'100vh',width:'100vw' }}>
-    <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Key Features</h1>
+    <h1 className='fw-bolder col-12 d-flex justify-content-center  text-center pt-5 mb-4' style={{ color: '#FFFFFF' }}>Key Features </h1>
 
 {/* images and text */}
 

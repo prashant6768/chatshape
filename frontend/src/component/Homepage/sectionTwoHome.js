@@ -7,10 +7,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ChatUIDe from '../ChatUiDe';
 
+
 const SectionTwoHome = () => {
 
   // const BACKEND = 'http://localhost:5000/'
-    const BACKEND = 'https://zemaapi.zema.io/'
+    // const BACKEND = 'https://zemaapi.zema.io/'
+    const BACKEND = process.env.REACT_APP_BACKEND
 
 
   const zemaFAQ = [
@@ -53,13 +55,17 @@ const SectionTwoHome = () => {
   };
 
   const [addBot, setAddBot] = useState('')
+  const [hcload,setHcload]= useState('')
 
   useEffect(()=>{
+   
     axios.post(`${BACKEND}api/gethomepagebot`, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*'
-    }).then(res =>{if(res.data[0] === "Error"){console.log("Error"); toast.success("Some Error Occured")}else {console.log(res.data,"==========166"); setAddBot(res.data)}}).catch(err => {console.log(err); toast.error("Some Error Occured") })
+    }).then(res =>{if(res.data[0] === "Error"){console.log("Error") }
+    else {console.log(res.data,"==========166"); setAddBot(res.data);}})
+    .catch(err => {console.log(err);  })
   },[])
 
   return (

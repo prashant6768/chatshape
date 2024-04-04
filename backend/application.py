@@ -427,14 +427,18 @@ def daily_task():
             'ConNo':uniqueCon,
             'date':today_date
         }
-        dataCrawl.update_one(
-            {'_id': x['_id']},
-            {'$push': {'tokenData': tokenData}}
-        )
-        dataCrawl.update_one(
-            {'_id': x['_id']}, 
-            {'$push': {'UniqueConData': ConData}}
-        )
+        existing_data_token = dataCrawl.find_one({'_id': x['_id'], 'tokenData.date': today_date})
+        if existing_data_token == None:
+            dataCrawl.update_one(
+                {'_id': x['_id']},
+                {'$push': {'tokenData': tokenData}}
+            )
+        existing_data_con = dataCrawl.find_one({'_id': x['_id'], 'UniqueConData.date': today_date})
+        if existing_data_con == None:
+            dataCrawl.update_one(
+                {'_id': x['_id']}, 
+                {'$push': {'UniqueConData': ConData}}
+            )
         dataCrawl.update_one(
             {'_id': x['_id']}, 
             {'$set': {'UniqueCon': 0}}
@@ -512,50 +516,92 @@ def recognize_audio(audio_file):
         return f"Error during speech recognition: {e}"
 
 
+
+
+
 ##############################################################3 history chat save to db
 @application.route('/api/history',methods=['POST'])
 def history():
-    data = request.get_json()['processedArray']
-    userData = request.get_json()['botID']['botID']
-    now = request.get_json()['now']
-    uniqueCon = request.get_json()['uniqueCon']
+    try:
+        data = request.get_json()['processedArray']
+        userData = request.get_json()['botID']['botID']
+        now = request.get_json()['now']
+        storeName = request.get_json().get('storeName', '')
+        storeEmail = request.get_json().get('storeEmail', '')
+        print("522--------",storeName,"-------------------------------------------------------------------522")
+        uniqueCon = request.get_json()['uniqueCon']
+        input_datetime = datetime.strptime(now, "%m/%d/%Y %I:%M:%S %p")
 
-    users_collection = db['users_website_crawl_data']
-    user_history = db['user_history']
-    objId= ObjectId(userData)
-    # print("---279",now,"---",data)
-    # dataDb_i = users_collection.find_one({'_id':objId})
-    if now != '' and len(data) != 0:
+        output_date_str = input_datetime.strftime("%b %d %Y %I:%M %p %Z")
+
+
+        users_collection = db['users_website_crawl_data']
+        user_history = db['user_history']
+        objId= ObjectId(userData)
+        if now != '' and len(data) != 0:
         # print("---282",now,"---",data)
-        print(uniqueCon,"------",str(type(uniqueCon)))
-        if uniqueCon == 1:
-            print("UNI----285")
-            user_history.insert_one({'time':now, 'botID':userData, 'chatHistory':data})
-            return "uni"
-        else:
-            # print("-------289---",user_history.find_one({"botID":str(userData) }))
-            user_history.update_one({"botID":str(userData),'time':now }, {"$set": {"chatHistory": data}})  
-            return 'NO uni'
-    return 'OK'
+            print(uniqueCon,"------",str(type(uniqueCon)))
+            if uniqueCon == 1:
+                print("UNI----285")
+                user_history.insert_one({'time':output_date_str, 'botID':userData, 'chatHistory':data, 'Name':storeName, 'Email':storeEmail})
+                return "uni"
+            elif storeName != '':
+                print("UNI----285")
+                user_history.update_one({"botID":str(userData),'time':output_date_str }, {"$set": {"Name": storeName}})
+                print("522--------",storeName,"-------------------------------------------------------------------544")
+                return "store"
+            elif storeEmail != '':
+                print("UNI----285")
+                user_history.update_one({"botID":str(userData),'time':output_date_str }, {"$set": {"Email": storeEmail}})
+                print("522--------",storeEmail,"-------------------------------------------------------------------544")
+                return "storeEmail"    
+            else:
+                print("-------289---",data,"------------")
+                user_history.update_one({"botID":str(userData),'time':output_date_str }, {"$set": {"chatHistory": data}})  
+                return 'NO uni'
+        return 'OK'
+    except Exception as e:
+        return str(e)    
 
 ####################################################################3 chat history get
 @application.route('/api/historyget/<id>',methods=['GET'])
 def historyget(id):
-    user_history = db['user_history']
-    hist = []
-    for x in user_history.find({'botID':str(id)}):
-        # print(x['chatHistory'])
-        if len(x['chatHistory']) <= 1:
-            user_history.delete_one({'_id': x['_id']})
-    for x in user_history.find({'botID':str(id)}):
-        data = {
-            'time':x['time'],
-            'history':x['chatHistory']
-        }
-        hist.append(data) 
+    try:
+        user_history = db['user_history']
+        hist = []
+        for x in user_history.find({'botID':str(id)}):
+            # print(x['chatHistory'])
+            if len(x['chatHistory']) <= 1:
+                user_history.delete_one({'_id': x['_id']})
+        for x in user_history.find({'botID':str(id)}):
+            if x['Name'] and x['Email']:
+                data = {
+                    'time':x['time'],
+                    'history':x['chatHistory'],
+                    'Name':x['Name'],
+                    'Email':x['Email']
+                }
+            elif x['Name']:
+                data = {
+                    'time':x['time'],
+                    'history':x['chatHistory'],
+                    'Name':x['Name'],
+                    'Email':''
+                }    
+            else:
+                data = {
+                    'time':x['time'],
+                    'history':x['chatHistory'],
+                    'Name':'',
+                    'Email':''
+                }
+
+            hist.append(data) 
         
     # print("--------303------",hist,"---------303--------")
-    return hist
+        return hist
+    except Exception as e:
+        return str(e)    
 
 
 ######################################### LLM Code  #####  STREAM
@@ -891,7 +937,7 @@ def get_link_data():
     if botName == '':
         return 'noname'
 
-    if pdfFile == None and len(urll) == 0:
+    if len(pdfFile) == 0 and len(urll) == 0:
         print("-------------------NO ENtry")
         return "FillOne"
     print("-------------------------Entry")
@@ -1033,6 +1079,8 @@ def get_link_data():
 
 
 
+
+
 ################################################################## exclude links and store data from links in db
 # @profile
 def get_data(urls ,userData ,botName ,pdf ,unique ,exclude , multiLink ,NoOfCharacters):
@@ -1086,7 +1134,8 @@ def get_data(urls ,userData ,botName ,pdf ,unique ,exclude , multiLink ,NoOfChar
         WebDriverWait(driver, timeout=10)
 #         .until(
 #     EC.visibility_of_element_located((By.XPATH, '//*'))
-# )
+# )     
+        docforgpt=[]
         try:
             for url in page_links_x:
                 try:
@@ -1094,18 +1143,27 @@ def get_data(urls ,userData ,botName ,pdf ,unique ,exclude , multiLink ,NoOfChar
                     page_content = driver.page_source
                     elements = partition_html(text=page_content)
                     text = "\n\n".join([str(el) for el in elements])
+                    # docforgpttext= "\n\n".join([str(el) for el in elements])
                     metadata = {"source": url}
                     docsSel.append(Document(page_content=text, metadata=metadata))
+                    # docforgpt.append(docforgpttext.replace('\n\n',' ').replace('\t', ' ').replace('\n', ' ').replace('\xa0', ' ').replace('\'', "'"))
                     # driver.close()
                     print("======================================================================================")
+                    
                 except Exception as e:
-                    print(str(e))
+                    print(str(e),"==1162")
         except exceptions.StaleElementReferenceException as e:
-            print(str(e))
+            print(str(e),"==1164")
             pass         
         driver.quit()
-
+        
         data = docsSel
+    #     print('-----1167', docforgpt,"==============1192")
+    #     with open('Zema.txt', 'w', encoding='utf-8') as file:
+    # # Write text to the file
+    #         file.write(str(docforgpt))
+    #     print("----1170")
+
         # return "Wrong place to return. just for testing-------"
 
 
@@ -1160,22 +1218,18 @@ def get_data(urls ,userData ,botName ,pdf ,unique ,exclude , multiLink ,NoOfChar
     except Exception as e:
         print(str(e))  
         return str(e)  
-    # print(document_embeddings,"==========846") 
-#     print("-------",textE)
 
+    unique_elements = []
+    seen_sources = set()
 
-    # try:
-    #     dba = Chroma.from_documents(documents=mainDoc, embedding=embeddings)
-    # except Exception as e:
-    #     print("----844--",str(e))
-    #     return str(e)  
+    for metadata in textM:
+        source = metadata.get('source')
 
-    # Chroma =  <class 'langchain.vectorstores.chroma.Chroma'>     
-    # dba = <langchain.vectorstores.chroma.Chroma object at 0x0000021AD9054430>
-    # print("------842=---",dba,"------=842--") this is what it returns <langchain.vectorstores.chroma.Chroma object at 0x0000021AD9054430>
-    # print("------842=---",dba.get(include=['embeddings','metadatas','documents'])['ids'],"------=842--")
-    # print(dir(dba))
-    # return str(embeddings)+" ==== "+str(mainDoc)
+        if source and source not in seen_sources:
+            unique_elements.append(metadata)
+            seen_sources.add(source)
+    print(seen_sources,"-----1180-------",unique_elements)
+   
 
     users_collection = db['users_website_crawl_data']
     user_sub = db['user_subscription']
@@ -1190,6 +1244,7 @@ def get_data(urls ,userData ,botName ,pdf ,unique ,exclude , multiLink ,NoOfChar
            'documents':textD,
         },
         'email': userData,
+        'metadataUnique':unique_elements,
         'botname':botName,
         'url':urls,
         'pdf':unique,
@@ -1204,7 +1259,7 @@ def get_data(urls ,userData ,botName ,pdf ,unique ,exclude , multiLink ,NoOfChar
             'cpuFontColor': '#3D4648',
             'cpuFontTextColor': '#FFFFFF',
             'backgroundColor': '#242439',
-            'fontSize': '12px',
+            'fontSize': '18px',
         },
         'tokenData':[],
         'TokenUsed':0,
@@ -1238,13 +1293,15 @@ def retrain(id):
     # pdfFile = request.files.get('pdfFile')
     pdfFile = request.files.getlist('pdfFile[]') 
     multiLink = request.form.get('multiLink')
-    print("-------pdf",pdfFile)
-    print("-----------url",len(urll))
-
-    if pdfFile == None and len(urll) == 0:
+    addDataToExisting = request.form.get('addDataToExisting')
+    print(addDataToExisting,"-------pdf",pdfFile)
+    print(pdfFile,"-----------url",len(urll))
+    
+    if len(pdfFile) == 0 and len(urll) == 0:
         print("-------------------NO ENtry")
         return "FillOne"
     print("-------------------------Entry")
+   
     # pdf = ''
     # unique = ''
 
@@ -1303,7 +1360,7 @@ def retrain(id):
        return "BotF" 
 
     print(multiLink,"-----593-----------exclude----------",exclude)
-    value = get_data_retrain(urll,userData,objId,pdf,unique,exclude,multiLink,NoOfCharacters)
+    value = get_data_retrain(urll,userData,objId,pdf,unique,exclude,multiLink,NoOfCharacters,addDataToExisting)
     # if os.path.exists(pdf):
     #     print("os path -------721",pdf)
     #     os.remove(pdf)
@@ -1386,7 +1443,7 @@ def retrain(id):
     return str(e)
  
 ################################################################## retrain data part 2 - exclude links and store data from links in db
-def get_data_retrain(urls,userData,objId,pdf,unique,exclude,multiLink, NoOfCharacters):
+def get_data_retrain(urls,userData,objId,pdf,unique,exclude,multiLink, NoOfCharacters,addDataToExisting):
   try:  
     print("600---------------------",len(urls))
     data=''
@@ -1494,30 +1551,81 @@ def get_data_retrain(urls,userData,objId,pdf,unique,exclude,multiLink, NoOfChara
     except Exception as e:
         print(str(e))  
         return str(e)  
+
+    unique_elements = []
+    seen_sources = set()
+    print("============1513")
+    for metadata in textM:
+        source = metadata.get('source')
+
+        if source and source not in seen_sources:
+            unique_elements.append(metadata)
+            seen_sources.add(source)
+    print(seen_sources,"-----1180-------",unique_elements)    
     
     users_collection = db['users_website_crawl_data']
     user_sub = db['user_subscription']
 
     try:
-       users_collection.update_one({'_id':objId},{"$set":
-       {
-        'NoOfCharacters': NoOfCharacters,
-        # 'crawldata': str(data),
-        # 'crawldataPdf':str(docs),
-        'crawl':{
-           'ids':textI,
-           'metadatas':textM,
-           'embeddings':textE,
-           'documents':textD,
-        },
-        'url':urls,
-        'pdf':unique,
-        'urlsUsed':page_links_x,
-        'urlsEx':exclude.split(","),
-        'embeddedQA':[],
-        }})
+        if addDataToExisting == 'N':
+           print("-------------------1504--",addDataToExisting)
+           users_collection.update_one({'_id':objId},{"$set":
+           {
+            'NoOfCharacters': NoOfCharacters,
+            # 'crawldata': str(data),
+            # 'crawldataPdf':str(docs),
+            'crawl':{
+               'ids':textI,
+               'metadatas':textM,
+               'embeddings':textE,
+               'documents':textD,
+            },
+            'url':urls,
+            'pdf':unique,
+            'metadataUnique':unique_elements,
+            'urlsUsed':page_links_x,
+            'urlsEx':exclude.split(","),
+            'embeddedQA':[],
+            }})
+
+        else:
+            print("-------------------1524--",addDataToExisting)
+        #     users_collection.update_one({'_id':objId},{"$push":
+        #    {
+        #        'crawl.ids':textI,
+        #        'crawl.metadatas':textM,
+        #        'crawl.embeddings':textE,
+        #        'crawl.documents':textD,
+        #     'url':urls,
+        #     'pdf':unique,
+        #     'urlsUsed':page_links_x,
+        #     'urlsEx':exclude.split(","),
+        #     }})
+            users_collection.update_one({'_id':objId},{"$push": { 'crawl.ids':{'$each' :textI }}})
+            print("1")
+            users_collection.update_one({'_id':objId},{"$push": { 'crawl.metadatas':{'$each' :textM }}})
+            print("2")
+            users_collection.update_one({'_id':objId},{"$push": { 'crawl.embeddings':{'$each' :textE }}})
+            print("3")
+            users_collection.update_one({'_id':objId},{"$push": { 'crawl.documents':{'$each' :textD }}})
+            print("4")
+            if len(urls) != 0:
+                users_collection.update_one({'_id':objId},{"$set": { 'url':urls }})
+            print("5")
+            if len(unique) != 0:    
+                users_collection.update_one({'_id':objId},{"$push": { 'pdf':{'$each':unique }}})
+            print("6")
+            if len(page_links_x) != 0:
+                users_collection.update_one({'_id':objId},{"$push": { 'urlsUsed':{'$each':page_links_x }}})
+            print("7")
+            if len(exclude) != 0:
+                users_collection.update_one({'_id':objId},{"$push": { 'urlsEx':{'$each':exclude.split(",") }}})
+            print("8")
+            if len(unique_elements) != 0:
+                users_collection.update_one({'_id':objId},{"$push": { 'metadataUnique':{'$each':unique_elements }}})    
+
         #  print(user_sub.find_one({"username":userData}),"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-       print("Data stored successfully!")
+        print("Data stored successfully!")
     except Exception as e:
        print("Error storing data:============", str(e),"===========================")
        return str(e)
@@ -1634,6 +1742,7 @@ def getupdatebot(id):
         'UniqueConData':[d for d in dataDb_i.get('UniqueConData') if d['date'].startswith(current_month)],
         'embeddedQA':dataDb_i.get('embeddedQA'),
         'embeddedQAsaved':dataDb_i.get('embeddedQAsaved'),
+        'metadataUnique':dataDb_i.get('metadataUnique'),
     }
     data={
         'email':dataDb['email'],
@@ -1649,6 +1758,7 @@ def getupdatebot(id):
         'UniqueConData':dataDb['UniqueConData'],
         'embeddedQA':dataDb['embeddedQA'],
         'embeddedQAsaved':dataDb['embeddedQAsaved'],
+        'metadataUnique':dataDb['metadataUnique'],
 
     }
     # print(data)
@@ -1657,15 +1767,16 @@ def getupdatebot(id):
 ###################################################################### get chatbot ui fontdata
 @application.route('/api/fontdata/<id>',methods=['GET'])
 def getfontdata(id):
-    users_collection = db['users_website_crawl_data']
-    user_sub = db['user_subscription']
-    objId= ObjectId(id)
-    dataDb_i = users_collection.find_one({'_id':objId})['FontData'] 
-    iMsg =  users_collection.find_one({'_id':objId})['initialMsg']  
-    sPrompt = users_collection.find_one({'_id':objId})['suggestedPrompt']
-    email = users_collection.find_one({'_id':objId})['email']
-    plan = user_sub.find_one({'username':email})['plan-Info']['plan']
-    dataDb = {
+    try:
+        users_collection = db['users_website_crawl_data']
+        user_sub = db['user_subscription']
+        objId= ObjectId(id)
+        dataDb_i = users_collection.find_one({'_id':objId})['FontData'] 
+        iMsg =  users_collection.find_one({'_id':objId})['initialMsg']  
+        sPrompt = users_collection.find_one({'_id':objId})['suggestedPrompt']
+        email = users_collection.find_one({'_id':objId})['email']
+        plan = user_sub.find_one({'username':email})['plan-Info']['plan']
+        dataDb = {
         'font':dataDb_i.get('font'),
         'userFontColor':dataDb_i.get('userFontColor'),
         'userFontTextColor':dataDb_i.get('userFontTextColor'),
@@ -1677,9 +1788,11 @@ def getfontdata(id):
         'sPrompt':sPrompt,
         'plan':plan
         
-    }
-    print("plan-----------863--",plan)
-    return dataDb
+        }
+        print("plan-----------863--",plan)
+        return dataDb
+    except Exception as e:
+        return['error',str(e)]    
 
 ###################################################################### Update chatbot ui fontdata
 @application.route('/api/fontdata/<id>',methods=['PUT'])
@@ -2648,7 +2761,7 @@ def admingethomepagebot():
         else:    
             botname = botname_i['botname']
         print("--2506=======",botname)
-        return [str(botData),botname]    
+        return [str(botData),botname,botData]    
     except Exception as e:
         print("---------2503-------",str(e))
         return ["Error",str(e)]     
@@ -2665,6 +2778,49 @@ def gethomepagebot():
         print("---------2503-------",str(e))
         return ["Error",str(e)]     
 
+
+############################################################    delete metadata from bot sources and thus the specific part of source
+@application.route('/api/deletemetadata/<id>',methods=['POST'])
+def deletemetadata(id):
+    try:
+        objId= ObjectId(id) 
+        data = request.get_json('data')['data']
+        dbase = db['users_website_crawl_data']
+        dataDb = dbase.find_one({'_id':objId})
+        print("======2721==",data)
+        # for x in dataDb['crawl']['metadatas']:
+        #     if x['source'] == data:
+        #         print("===2724===",x,"=======",x['source'].index(data))
+        for index, x in reversed(list(enumerate(dataDb['crawl']['metadatas']))):
+            if x['source'] == data:
+                print(f"The condition was met at index----- {index}----")
+                dataDb['crawl']['ids'].pop(index)
+                dataDb['crawl']['metadatas'].pop(index)
+                dataDb['crawl']['embeddings'].pop(index)
+                dataDb['crawl']['documents'].pop(index)
+            else:
+                print(x['source'],"--------------",data)    
+        for x in dataDb['pdf']:
+            if x == os.path.basename(data):
+                print("===2727===",x)
+                dataDb['pdf'].remove(os.path.basename(data))
+               
+        for x in dataDb['urlsUsed']:
+            if x == data:
+                print("===2730===",x)
+                dataDb['urlsUsed'].remove(data)
+                dataDb['urlsEx'].append(data)
+
+        for index, x in reversed(list(enumerate(dataDb['metadataUnique']))):
+            if x['source'] == data:
+                print(f"The condition was met at index {index}")  
+                dataDb['metadataUnique'].pop(index)   
+
+        dbase.update_one({'_id': objId}, {'$set': dataDb})                
+        return 'ok'    
+    except Exception as e:
+        print("---------2503-------",str(e))
+        return ["Error",str(e)]     
 
 
 # if __name__ == '__main__':

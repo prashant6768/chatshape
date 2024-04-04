@@ -22,7 +22,8 @@ const Login = () => {
   const navigate = useNavigate();
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://zemaapi.zema.io/'
+  // const BACKEND = 'https://zemaapi.zema.io/'
+  const BACKEND = process.env.REACT_APP_BACKEND
   
 
     const [username, setUsername] = useState('');
@@ -55,15 +56,56 @@ const Login = () => {
     e.preventDefault();
     
     setLoading(true); 
-    await axios.post(`${BACKEND}auth/login`,{username,password},{
-        'Content-type':'application/json', 
-        'Accept':'application/json',
-        'Access-Control-Allow-Origin':'*'
-  })
-    .then(data => { if(data.data === 'NO'){toast.error("Wrong Credentials");setLoading(false);}else if(data.data === 'ic'){toast.error("Fill Both Fields");setLoading(false);}else if(data.data[1] === 'admin'){Cookies.set('accessToken', `${data.data[0]}`); Cookies.set('adminToken', `${data.data[1]}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}else{Cookies.set('accessToken', `${data.data}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)} })
-    // .then(data => console.log(data.data))
-    // .then(setTimeout(() => { navigate('/account') }, 2000))
-    .catch(err => {console.log("login form err = ",err); toast.error("Something went wrong");setLoading(false);})
+  //   await axios.post(`${BACKEND}auth/login`,{username,password},{
+  //       'Content-type':'application/json', 
+  //       'Accept':'application/json',
+  //       'Access-Control-Allow-Origin':'*'
+  // })
+  //   .then(data => {
+  //      if(data.data === 'NO'){toast.error("Wrong Credentials");setLoading(false);}
+  //      else if(data.data === 'ic'){toast.error("Fill Both Fields");setLoading(false);}
+  //      else if(data.data[1] === 'admin'){Cookies.set('accessToken', `${data.data[0]}`); Cookies.set('adminToken', `${data.data[1]}`); Cookies.set('token', `${data.data[2]}`); Cookies.set('refresh_token', `${data.data[3]}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)}
+  //      else{Cookies.set('accessToken', `${data.data[0]}`); Cookies.set('token', `${data.data[1]}`); Cookies.set('refresh_token', `${data.data[2]}`); toast.success("Login Successful");setLoading(false);setTimeout(() => { navigate('/account') }, 2000)} })
+  //   .catch(err => {console.log("login form err = ",err); toast.error("Something went wrong");setLoading(false);})
+
+
+  await axios.post(`${BACKEND}auth/login`, { username, password }, {
+    headers: {
+        'Content-type': 'application/json', 
+        'Accept': 'application/json',
+       'Access-Control-Allow-Origin': '*'
+
+    }
+})
+.then(data => {
+    if (data.data === 'NO') {
+        toast.error("Wrong Credentials");
+        setLoading(false);
+    } else if (data.data === 'ic') {
+        toast.error("Fill Both Fields");
+        setLoading(false);
+    } else if (data.data[1] === 'admin') {
+        document.cookie = `accessToken=${data.data[0]}; path=/; Secure; SameSite=None`;
+        document.cookie = `adminToken=${data.data[1]}; path=/; Secure; SameSite=None`;
+        document.cookie = `token=${data.data[2]}; path=/; Secure; SameSite=None`;
+        document.cookie = `refresh_token=${data.data[3]}; path=/; Secure; SameSite=None`;
+        toast.success("Login Successful");
+        setLoading(false);
+        setTimeout(() => { navigate('/account') }, 2000);
+    } else {
+        document.cookie = `accessToken=${data.data[0]}; path=/; Secure; SameSite=None`;
+        document.cookie = `token=${data.data[1]}; path=/; Secure; SameSite=None`;
+        document.cookie = `refresh_token=${data.data[2]}; path=/; Secure; SameSite=None`;
+        toast.success("Login Successful");
+        setLoading(false);
+        setTimeout(() => { navigate('/account') }, 2000);
+    }
+})
+.catch(err => {
+    console.log("login form err = ",err);
+    toast.error("Something went wrong");
+    setLoading(false);
+});
 
     console.log('Submitted:', username, password);
   };
@@ -92,12 +134,17 @@ setTimeout(() => { navigate('/account') }, 2000)
 
 
   const location = useLocation();
+  const[token,setToken]=useState('')
+  const[refreshT,setRefreshT]=useState('')
 
   useEffect(() => {
     // Parse the query parameters from the URL
     const params =new URLSearchParams(window.location.search);
     setParam(params.get('access_token'))
     setSl(params.get('sl'))
+    setToken(params.get('token'))
+    setRefreshT(params.get('refresh_token'))
+
     console.log(param)
   }, [location.search]);
 
@@ -109,16 +156,22 @@ setTimeout(() => { navigate('/account') }, 2000)
     if(sl === 's'){
       Cookies.set('accessToken', `${param}`)
       toast.success("Profile created Successfully")
+      Cookies.set('token', token, { expires: 1, path: '/' });
+      Cookies.set('refresh_token', refreshT, { expires: 1, path: '/' })
       setTimeout(() => { navigate('/account') }, 2000)
       console.log(param,"SSSSSSSSSSS")
     }else if(sl === 'l'){
       Cookies.set('accessToken', `${param}`)
       toast.success("Login Successful")
+      Cookies.set('token', token, { expires: 1, path: '/' });
+      Cookies.set('refresh_token', refreshT, { expires: 1, path: '/' })
       setTimeout(() => { navigate('/account') }, 2000)
       console.log(param,"LLLLLLLLL")
     }else if(sl === 'a'){
       Cookies.set('accessToken', `${param}`)
       Cookies.set('adminToken', `admin`)
+      Cookies.set('token', token, { expires: 1, path: '/' });
+      Cookies.set('refresh_token', refreshT, { expires: 1, path: '/' })
       toast.success("Login Successful")
       setTimeout(() => { navigate('/account') }, 2000)
       console.log(param,"LLLLLLLLL")

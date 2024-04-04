@@ -59,7 +59,8 @@ const ChatUI = (botID) => {
   // <script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js" defer id="popup" cred="65427cf9e8dcb18a5750fb1e"></script>
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://zemaapi.zema.io/'
+  // const BACKEND = 'https://zemaapi.zema.io/'
+  const BACKEND = process.env.REACT_APP_BACKEND
 
   // const token = document.cookie.split('=')[1]
   // const decoded = jose.decodeJwt(token,'notmysecretkey');
@@ -187,6 +188,286 @@ const ChatUI = (botID) => {
       sender: 'me',
     };
 
+    console.log( inputValue, botID, uniqueCon,chatUiDe)
+    // curl -X POST https://zemaapi.zema.io/api/msg      -H "Content-Type: application/json"      -d '{"inputValue": "your input value", "botID": {"botID": "65782d638816080b8eb22d1b"}, "uniqueCon": 1, "chatUiDe":None}'
+    // curl -X POST -H "Content-type: application/json" -H "Accept: application/json" -d '{"inputValue": "yourInputValue", "botID": "65782d638816080b8eb22d1b", "uniqueCon": 1, "chatUiDe": None}' https://zemaapi.zema.io/api/msg
+
+
+// ////////////////////////////
+// initiate a post request using this data data = {
+//   "inputValue": "explain the topic in 30 words",
+//   "botID": {"botID": "65782d638816080b8eb22d1b"},
+//   "uniqueCon": 1,
+//   "chatUiDe": None
+// }
+
+// ////////////////////////////////
+// openapi: 3.0.0
+// info:
+//   title: Zema API
+//   description: API for interacting with Zema messaging service.
+//   version: 1.0.0
+// servers:
+//   - url: https://zemaapi.zema.io
+//     description: Zema API server
+// paths:
+//   /api/msg:
+//     post:
+//       operationId: sendMessage
+//       summary: Send a message to the Zema API
+//       requestBody:
+//         required: true
+//         content:
+//           application/json:
+//             schema:
+//               type: object
+//               properties:
+//                 inputValue:
+//                   type: string
+//                   description: The input value to be sent
+//                   example: zema in 1 word
+//                 botID:
+//                   type: object
+//                   properties:
+//                     botID:
+//                       type: string
+//                       description: Unique identifier for the bot
+//                       example: 6576dff6616c8f79f8e7286c
+//                 uniqueCon:
+//                   type: integer
+//                   format: int32
+//                   description: A unique condition identifier
+//                   exapmle: 1
+//                 chatUiDe:
+//                   type: string
+//                   nullable: true
+//                   description: Chat UI identifier, can be null
+//                   example: null
+//       responses:
+//         default:
+//           description: Default response for various outcomes
+//           content:
+//             application/json:
+//               schema:
+//                 oneOf:
+//                   - type: string
+//                     enum:
+//                       - SubE
+//                       - RDNF
+//                   - type: array
+//                     items:
+//                       type: string
+//                   - type: object
+//                     properties:
+//                       summaries:
+//                         type: string
+//                       planname:
+//                         type: string
+//                       uniqueCon:
+//                         type: integer
+//                       error:
+//                         type: string
+//                         description: Error message if an error occurred
+
+
+
+/////////////////////////////////////////////  working at 10 pm json form  (gave only one post and one get error message in ubuntu, no 100s of socket io)
+// {
+//   "openapi": "3.0.0",
+//   "info": {
+//     "title": "Zema Chatbot API",
+//     "description": "API for interacting with Zema's chatbot service.",
+//     "version": "1.0.0"
+//   },
+//   "servers": [
+//     {
+//       "url": "https://zemaapi.zema.io",
+//       "description": "Zema API server"
+//     }
+//   ],
+//   "paths": {
+//     "/api/msg": {
+//       "post": {
+//         "operationId": "postMessage",
+//         "summary": "Send a message and receive a response from the chatbot.",
+//         "requestBody": {
+//           "required": true,
+//           "content": {
+//             "application/json": {
+//               "schema": {
+//                 "type": "object",
+//                 "properties": {
+//                   "inputValue": {
+//                     "type": "string"
+//                   },
+//                   "botID": {
+//                     "type": "object",
+//                     "properties": {
+//                       "botID": {
+//                         "type": "string"
+//                       }
+//                     }
+//                   },
+//                   "uniqueCon": {
+//                     "type": "boolean"
+//                   },
+//                   "chatUiDe": {
+//                     "type": "string",
+//                     "nullable": true
+//                   }
+//                 }
+//               }
+//             }
+//           }
+//         },
+//         "responses": {
+//           "200": {
+//             "description": "Successful response",
+//             "content": {
+//               "application/json": {
+//                 "schema": {
+//                   "oneOf": [
+//                     {
+//                       "type": "string"
+//                     },
+//                     {
+//                       "type": "array",
+//                       "items": {
+//                         "type": "string"
+//                       }
+//                     }
+//                   ]
+//                 }
+//               }
+//             }
+//           },
+//           "400": {
+//             "description": "Bad request, such as missing required fields"
+//           },
+//           "500": {
+//             "description": "Internal server error indicating an issue with the server"
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+
+
+
+
+// //////////////////////////////  only working, checked at 9 pm
+// openapi: 3.0.0
+// info:
+//   title: Zema Chatbot API
+//   description: API for interacting with Zema's chatbot service.
+//   version: 1.0.0
+// servers:
+//   - url: https://zemaapi.zema.io
+//     description: Zema API server
+// paths:
+//   /api/msg:
+//     post:
+//       operationId: postMessage
+//       summary: Send a message and receive a response from the chatbot.
+//       requestBody:
+//         required: true
+//         content:
+//           application/json:
+//             schema:
+//               type: object
+//               properties:
+//                 inputValue:
+//                   type: string
+//                 botID:
+//                   type: object
+//                   properties:
+//                     botID:
+//                       type: string
+//                 uniqueCon:
+//                   type: integer
+//                 chatUiDe:
+//                   type: string
+//                   nullable: true
+//       responses:
+//         '200':
+//           description: Successful response
+//           content:
+//             application/json:
+//               schema:
+//                 oneOf:
+//                   - type: string
+//                   - type: array
+//                     items:
+//                       type: string
+//         '400':
+//           description: Bad request, such as missing required fields
+//         '500':
+//           description: Internal server error indicating an issue with the server
+
+///////////////////////////////////
+// openapi: 3.0.0
+// info:
+//   title: AI Trading Spy API
+//   description: API for AI Trading Spy services.
+//   version: 1.0.0
+// servers:
+//   - url: https://api.aitradingspy.com
+//     description: AI Trading Spy API server
+// paths:
+//   /getg/:
+//     get:
+//       operationId: getSampleString
+//       summary: Retrieves a fixed sample string
+//       responses:
+//         '200':
+//           description: A simple string response
+//           content:
+//             text/plain; charset=utf-8:
+//               schema:
+//                 type: string
+//                 example: SAMPLE STRING
+
+/////////////////////////////////
+// {
+//   "openapi": "3.0.0",
+//   "info": {
+//     "title": "AI Trading Spy API",
+//     "description": "API for AI Trading Spy services.",
+//     "version": "1.0.0"
+//   },
+//   "servers": [
+//     {
+//       "url": "https://api.aitradingspy.com",
+//       "description": "AI Trading Spy API server"
+//     }
+//   ],
+//   "paths": {
+//     "/getg/": {
+//       "get": {
+//         "operationId": "getSampleString",
+//         "summary": "Retrieves a fixed sample string",
+//         "responses": {
+//           "200": {
+//             "description": "A simple string response",
+//             "content": {
+//               "text/plain; charset=utf-8": {
+//                 "schema": {
+//                   "type": "string",
+//                   "example": "SAMPLE STRING"
+//                 }
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+
+
+
+
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setLoading(true);
     scrollToBottom()
@@ -225,7 +506,7 @@ scrollToBottom()
     },[ messages])
 
   useEffect(() => {
-    if (chatbotMsg !== '') {
+    // if (chatbotMsg !== '') {
       console.log("111111==", messages)
       const filteredArray = messages.filter(item => item.text !== '');
       const processedArray = filteredArray.map(({ id, ...x }) => x);
@@ -235,7 +516,7 @@ scrollToBottom()
         'Accept': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }).then(res => console.log(res.data, " === from backend message history ")).catch(err => console.log(err))
-    }
+    // }
   }, [chatbotMsg])
 
 

@@ -4,7 +4,7 @@ import '../../src/css/chatCss.css'
 import { Form, Button, Dropdown, DropdownButton } from 'react-bootstrap';
 // import * as jose from 'jose';
 import axios from 'axios'
-import { ThreeDots } from 'react-loader-spinner';
+import { RotatingLines, ThreeDots } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa'
 import {HiSpeakerWave, HiSpeakerXMark} from 'react-icons/hi2'
@@ -26,7 +26,7 @@ function TypingEffect({ text }) {
 const ChatUIDe = (botID) => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
-    const [chatbotMsg, setChatbotMsg] = useState('Work in Progress');
+    const [chatbotMsg, setChatbotMsg] = useState('');
     const [suggestedPrompt, setSPrompt] = useState([])
     const [spromptHide, setSpromptHide] = useState(false)
     const [plan, setPlan] = useState('')
@@ -41,15 +41,26 @@ const ChatUIDe = (botID) => {
     const[consecFailMsg,setConsecFailMsg]=useState([])
     const[chatUiDe,setChatUiDe]= useState('True')
 
+    const [toggleStoreName,setToogleStoreName]= useState(false)
+    const [storeName,setStoreName]= useState('')
+    const [toggleStoreEmail,setToogleStoreEmail]= useState(false)
+    const [storeEmail,setStoreEmail]= useState('')
+
     // const BACKEND = 'http://localhost:5000/'
     // const BACKENDWS = 'ws://localhost:5000/'
-    const BACKEND = 'https://zemaapi.zema.io/'
-    const BACKENDWS = 'wss://zemaapi.zema.io/'
+    // const BACKEND = 'https://zemaapi.zema.io/'
+    // const BACKENDWS = 'wss://zemaapi.zema.io/'
+    const BACKEND = process.env.REACT_APP_BACKEND
+    const BACKENDWS = process.env.REACT_APP_BACKENDWS
 
 
 
     const [socket, setSocket] = useState(null);
     const [room, setRoom] = useState('');
+    const [answerCount,setAnswerCount]= useState(0)
+    const [thankName,setThankName]= useState(false)
+    const [thankEmail,setThankEmail]= useState(false)
+
 
 
 useEffect(() => {
@@ -137,7 +148,7 @@ console.log(err,"======try catch")
     useEffect(() => {
         socket?.on('message-chat', data => {
             setChkk(prevChkk => [...prevChkk, data.message])
-            console.log(data.message)
+            console.log(data.message," --148")
         });
    
     }, [socket])
@@ -167,6 +178,27 @@ console.log(err,"======try catch")
         let inputValue = x
         console.log(spromptHide)
         setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+        if(toggleStoreName === true){
+
+            const nameRegex = /[0-9!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|~`]/;
+            if (nameRegex.test(inputValue)) {
+              toast.error("Name cannot contain numbers or symbols");
+            //   setLoading(false);
+            console.log("NAme-----------------symbol-----")
+              return;
+            }
+
+            console.log("Store the name", x)
+            setStoreName(inputValue)
+            setToogleStoreName(false)
+        }else if(toggleStoreEmail === true){
+            console.log("Store the name", x)
+            setStoreEmail(inputValue)
+            setToogleStoreEmail(false)
+        }
+        else{
+        
         setLoading(true);
         scrollToBottom()
         axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon, chatUiDe }, {
@@ -181,11 +213,11 @@ console.log(err,"======try catch")
             else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false);console.log("-------111111-----",res.data);setUniqueCon(0);  setChatbotMsg("Some Error Occured !!!5!"); setConsecFailMsg(prev => [...prev, res.data[1]]); setConsecFail(consecFail + 1) }
             else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found.");setUniqueCon(0);  setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
             else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]);setUniqueCon(0);  setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
-            else { setChatbotMsg(res.data[0]); setConsecFail(0); setUniqueCon(0); console.log(messages, " === from backend"); setLoading(false) }
+            else {setAnswerCount(answerCount+1); setChatbotMsg(res.data[0]); setConsecFail(0); setUniqueCon(0); console.log(messages, " === from backend",res.data); setLoading(false) }
         })
             .catch(err => { setLoading(false); console.log(err); setConsecFail(consecFail + 1); setConsecFailMsg(prev => [...prev, err]); setChatbotMsg("Sorry, Some Error has Occured !!!! ") })
         scrollToBottom()
-
+    }
     }
 
 
@@ -205,6 +237,21 @@ console.log(err,"======try catch")
             return;
         }
 
+        if(toggleStoreName === true){
+            const nameRegex = /[0-9!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|~`]/;
+            if (nameRegex.test(inputValue)) {
+              toast.error("Name cannot contain numbers or symbols");
+              return;
+            }
+        }
+        if(toggleStoreEmail === true){
+            const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+            if (!emailRegex.test(inputValue)) {
+              toast.error("Invalid Email Format");
+              return;
+            }           
+        }
+
         const newMessage = {
             id: messages.length + 1,
             text: inputValue,
@@ -212,6 +259,27 @@ console.log(err,"======try catch")
         };
 
         setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+        if(toggleStoreName === true){
+            console.log("Store the name", inputValue)
+
+            const nameRegex = /[0-9!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|~`]/;
+            if (nameRegex.test(inputValue)) {
+              toast.error("Name cannot contain numbers or symbols");
+            //   setLoading(false);
+            console.log("NAme-----------------symbol-----")
+              return;
+            }
+
+            setStoreName(inputValue)
+            setToogleStoreName(false)
+        }else if(toggleStoreEmail === true){
+           
+            setStoreEmail(inputValue)
+            setToogleStoreEmail(false)
+        }
+        else{
+       
         setLoading(true);
         scrollToBottom()
         axios.post(`${BACKEND}api/msg`, { inputValue, botID, uniqueCon, chatUiDe }, {
@@ -221,15 +289,15 @@ console.log(err,"======try catch")
         })
             // .then(res => console.log(res.data," === from backend ")).catch(err => console.log(err))
             .then(res => {
-                if (res.data === 'SubE') { setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade"); setUniqueCon(0) }
+                if (res.data === 'SubE') {  setLoading(false); setChatbotMsg("Your services in the plan have expired. Kindly upgrade"); setUniqueCon(0) }
                  else if (res.data == 'noid') { setLoading(false); setChatbotMsg("Sorry, This Bot has been deleted"); setUniqueCon(0) } 
                  else if (res.data[0] == 'Some Error Occured !!!!') { setLoading(false); setChatbotMsg("Some Error Occured !!!!"); setConsecFail(consecFail + 1); setUniqueCon(0); setConsecFailMsg(prev => [...prev, res.data[1]]) } 
                  else if (res.data == 'RDNF') { setLoading(false); setChatbotMsg("Relevant Data Not Found."); setUniqueCon(0); setConsecFailMsg(prev => [...prev, "Relevant Data Not Found"]); setConsecFail(consecFail + 1) }
                 else if (res.data[1] == 'RDN') { setLoading(false); setChatbotMsg(res.data[0]); setUniqueCon(0); setConsecFailMsg(prev => [...prev, res.data]); setConsecFail(consecFail + 1) }
-                else { setChatbotMsg(res.data[0]); setConsecFail(0); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); }
+                else { setAnswerCount(answerCount+1);setChatbotMsg(res.data[0]);  setConsecFail(0); console.log(messages, "=== backend www", res.data); setUniqueCon(0); setLoading(false); }
             }).catch(err => { setLoading(false); setConsecFail(consecFail + 1); console.log(err); setChatbotMsg("Sorry, Some Error has Occured !!!! "); setConsecFailMsg(prev => [...prev, err]) })
         scrollToBottom()
-
+        }
     };
 
     useEffect(() => {
@@ -252,22 +320,36 @@ console.log(err,"======try catch")
     }, [messages])
 
     useEffect(() => {
-        console.log("111111==", messages)
+        console.log("111111==", messages, messages.length)
         const filteredArray = messages.filter(item => item.text !== '');
         const processedArray = filteredArray.map(({ id, ...x }) => x);
         console.log("222== ", processedArray)
-        axios.post(`${BACKEND}api/history`, { botID, processedArray, now, uniqueCon }, {
+        console.log("280------",storeName)
+        if(storeName !== ''){
+            setThankName(true)
+        }
+        if(storeEmail !== ''){
+            setThankEmail(true)
+        }
+        axios.post(`${BACKEND}api/history`, { botID, processedArray, now, uniqueCon,storeName,storeEmail }, {
             'Content-type': 'application/json',
             'Accept': 'application/json',
             'Access-Control-Allow-Origin': '*'
-        }).then(res => console.log(res.data, " === from backend message history ")).catch(err => console.log(err))
-    }, [chatbotMsg])
+        }).then(res => {console.log(res.data, " === from backend message history "); setStoreName('');setStoreEmail('')}).catch(err => console.log(err))
+    }, [chatbotMsg,storeName,storeEmail])
 
     const[apiload,setApiload] = useState(false)
+    
 
     useEffect(() => {
         setApiload(true)
-        axios.get(`${BACKEND}api/fontdata/${botID.botID}`).then(res => { setFontData(res.data); setSPrompt(res.data.sPrompt); setChatbotMsg(res.data.initialMsg); setPlan(res.data.plan); console.log(res.data.initialMsg, "=font api init"); setApiload(false) }).catch(err => {console.log(err); setApiload(false)})
+        console.log("---------",`${BACKEND}api/fontdata/${botID.botID}`)
+        axios.get(`${BACKEND}api/fontdata/${botID.botID}`)
+        .then(res =>{if(res.data[0]=='error'){console.log(res.data[1]);toast.error("Some Error Occured"); setApiload(false)}
+         else{ setFontData(res.data);
+            //  setSPrompt(res.data.sPrompt);
+              setChatbotMsg(res.data.initialMsg); setPlan(res.data.plan); console.log(res.data.initialMsg, "=font api init"); setApiload(false) }})
+         .catch(err => {console.log(err); setApiload(false)})
         console.log(suggestedPrompt)
     }, [botID.botID])
 
@@ -282,7 +364,10 @@ console.log(err,"======try catch")
         if (chatbotMsg === '' && chatbotMsg === null ) {
             console.log("W")
         } else {
-            setMessages((prevMessages) => [...prevMessages, newMessage]);
+         
+                setMessages((prevMessages) => [...prevMessages, newMessage]);
+            
+         
             // if (speechTog === true) {
             //     const speechSynthesis = window.speechSynthesis;
             //     const utterance = new SpeechSynthesisUtterance(chatbotMsg);
@@ -502,6 +587,73 @@ console.log(err,"======try catch")
         }, 10);
     };
 
+    const [duplicatePreventer1,setDuplicatePreventer1]=useState(false)
+    const [duplicatePreventer2,setDuplicatePreventer2]=useState(false)
+
+    useEffect(()=>{
+   if(answerCount === 1 && duplicatePreventer1 === false && thankName !== true){
+    console.log("++++++++++++++++++++++++++++++++++++++++++++")
+ 
+    const newMessage = {
+        id: messages.length + 2,
+        text: 'Tell me your name to proceed further',
+        sender: '',
+    };
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+            console.log(chatbotMsg,"---532")
+            setToogleStoreName(true)
+            setDuplicatePreventer1(true)
+            
+   }
+
+   if(thankName === true ){
+    setToogleStoreName(false)
+            setThankName(false)
+
+
+    const newMessage = {
+        id: messages.length + 1,
+        text: 'Thanks, You can proceed with your queries',
+        sender: '',
+    };
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+            console.log(chatbotMsg,"---561")
+            setInputValue('')
+   }
+  
+
+   if(answerCount === 5 && duplicatePreventer2 === false && thankEmail !== true){
+    console.log("++++++++++++++++++++++++++++++++++++++++++++")
+ 
+    const newMessage = {
+        id: messages.length + 2,
+        text: 'Tell me your email to proceed further',
+        sender: '',
+    };
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+            console.log(chatbotMsg,"---532")
+            setToogleStoreEmail(true)
+            setDuplicatePreventer2(true)
+            
+   }
+
+   if(thankEmail === true ){
+    setToogleStoreEmail(false)
+            setThankEmail(false)
+    const newMessage = {
+        id: messages.length + 1,
+        text: 'Thanks, You can proceed with your queries',
+        sender: '',
+    };
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+            console.log(chatbotMsg,"---561")
+            setInputValue('')
+   }
+
+   console.log("Triggerred after name submit",thankName)
+    },[answerCount,thankName,thankEmail])
+
+
     return (
         <div className='row d-flex justify-content-around flex-wrap'>
 
@@ -516,10 +668,10 @@ console.log(err,"======try catch")
                         mark ?
                             <h1 className='bg-primary mx-3' style={{ position: 'absolute', opacity: '15%', left: '20px', bottom: '50px' }}>Powered by Zema</h1> : <p></p>
                     } */}
-                    <div className="chat-container rounded-4 px-0" ref={chatContainerRef}  style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '90vw', minWidth: '240px', width: '100%', borderWidth: '0px' }}>
+                    <div className="chat-container  px-0" ref={chatContainerRef}  style={{ backgroundColor: fontData.backgroundColor, height: '600px', paddingBottom: '100px', maxWidth: '90vw', minWidth: '240px', width: '100%', borderWidth: '0px',borderTopRightRadius:'15px', borderTopLeftRadius:'15px' }}>
                         <div className="chat-messages " >
                             {messages.map((message) => (
-                                message.text === '' || null || undefined ? '' :
+                                message.text === '' || null || undefined || messages[messages.length-1].text == messages[messages.length-2].text ? '' :
                                     <div
                                         key={message.id}
                                         className={`message ${message.sender === 'me' ? 'sent' : 'received'}`}
@@ -532,9 +684,19 @@ console.log(err,"======try catch")
                              {
                                 chkk.length == 0 ? '':<p style={ messageStyleRec} className="message  received" >{chkk}</p>
            }
-                            {loading ? (
-                                <ThreeDots type="Oval" position="top-center" color="#3D4648" height={50} width={50} />
-
+             <div className='form-group d-flex justify-content-center mt-4'>
+       {loading ? (
+          <ThreeDots type="Oval" position="top-center" color="#fff" height={50} width={50} />
+         
+        ) : (
+          ''
+        )}
+        </div>
+                            {apiload ? (
+                                <div className='d-flex flex-wrap justify-content-center mx-auto my-auto' >
+                                <RotatingLines type="Oval" className='col-12'   color="#3D4648" height={150} width={150} />
+                                <h3 className='col-12 mx-auto text-center mt-3' style={{ color:"#4C9E4B"}}>Please wait, we are getting chatbot ready for you!!!</h3>
+</div>
                             ) : (
                                 ''
                             )}
@@ -547,6 +709,7 @@ console.log(err,"======try catch")
                         </div>
                     </div>
                     <form className="chat-input mt-5 rounded-bottom-4 " style={{ minHeight: '50px', height: '50px', maxWidth: '90vw', minWidth: '240px', width: '100%', bottom: '-2px', position: 'absolute', backgroundColor: fontData.backgroundColor, borderColor: 'black', borderWidth: '2px' }} onSubmit={(e) => handleSubmit(e)}>
+                    {/* <h1 style={{color:'white'}}>{answerCount}</h1> */}
                         <input
                             type="text"
                             style={{ minWidth: '50%' }}

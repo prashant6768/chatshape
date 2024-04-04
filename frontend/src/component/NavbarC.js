@@ -9,6 +9,7 @@ import logo2 from '../assets/Zema_Logo_Original.png'
 import React, { useState, useRef, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { Button, Dropdown } from 'react-bootstrap';
+import axios from 'axios'
 
 
 
@@ -16,8 +17,40 @@ import { Button, Dropdown } from 'react-bootstrap';
 
 const NavbarC = ({ gradientC }) => {
 
+  const BACKEND = process.env.REACT_APP_BACKEND
   const decoded = Cookies.get('accessToken');
   const adminToken = Cookies.get('adminToken');
+
+        // Function to refresh the access token
+const refreshAccessToken = async () => {
+  try {
+    const refreshToken = Cookies.get('refresh_token');
+    const response = await axios.post(`${BACKEND}auth/refresh`, {
+    // const response = await axios.post('http://localhost:5000/login/refresh/', {
+      refresh_token: refreshToken,
+    },{
+    headers: {
+      'Content-type':'application/json', 
+      'Accept':'application/json',
+      'Access-Control-Allow-Origin':'*',
+      'Authorization': `Bearer ${refreshToken}`,
+    },
+  }).then(response =>{
+    if (response.data.token) {
+      // Update the access token in cookies or localStorage
+      Cookies.set('token', response.data.token, { expires: 1, path: '/' });
+      console.log("REfresh ed")
+    }else{console.log(response.data.error)}
+  }).catch(err => console.log(err))
+
+   
+  } catch (error) {
+    console.error('Error refreshing access token:', error);
+  }
+};
+
+// Call refreshAccessToken every 5 minutes (300,000 milliseconds)
+setInterval(refreshAccessToken, 300000);
 
 
   const [isOpen, setIsOpen] = useState(false);

@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Accordion from 'react-bootstrap/Accordion';
 import { ThreeDots } from 'react-loader-spinner';
+import { Tooltip as Tp } from 'react-tooltip'
 import { ToastContainer, toast } from 'react-toastify';
 import { BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill } from 'react-icons/bs'
 
@@ -31,7 +32,8 @@ const SectionOneBotSA = (id) => {
   const adminToken = Cookies.get('adminToken')
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://zemaapi.zema.io/'
+  // const BACKEND = 'https://zemaapi.zema.io/'
+  const BACKEND = process.env.REACT_APP_BACKEND
 
 
   const [comData, setComData] = useState([])
@@ -54,7 +56,8 @@ const SectionOneBotSA = (id) => {
         console.log(res.data[0], "all the data");
         setData(res.data[0]);
         setApiload(false)
-      }else if(res.data == 'You Are Not Authorized'){setApiload(false);toast.error('You Are Not Authorized')}else{console.log(res.data);toast.error("Some Error Ocuured!!!");setApiload(false)}})
+      }else if(res.data == 'You Are Not Authorized'){setApiload(false);toast.error('You Are Not Authorized')}
+      else{console.log(res.data);toast.error("Some Error Ocuured!!!");setApiload(false)}})
       .catch(err => {console.log(err);setApiload(false)})
   }, [])
 
@@ -235,9 +238,10 @@ const SectionOneBotSA = (id) => {
       'Access-Control-Allow-Origin': '*'
     })
       .then(res => {if(res.data[1] == 'ok'){
-        console.log(res.data[0], "all the error data");
+        console.log(res.data[0], "all the erro data");
         setErrData(res.data[0])
-      }else if(res.data == 'You Are Not Authorized'){toast.error("You Are Not Authorized")}else{toast.error("Some Error Occured")}})
+      }else if(res.data == 'You Are Not Authorized'){toast.error("You Are Not Authorized");console.log(res.data)
+    }else{toast.error("Some Error Occured");console.log(res.data)}})
       .catch(err => console.log(err))
   }, [])
 
@@ -423,6 +427,17 @@ const SectionOneBotSA = (id) => {
     setTogRetrain(!togRetrain)
   }
 
+
+  const [addPdf, setAddPdf] = useState("N");
+  const handleCheckboxChangePdf = (event) => {
+    const checkbox = event.target;
+    if (checkbox.checked) {
+      setAddPdf("Y")
+    } else {
+      setAddPdf("N")
+    }
+  };
+
   useEffect(() => {
     if (sendLink !== '' || exclude !== '' || pdfFile !== null) {
       console.log(exclude, '---exclude')
@@ -431,6 +446,7 @@ const SectionOneBotSA = (id) => {
       formData.append('sendLink', sendLink);
       formData.append('exclude', exclude);
       formData.append('multiLink', multiLink);
+      formData.append('addDataToExisting', addPdf);
 
       // formData.append('pdfFile', pdfFile);
 
@@ -664,16 +680,21 @@ const toggleAccordion = (index) => {
           <h4 className='fw-bolder col-12 d-flex justify-content-start container text-start pt-3 mb-2' style={{ color: '#FFFFFF' }}>Source PDF</h4> 
           :<></>
         }
-        {
+       
+        {/* {
           data.pdf ?
-          // <>
-          // <h5 className='fw-bolder col-12 d-flex justify-content-start container text-start pt-3 mb-2' style={{ color: '#FFFFFF' }}>Source PDF</h5>
          data.pdf.map(x =>(
           <h5 className='fw-bolder col-12 d-flex justify-content-start container text-start pt-3 mb-2' style={{ color: '#FFFFFF' }}>{x}</h5>
-))
-// </>       
-          :<></>
+))  :<></>
+        } */}
+         {
+          Array.isArray(data.pdf)?
+         data.pdf.map(x =>(
+          <h5 className='fw-bolder col-12 d-flex justify-content-start container text-start pt-3 mb-2' style={{ color: '#FFFFFF' }}>{x}</h5>
+))  : <h5 className='fw-bolder col-12 d-flex justify-content-start container text-start pt-3 mb-2' style={{ color: '#FFFFFF' }}>{data.pdf}</h5>
+
         }
+       
 
 
 
@@ -842,7 +863,7 @@ const toggleAccordion = (index) => {
              className='col-11 my-2 custom-accordion' >
               <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }} >
                 <Accordion.Header >
-                  {x.time}
+                  {x.time} {x.Name} {x.Email}
                   <span
                         style={{
                           color: '#FFE459',
@@ -1129,8 +1150,8 @@ const toggleAccordion = (index) => {
           <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='URL Used' value={data.url} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >PDF Used</label>
           <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%', minHeight:'100px'}} readOnly placeholder='PDF Used' value={Array.isArray(data.pdf) ? data.pdf.map(String).join('\n') : ''} />
-          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URLs scrapped</label>
-          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%' }} readOnly placeholder='URLs scrapped'  value={Array.isArray(data.urlsUsed) ? data.urlsUsed.join('\n') : ''} />
+          <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URLs Scrapped</label>
+          <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center mb-3 ' style={{ width: '95%' }} readOnly placeholder='URLs Scrapped'  value={Array.isArray(data.urlsUsed) ? data.urlsUsed.join('\n') : ''} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URLs Excluded</label>
           <textarea className='fs-4 d-flex justify-content-center container mt-1 text-center  ' style={{ width: '95%', marginBottom:'50px' }} readOnly placeholder='URLs excluded'  value={Array.isArray(data.urlsEx) ? data.urlsEx.join('\n') : ''} />
           
@@ -1253,6 +1274,22 @@ const toggleAccordion = (index) => {
                   multiple
                   onChange={(e) => setPdfFile(e.target.files)}
                 />
+              </div>
+              <div className="form-check form-switch mt-1 d-flex justify-content-center mb-3">
+                <input
+                  className="form-check-input my-anchor-element-add me-4"
+                  type="checkbox"
+                  role="switch"
+                  id="flexSwitchCheckDefault"
+                  onChange={handleCheckboxChangePdf}
+                />
+                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
+                 Add data to existing knowledge base
+                </label>
+                <Tp anchorSelect=".my-anchor-element-add" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000",fontWeight:'bolder',width:'90vw' }} place="top">
+In 'OFF' state, the knowledge base will be replaced by new data <br/>
+In 'ON' state, the new data will be added to existing knowledge base.
+</Tp>
               </div>
               <div className='form-group'>
                 <button className='btn btn-outline-warning px-5 ' onClick={(e) => handleRetrainToggle(e)}>Retrain Bot</button>

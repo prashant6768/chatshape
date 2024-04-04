@@ -54,7 +54,7 @@ const GuidePageSA = () => {
                     <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
                         <a href='#userdatapage' style={{ textDecoration: 'none' }}> <h5 style={{ color: 'white' }}>User Data Page</h5></a>
                     </li>
-                    <ul className='col-11 my-2'>
+                    <ul className='col-11  my-2'>
                         <li style={{ textDecoration: 'black' }} className='d-flex text-center align-items-center  justify-content-start'>
                             <a href='#udpcard' style={{ textDecoration: 'none' }}> <h6 style={{ color: 'white' }}>Data Cards</h6></a>
                         </li>
@@ -1053,7 +1053,7 @@ const GuidePageSA = () => {
                     Add / Remove Super Admins
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        Super Admins are the users that that are given extra functionalities so as to handle the working of Zema. This table shows the usernames/ emails of the users who are given super admin powers. Super Admins are the only ones that can access the Admin dropdown and the pages inside it. 
+                        Super Admins are the users that are given extra functionalities so as to handle the working of Zema. This table shows the usernames/ emails of the users who are given super admin powers. Super Admins are the only ones that can access the Admin dropdown and the pages inside it. 
                     </p>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
                       To add a new Super Admin, just fill in the email of the Zema user inside the form and click on 'Add Admin'. To become a Super admin, one must have a Zema account. 
@@ -1066,7 +1066,7 @@ const GuidePageSA = () => {
                     Change the knowledge base of chatbot on homepage
                     </h3>
                     <p className=' col-11 d-flex flex-wrap justify-content-start me-auto  text-start pt-2 mb-2' style={{ color: '#FFFFFF' }}>
-                        A chatbot / Chat interface is available on the homepage. It is functional and can be used as a regular chatbot. We can modify it's knowledge base from this form. Just paste the script used for embedding the chatbot into this form and press 'Add Chatbot' button. Zema will automatically find the the cred value inside the script which is used as a unique identity of the chatbot. After submittin the script only the cred value will be visible in the form, along with the name of the chatbot.
+                        A chatbot / Chat interface is available on the homepage. It is functional and can be used as a regular chatbot. We can modify it's knowledge base from this form. Just paste the script used for embedding the chatbot into this form and press 'Add Chatbot' button. Zema will automatically find the cred value inside the script which is used as a unique identity of the chatbot. After submitting the script only the cred value will be visible in the form, along with the name of the chatbot.
                     </p>
 
                     <h3 id='errsuperadmin' className='fw-bolder col-12 d-flex justify-content-start  text-start pt-5 mb-4' style={{ color: '#FFFFFF' }}>

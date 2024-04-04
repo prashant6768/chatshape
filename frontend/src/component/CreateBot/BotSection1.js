@@ -18,10 +18,13 @@ const BotSection1 = () => {
   // const decoded = jose.decodeJwt(token,'notmysecretkey');
   // const decoded = document.cookie.split('=')[1]
   const decoded = Cookies.get('accessToken');
+  const token = Cookies.get('token');
+
   console.log("-----------decoded",decoded)
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://zemaapi.zema.io/'
+  // const BACKEND = 'https://zemaapi.zema.io/'
+  const BACKEND = process.env.REACT_APP_BACKEND
 
 
   const[sendLink,setSendLink]= useState('')
@@ -84,13 +87,23 @@ console.log(multiLink)
       console.log(pair[0] + ', ' + pair[1]);
     }
 
-     axios.post(`${BACKEND}api/sendLinkData`,formData,{
-        'Content-type':'application/json', 
+     axios.post(`${BACKEND}api/sendLinkData`,formData,{headers:{
+        'Content-type':'multipart/form-data', 
         'Accept':'application/json',
         'Access-Control-Allow-Origin':'*',
-    })
+        'Authorization': `Bearer ${token}`,
+    }})
+    
+    
     // .then(res =>console.log("FROM BACKEND = ",res.data)).catch(err => console.log(err))
-    .then(res=>{if(res.data == 'BotF'){ toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoading(false);}else if(res.data == 'FillOne'){ toast.error('Atleast fill one of these, PDF or website URL'); setLoading(false);}else if(res.data == 'SubE'){ toast.error('Your Subscription has Expired, renew subscription for more'); setLoading(false);}else if(res.data == 'noname'){ toast.error('Botname is compulsary'); setLoading(false);}else if(res.data === 'ok'){toast.success('Stored successfully!'); console.log(res.data," working"); setLoading(false);setTimeout(() => { navigate('/mychatbots') }, 2000)}else{toast.error('Some Error Occured!!'); console.log("==========",res.data,"not woring"); setLoading(false)}}).catch(err => {console.log("error  botsection 1 ",err); toast.error('API request failed!'); setLoading(false);})
+    .then(res=>{
+      if(res.data == 'BotF'){ toast.error('You have Finished all your Bots, upgrade subscription for more'); setLoading(false);}
+      else if(res.data == 'FillOne'){ toast.error('Atleast fill one of these, PDF or website URL'); setLoading(false);}
+      else if(res.data == 'SubE'){ toast.error('Your Subscription has Expired, renew subscription for more'); setLoading(false);}
+      else if(res.data == 'noname'){ toast.error('Botname is compulsary'); setLoading(false);}
+      else if(res.data === 'ok'){toast.success('Stored successfully!'); console.log(res.data," working"); setLoading(false);setTimeout(() => { navigate('/mychatbots') }, 2000)}
+      else{toast.error('Some Error Occured!!'); console.log("==========",res.data,"not woring"); setLoading(false)}})
+      .catch(err => {console.log("error  botsection 1 ",err); toast.error('API request failed!'); setLoading(false);})
     console.log(formData)
     }
 
@@ -117,14 +130,14 @@ console.log(multiLink)
        </div>
        <div className="form-check form-switch mt-1 ps-0 d-flex justify-content-center flex-wrap mb-3 ">
       <input
-        className="form-check-input col-12  mx-1"
+        className="form-check-input my-anchor-element col-12  mx-1"
         type="checkbox"
         role="switch"
         id="flexSwitchCheckDefault"
         onChange={handleCheckboxChange}
       />
        {/* <a className='my-anchor-element col-12 '> */}
-      <label className="form-check-label my-anchor-element  col-12" style={{color:'white'}} htmlFor="flexSwitchCheckDefault">
+      <label className="form-check-label   col-12" style={{color:'white'}} htmlFor="flexSwitchCheckDefault">
         Scrap data from Urls found inside the above url.
       </label>
       {/* </a> */}
@@ -142,10 +155,13 @@ console.log(multiLink)
           type="file"
           accept=".pdf"
           style={{backgroundColor:'white',color:'black', borderRadius:'0px'}}
-          className="btn custom-file-input w-100 me-auto"
+          className="btn custom-file-input w-100 me-auto my-anchor-element-pdf"
           multiple
           onChange={(e) => setPdfFile(e.target.files)}
         />
+          <Tp anchorSelect=".my-anchor-element-pdf" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000",fontWeight:'bolder',width:'90vw' }} place="top">
+You can use multiple PDF files as knowledge base.
+</Tp>
       </div>
        <div className="form-group">
        <label>Name of Bot</label>

@@ -39,7 +39,8 @@ const SectionOneUserDataIndiSa = (id) => {
 
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://zemaapi.zema.io/'
+  // const BACKEND = 'https://zemaapi.zema.io/'
+  const BACKEND = process.env.REACT_APP_BACKEND
 
   useEffect(() => {
     setApiload(true)
@@ -50,8 +51,9 @@ const SectionOneUserDataIndiSa = (id) => {
     })
       .then(res => {if(res.data[4] == 'ok'){
         console.log(res.data,"all the data");
-        setDataSub(res.data[0][0]); setDataPay(res.data[1]); setDataBot(res.data[2]);setDataUsername(res.data[3]);setApiload(false)
-      }else if(res.data == 'You Are Not Authorized'){console.log(res.data);setApiload(false);toast.error("You Are Not Authorized")}else{console.log(res.data);setApiload(false);toast.error("Some Error Occured")}})
+        setDataSub(res.data[0][0]); setDataPay(res.data[1]); setDataBot(res.data[2]);setDataUsername(res.data[3]);setApiload(false); console.log(res.data[3])
+      }else if(res.data == 'You Are Not Authorized'){console.log(res.data);setApiload(false);toast.error("You Are Not Authorized")
+    }else{console.log(res.data);setApiload(false);toast.error("Some Error Occured")}})
       .catch(err => {console.log(err); setApiload(false)})
   }, [])
 
@@ -452,14 +454,15 @@ setDecoded1(dataUsername)
 },[dataUsername])
 
 useEffect(() => {
-  console.log("QQQQQQQQQQ ", decoded)
+  console.log(decoded1,"QQQQQQQQQQ ", decoded)
   // const decoded1 = dataUsername
+
   axios.post(`${BACKEND}api/profiledata`, { decoded1 }, {
       'Content-type': 'application/json',
       'Accept': 'application/json',
       'Access-Control-Allow-Origin': '*',
   })
-  .then(res => {if(res.data[1] == 'error'){console.log(res.data[0])}else{ setName(res.data.name); setPhone(res.data.phone); console.log(res.data, "profile") }}).catch(err => console.log(err))
+  .then(res => {if(res.data[1] == 'error'){console.log(res.data[0]);console.log(res.data[1])}else{ setName(res.data.name); setPhone(res.data.phone); console.log(res.data, "profile") }}).catch(err => console.log(err))
   // .then(res => { setName(res.data.name); setPhone(res.data.phone); console.log(res.data, "profile") }).catch(err => console.log(err))
 }, [decoded1])
 

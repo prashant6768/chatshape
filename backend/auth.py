@@ -96,18 +96,8 @@ def login_google():
         prompt="consent",
         # response_type="code"
     )
-
-    
-    # session["oauth_state"] = state
-    # state2 = session.pop("oauth_state", None)
-    # print("121---------------------state2",state2)
-
-    # print("120------------------state",state)
     print("124-----------------redirect--------",authorization_url)
-    
     return authorization_url
-
-
 
 @auth.route("/callback")
 def callback_google():
@@ -616,6 +606,9 @@ def cpOTP():
         print(str(e),"-------389")
         return str(e)     
 
+# curl -X POST -H "Content-type: application/json" -H "Accept: application/json" -d '{"username": "yourUsername", "password": "yourPassword"}' https://zemaapi.zema.io/auth/login
+
+
 @auth.route('/login', methods=[ 'POST'])
 def login():
     if request.method == 'POST':
@@ -677,3 +670,89 @@ def login():
  
 
 
+# @auth.route("/authorize")
+# def authorize():
+#     state = request.args.get('state')
+
+#     scope = "openid email profile"
+
+#     # Replace these variables with your actual client_id and redirect_uri
+#     client_id = GOOGLE_CLIENT_ID
+#     redirect_uri = GOOGLE_REDIRECT_URI2
+
+#     # Construct the Google OAuth URL with the state parameter and an intermediate redirect_uri
+#     params = {
+#         "client_id": client_id,
+#         "response_type": "code",
+#         "scope": scope,
+#         "redirect_uri": redirect_uri,
+#         "access_type": "offline",
+#         "prompt": "consent",
+#         "state": state
+#     }
+#     google_auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
+#     return redirect(f"{google_auth_url}?{urlencode(params)}")
+
+# @auth.get("/intermediate")
+# async def intermediate(request: Request):
+#     code = request.query_params.get('code')
+#     state = request.query_params.get('state')
+#     # Redirect to OpenAI's callback URL with code and state
+
+#     params = {"code": code, "state": state}
+
+#     redirect_uri = request.query_params.get('redirect_uri')
+
+#     print(f"Intermediate redirect with params = {params} and redirect = {redirect_uri}")
+
+#     return RedirectResponse(f"{openai_redirect_uri}?{urlencode(params)}")
+
+#     @auth.route("/token",methods=['GET'])
+# def token():
+#     try:
+#         state = request.args.get('state')
+#         scope = "openid email profile"
+#         code = request.args.get('code')
+
+#        # code = request.form.get('code')
+
+#         print(f"token endpoint: request data = {request.form}")
+
+#         token_url = "https://oauth2.googleapis.com/token"
+#         data = {
+#             "code": code,
+#             "client_id": GOOGLE_CLIENT_ID,
+#             "client_secret": GOOGLE_CLIENT_SECRET,
+#             "redirect_uri": GOOGLE_REDIRECT_URI2,  # Use the same redirect_uri as in /authorize
+#             "grant_type": "authorization_code"
+#         }
+
+#         response = requests.post(token_url, data=data)
+
+#         # Check if the response from Google is successful
+#         if response.status_code != 200:
+#             print("Error during token exchange with Google:", response.status_code, response.text)
+#             return "Token exchange failed with Google", 500
+
+#         token_response = response.json()
+        
+#         # Check if the necessary tokens are present in the response
+#         if "access_token" not in token_response or "refresh_token" not in token_response:
+#             print("Missing tokens in Google's response:", token_response)
+#             return "Missing tokens in response from Google", 500
+
+#         # Return the formatted token response
+#         return jsonify({
+#             "access_token": token_response.get("access_token"),
+#             "token_type": "bearer",
+#             "refresh_token": token_response.get("refresh_token"),
+#             "expires_in": token_response.get("expires_in")
+#         })
+
+#     except requests.RequestException as e:
+#         print("Request exception during token exchange:", e)
+#         return "Token exchange request failed", 500
+
+#     except Exception as e:
+#         print("Unexpected error in /token endpoint:", e)
+#         return "Unexpected error in token exchange", 500

@@ -15,8 +15,9 @@ const ForgetPassword = () => {
     const navigate = useNavigate();
     const gradientC = true
 
-     const BACKEND = 'https://zemaapi.zema.io/'
+    //  const BACKEND = 'https://zemaapi.zema.io/'
     // const BACKEND = 'http://localhost:5000/'
+    const BACKEND = process.env.REACT_APP_BACKEND
     
 
 

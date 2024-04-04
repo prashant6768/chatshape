@@ -52,9 +52,10 @@ const ChatUIDemo = (botID) => {
 
     // const BACKEND = 'http://localhost:5000/'
     // const BACKENDWS = 'ws://localhost:5000/'
-    const BACKEND = 'https://zemaapi.zema.io/'
-    const BACKENDWS = 'wss://zemaapi.zema.io/'
-
+    // const BACKEND = 'https://zemaapi.zema.io/'
+    // const BACKENDWS = 'wss://zemaapi.zema.io/'
+    const BACKEND = process.env.REACT_APP_BACKEND
+    const BACKENDWS = process.env.REACT_APP_BACKENDWS
 
 
     const [socket, setSocket] = useState(null);

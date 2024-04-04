@@ -40,3 +40,46 @@
 .sectionOneGradient {
   background: linear-gradient(107.97deg, rgb(253, 121, 48) 0%, rgb(191, 0, 183) 100%);
 }
+
+@font-face {
+  font-family: Lato;
+  src: url(./Fonts/Lato-Regular.ttf);
+}
+@font-face {
+  font-family: Lato-L;
+  src: url(./Fonts/Lato-Thin.ttf);
+}
+@font-face {
+  font-family: Lato-B;
+  src: url(./Fonts/Lato-Bold.ttf);
+}
+@font-face {
+  font-family: w;
+  src: url(./Fonts/RubikBubbles-Regular.ttf);
+}
+h1 {
+  font-family: 'Lato', sans-serif;
+}
+
+/* h1{
+  font-family:Lato-B,sans-serif;
+} */
+h2{
+  font-family:Lato-B,sans-serif;
+}
+h3{
+  font-family:Lato-B,sans-serif;
+}
+h4{
+  font-family:Lato-B,sans-serif;
+}
+h5{
+  font-family:Lato-B,sans-serif;
+}
+
+p{
+  font-family: Lato,sans-serif ;
+}
+li{
+  font-family: Lato,sans-serif ;
+}

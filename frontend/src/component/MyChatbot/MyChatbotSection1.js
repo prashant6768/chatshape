@@ -20,7 +20,8 @@ const MyChatbotSection1 = () => {
   const [apiload,setApiload] = useState(false)
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://zemaapi.zema.io/'
+  // const BACKEND = 'https://zemaapi.zema.io/'
+  const BACKEND = process.env.REACT_APP_BACKEND
 
 
   useEffect(() => {

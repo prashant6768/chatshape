@@ -21,7 +21,8 @@ const PricingSection1 = () => {
     const [selectedOption, setSelectedOption] = useState('A');
 
     // const BACKEND = 'http://localhost:5000/'
-    const BACKEND = 'https://zemaapi.zema.io/'
+    // const BACKEND = 'https://zemaapi.zema.io/'
+    const BACKEND = process.env.REACT_APP_BACKEND
 
     const handleOptionClick = (option) => {
         setSelectedOption(option);

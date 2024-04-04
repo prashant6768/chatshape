@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import {ThreeDots} from 'react-loader-spinner';
 import { HashLink } from 'react-router-hash-link';
 import { Tooltip as Tp}  from 'react-tooltip'
+import { BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill } from 'react-icons/bs'
+import Accordion from 'react-bootstrap/Accordion';
 
 const SectionOneSA = () => {
 
@@ -16,10 +18,12 @@ const SectionOneSA = () => {
   const adminToken = Cookies.get('adminToken')
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://zemaapi.zema.io/'
+  // const BACKEND = 'https://zemaapi.zema.io/'
+  const BACKEND = process.env.REACT_APP_BACKEND
 
 
   const [data, setData] = useState([])
+  const[filterHistory,setFilterHistory]= useState([])
   const[apiload,setApiload]= useState(false)
 
   useEffect(() => {
@@ -109,6 +113,7 @@ const [filteredData, setFilteredData] = useState(data);
 const[issueData,setIssueData]=useState([])
 const [searchTermIssue, setSearchTermIssue] = useState('');
 const [filteredDataIssue, setFilteredDataIssue] = useState(data);
+const [botId,setBotId]= useState('')
 
 useEffect(()=>{
   axios.post(`${BACKEND}api/admin/issueLog`, { decoded, adminToken }, {
@@ -151,8 +156,24 @@ const scrollWidthOffset = (el) => {
   window.scrollTo({ top: yCoordinate + yOffset, behavior: 'smooth' }); 
 }
 
+const messageStyleSend = {
+  backgroundColor: '#0070DA',
+  fontSize: '14px',
+  // color: '#FFFFFF',
+  fontFamily: 'arial',
+};
+const messageStyleRec = {
+  backgroundColor: '#3D4648',
+  fontSize: '14px',
+  // color: '#FFFFFF',
+  fontFamily: 'arial',
+
+};
+
 const [addBot, setAddBot] = useState('')
 const [botname,setBotname] = useState('')
+const [searchTermPay, setSearchTermPay] = useState([]);
+const [history,setHistory]= useState([])
 
 const handleAddBot = (e) => {
   const credMatch = addBot.match(/cred="(.*?)"/)[1];
@@ -170,8 +191,77 @@ useEffect(()=>{
     'Content-type': 'application/json',
     'Accept': 'application/json',
     'Access-Control-Allow-Origin': '*'
-  }).then(res =>{if(res.data === 'You Are Not Authorized'){console.log("You Are Not Authorized"); toast.error("You Are Not Authorized")}else if(res.data[0] === "Error"){console.log("Error"); toast.success("Some Error Occured")}else {console.log(res.data,"==========166"); setAddBot(res.data[0]);setBotname(res.data[1])}}).catch(err => {console.log(err); toast.error("Some Error Occured") })
+  }).then(res =>{if(res.data === 'You Are Not Authorized'){console.log("You Are Not Authorized"); toast.error("You Are Not Authorized")}else if(res.data[0] === "Error"){console.log("Error"); toast.error("Some Error Occured")}else {console.log(res.data,"==========166"); setAddBot(res.data[0]);setBotname(res.data[1]);setBotId(res.data[2])}}).catch(err => {console.log(err); toast.error("Some Error Occured") })
 },[])
+
+useEffect(() => {
+  console.log("BOT ID ================= ",botId)
+  if (botId !== '') {
+    axios.get(`${BACKEND}api/historyget/${botId}`, {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    }).then(res => { setHistory(res.data); console.log("history ", res.data) }).catch(err => console.log(err))
+  }
+}, [botId])
+
+
+useEffect(()=>{
+  setFilterHistory(history)
+},[history])
+
+const handleSearchHist = (e) => {
+  const input = e.target.value;
+  setSearchTermPay(input);
+
+  const filtered = history.filter((item) => {
+    const regex = new RegExp(input, 'i');
+    for (const key in item) {
+      if (item.hasOwnProperty(key) && regex.test(item[key])) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  setFilterHistory(filtered);
+  console.log("filtered pay", filterHistory)
+};
+
+const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPageHist = 10; 
+const [sortedHistory, setSortedHistory] = useState([]); 
+
+useEffect(() => {
+  const sortedData = Array.isArray(filterHistory)
+    ? filterHistory.sort((a, b) => new Date(b.time) - new Date(a.time))
+    : [];
+
+  setSortedHistory(sortedData);
+  setCurrentPage(1)
+}, [filterHistory]);
+
+const startIndex = (currentPage - 1) * itemsPerPageHist;
+const endIndex = startIndex + itemsPerPageHist;
+
+const itemsToDisplayHist = sortedHistory.slice(startIndex, endIndex);
+
+const handlePageChange = (page) => {
+  if (page >= 1 && page <= Math.ceil(sortedHistory.length / itemsPerPageHist)) {
+    setCurrentPage(page);
+  }
+};
+
+const [openAccordionIndex, setOpenAccordionIndex] = useState(null);
+
+const toggleAccordion = (index) => {
+  if (openAccordionIndex === index) {
+    setOpenAccordionIndex(null);
+  } else {
+    setOpenAccordionIndex(index);
+  }
+};
+
 
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
@@ -352,6 +442,75 @@ useEffect(()=>{
           </Card.Body>
         </Card>
       </div>
+
+      <div className='fs-4 col-12 row d-flex justify-content-center text-center  mb-5 mt-3 mx-1 ' style={{ color: '#FFFFFF' }}>
+            <label className='fs-4 d-flex justify-content-center  col-11 text-center mt-5 mb-5 mx-2' style={{ height: '100%', color: '#FFFFFF' }}>Chat History</label>
+        
+            <input className='fs-4 col-sm-8 col-11 col-lg-10 d-flex justify-content-center rounded-4  mt-4 text-center mb-3 ' type="text"
+                placeholder="Search..."
+                value={searchTermPay}
+                onChange={handleSearchHist}
+                 />
+          {filterHistory === '' ? '':
+          // filterHistory.sort((a, b) => new Date(b.time) - new Date(a.time)).map(x =>
+          itemsToDisplayHist.map((x, index) => (
+            <Accordion
+             alwaysOpen='false'  
+            key={index}
+             activeKey={openAccordionIndex === index ? '0' : null}
+            onSelect={() => toggleAccordion(index)}
+             className='col-11 my-2 custom-accordion' >
+              <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }} >
+                <Accordion.Header >
+                  {x.time} / {x.Name} / {x.Email}
+                  <span
+                        style={{
+                          color: '#FFE459',
+                          position: 'absolute',
+                          right: '25px',
+                          top: '50%',
+                          fontSize: '34px',
+                          transform: 'translateY(-50%)',
+                        }}
+                      >
+                        {openAccordionIndex === index ? '-' : '+'}
+                      </span>
+                      </Accordion.Header>
+                <Accordion.Body style={{ color: 'white' }} >
+                 {x.history.map(message=>
+                  <div
+                  key={message.id}
+                  className={`message ${message.sender === 'me' ? 'sent' : 'received'}`}
+                  style={message.sender === 'me' ? messageStyleSend : messageStyleRec}
+              >
+                  {/* <div id="text-container" className="message-content typing">{message.text}</div> */}
+                  <p style={{ color: 'white' }} className={`my-1 ${message.sender === 'me' ? 'text-end' : 'text-start'}`}>{message.text}</p>
+                  {/* <p  style={{color:'white'}} className="message-content my-1 ">{message.text}</p> */}
+              </div>
+                  )}
+                </Accordion.Body>
+              </Accordion.Item>
+            </Accordion>
+))}
+          </div>
+          
+      <div className=' d-flex justify-content-center fs-4'>    
+      <div
+        onClick={() => handlePageChange(currentPage - 1)}
+        className={` ${currentPage === 1 ? 'disabled' : ''}`}
+      >
+        <BsFillArrowLeftCircleFill style={{color:'white'}} />
+      </div>
+      <p className='d-flex  justify-content-center  text-center mb-1 mt-1 mx-4' style={{ color: '#FFFFFF' }}>
+        Page {currentPage}
+      </p>
+      <div
+        onClick={() => handlePageChange(currentPage + 1)}
+        className={` ${endIndex >= filterHistory.length ? 'disabled' : ''}`}
+      >
+        <BsFillArrowRightCircleFill style={{color:'white'}} />
+      </div>
+    </div>
 
       <ToastContainer position="top-center" autoClose={5000} hideProgressBar={true} />
     </div>

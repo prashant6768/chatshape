@@ -80,7 +80,8 @@ const ManageBot = (id) => {
   const [resizer, setResizer] = useState(true)
 
   // const BACKEND = 'http://localhost:5000/'
-  const BACKEND = 'https://zemaapi.zema.io/'
+  // const BACKEND = 'https://zemaapi.zema.io/'
+  const BACKEND = process.env.REACT_APP_BACKEND
 
   const [apiload,setApiload] = useState(false)
 
@@ -95,6 +96,7 @@ const ManageBot = (id) => {
   const [history, setHistory] = useState('')
   const [urlsUsed, setUrlsUsed] = useState([])
   const [urlsEx, setUrlsEx] = useState([])
+  const [sources,setSources] = useState([])
 
 
   const handleCreateGraph = () => {
@@ -132,13 +134,17 @@ const ManageBot = (id) => {
     setUrlsUsed(dataArr.urlsUsed)
     setUrlsEx(dataArr.urlsEx)
     setEmbeddedQA(dataArr.embeddedQA)
-    console.log("---131----", dataArr.embeddedQA)
+    if (dataArr && dataArr.metadataUnique) {
+      setSources(dataArr.metadataUnique.map(item => item.source));
+    console.log(dataArr,"---131----",dataArr.metadataUnique.map(item => item.source))
+
+    }
     setSPrompt(dataArr.sPrompt)
     setInitialMsg(dataArr.initialMsg)
     setTokenDataGraph(dataArr.tokenData)
     setConDataGraph(dataArr.UniqueConData)
     console.log("------qqqqqqqq--", dataArr.urlsUsed)
-    console.log(dataArr.tokenData, "------", dataArr.UniqueConData)
+    console.log(dataArr.url, "------", dataArr.UniqueConData)
     console.log("------qqqpdfffffqqqqq--", dataArr.pdf)
 
     //   setUrl(dataArr.url)
@@ -239,7 +245,7 @@ const ManageBot = (id) => {
     }
   };
 
-  const [addPdf, setAddPdf] = useState(false);
+  const [addPdf, setAddPdf] = useState("N");
   const handleCheckboxChangePdf = (event) => {
     const checkbox = event.target;
     if (checkbox.checked) {
@@ -267,6 +273,7 @@ const ManageBot = (id) => {
       formData.append('sendLink', sendLink);
       formData.append('exclude', exclude);
       formData.append('multiLink', multiLink);
+      formData.append('addDataToExisting', addPdf);
 
       // formData.append('pdfFile', pdfFile);
       if (pdfFile) {
@@ -311,7 +318,7 @@ const ManageBot = (id) => {
         'Content-type': 'application/json',
         'Accept': 'application/json',
         'Access-Control-Allow-Origin': '*',
-      }).then(res => { setHistory(res.data); console.log("history ", res.data) }).catch(err => console.log(err))
+      }).then(res => {if(res.data[0]== 'error'){console.log("321----",res.data[1])}else{ setHistory(res.data); console.log("history ", res.data)} }).catch(err => console.log(err))
     }
   }, [vis])
 
@@ -436,6 +443,16 @@ const ManageBot = (id) => {
     toast.success('Script Copied', 3000)
   };
 
+  const handleRemoveMetadata=(data)=>{
+    // e.preventDefault()
+    console.log("remove    ",data)
+    axios.post(`${BACKEND}api/deletemetadata/${id.id}`, {data},{
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }).then(res => {if(res.data[0] == 'Error'){console.log(res.data[1]);toast.error('Some Error Occured!!!')}else if(res.data == 'ok'){toast.success("Data Removed");setTimeout(() => { window.location.reload(true) }, 1000)}else{console.log(res.data);toast.error("Some Error Occured")}}).catch(err => {toast.error('Some Error Occured');console.log(err)})
+
+  }
 
   return (
     <div className='pb-5' style={{ backgroundColor: '#171725', height: '100%', minHeight: '100vh', width: '100vw' }}>
@@ -478,15 +495,16 @@ const ManageBot = (id) => {
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF', marginTop: '100px' }} >Add this Script to your website to get your chatbot</label>
           {/* <textarea id='textareascript' className='fs-4 d-flex justify-content-center container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={`<script src="https://cdn.jsdelivr.net/gh/Aniket-Shival/popup@Aniket-Shival-mic-3/popup.js" defer id="popup" cred="${id.id}"></script>`} /> */}
 
-          <Tp anchorSelect=".my-anchor-element" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000", fontWeight: 'bolder' }} place="top">
+          <Tp anchorSelect=".my-anchor-element-script" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000", fontWeight: 'bolder' }} place="top">
             Click to Copy the script
           </Tp>
-          <textarea id='textareascript' className='fs-4 d-flex justify-content-center my-anchor-element container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={embedScript}
+          <textarea id='textareascript' className='fs-4 d-flex justify-content-center my-anchor-element-script container text-center  mb-3' readOnly style={{ height: '100px', width: '95%', }} placeholder='Script' value={embedScript}
             onClick={handleCopyClick}
           />
 
 
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >URL Used</label>
+
           <input className='fs-4 d-flex justify-content-center container mt-1 text-center  mb-3' style={{ width: '95%' }} readOnly placeholder='URL Used' value={url} />
           <label className='fs-4 d-flex justify-content-center container text-center mb-3' style={{ height: '100%', color: '#FFFFFF' }}  >PDF Used</label>
           {
@@ -589,6 +607,29 @@ const ManageBot = (id) => {
             </>
           )}
 
+<div className='row col-11 mx-auto mt-4 d-flex '>
+        <Card style={{ backgroundColor: '#212529' }} className='  d-flex rounded-4'>
+          <Card.Body className="d-flex flex-column" style={{}}>
+
+            {
+              sources.map(x => (
+                <div className='row col-12 mt-2 d-flex justify-content-between pb-2' style={{ borderBottom: '1px solid white', display: 'flex', flexWrap: 'wrap' }}>
+                  <div className='col-lg-10 col-sm-10'>
+                    <p className='col-12 d-flex justify-content-start text-start' style={{ color: '#FFFFFF', wordBreak: 'break-all' }}>
+                      {x.replace('/home/ubuntu/zema/PDF/', '')}
+                      </p>
+                  </div>
+                  <div className='col-lg-2 col-sm-2'>
+                    <button className='btn btn-outline-danger col-12 d-flex justify-content-center text-center ' value={x} 
+                    onClick={(e)=>{handleRemoveMetadata(e.target.value)}}
+                     style={{  }}>Remove</button>
+                  </div>
+                </div>
+              ))}
+          </Card.Body>
+        </Card>
+      </div>
+
           {/* update bot */}
           <div className='fs-4 col-12 d-flex justify-content-center  text-center mb-5 mt-3' style={{ color: '#FFFFFF', backgroundColor: '#242439' }}>
             <form className='col-sm-9 mb-5 col-11 mx-auto ' style={{ marginTop: '50px' }}>
@@ -635,7 +676,7 @@ const ManageBot = (id) => {
               </div>
               <div className="form-check form-switch mt-1 d-flex justify-content-center mb-3">
                 <input
-                  className="form-check-input me-4"
+                  className="form-check-input my-anchor-element me-4"
                   type="checkbox"
                   role="switch"
                   id="flexSwitchCheckDefault"
@@ -644,6 +685,9 @@ const ManageBot = (id) => {
                 <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
                   Scrap data from URLs found inside the above url
                 </label>
+                <Tp anchorSelect=".my-anchor-element" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000",fontWeight:'bolder',width:'90vw' }} place="top">
+  In "Off State", the chatbot will have data from only the URL provided. <br/> In "On State", the chatbot will also have data from additional webpages whose URLs it finds in the given webpage 
+</Tp>
               </div>
               <div className="form-group">
                 <label>Pages you want to exclude from the chatbot (Write each individual link in seperate line)</label>
@@ -655,22 +699,29 @@ const ManageBot = (id) => {
                   type="file"
                   accept=".pdf"
                   style={{ backgroundColor: 'white', color: 'black', borderRadius: '0px' }}
-                  className="btn custom-file-input w-100 me-auto"
+                  className="btn custom-file-input w-100 me-auto my-anchor-element-pdf"
                   onChange={(e) => setPdfFile(e.target.files)}
                   multiple
                 />
               </div>
+              <Tp anchorSelect=".my-anchor-element-pdf" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000",fontWeight:'bolder',width:'90vw' }} place="top">
+You can use multiple PDF files as knowledge base.
+</Tp>
               <div className="form-check form-switch mt-1 d-flex justify-content-center mb-3">
                 <input
-                  className="form-check-input me-4"
+                  className="form-check-input my-anchor-element-add me-4"
                   type="checkbox"
                   role="switch"
                   id="flexSwitchCheckDefault"
                   onChange={handleCheckboxChangePdf}
                 />
                 <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
-                 Add PDF data to existing knowledge base
+                 Add data to existing knowledge base
                 </label>
+                <Tp anchorSelect=".my-anchor-element-add" style={{ backgroundColor: "rgba(255, 255, 255,1)", color: "#000000",fontWeight:'bolder',width:'90vw' }} place="top">
+In 'OFF' state, the knowledge base will be replaced by new data <br/>
+In 'ON' state, the new data will be added to existing knowledge base.
+</Tp>
               </div>
               <div className='form-group'>
                 <button className='btn btn-outline-warning px-5 ' onClick={(e) => handleRetrainToggle(e)}>Retrain Bot</button>
@@ -818,7 +869,7 @@ const ManageBot = (id) => {
                 >
                   <Accordion.Item eventKey="0" style={{ backgroundColor: '#212529', border: '1px solid #4A5AB0' }}>
                     <Accordion.Header>
-                      {x.time}
+                      {x.time} {x.Name} {x.Email}
                       <span
                         style={{
                           color: '#FFE459',

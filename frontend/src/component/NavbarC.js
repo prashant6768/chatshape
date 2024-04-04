@@ -22,35 +22,35 @@ const NavbarC = ({ gradientC }) => {
   const adminToken = Cookies.get('adminToken');
 
         // Function to refresh the access token
-const refreshAccessToken = async () => {
-  try {
-    const refreshToken = Cookies.get('refresh_token');
-    const response = await axios.post(`${BACKEND}auth/refresh`, {
-    // const response = await axios.post('http://localhost:5000/login/refresh/', {
-      refresh_token: refreshToken,
-    },{
-    headers: {
-      'Content-type':'application/json', 
-      'Accept':'application/json',
-      'Access-Control-Allow-Origin':'*',
-      'Authorization': `Bearer ${refreshToken}`,
-    },
-  }).then(response =>{
-    if (response.data.token) {
-      // Update the access token in cookies or localStorage
-      Cookies.set('token', response.data.token, { expires: 1, path: '/' });
-      console.log("REfresh ed")
-    }else{console.log(response.data.error)}
-  }).catch(err => console.log(err))
+// const refreshAccessToken = async () => {
+//   try {
+//     const refreshToken = Cookies.get('refresh_token');
+//     const response = await axios.post(`${BACKEND}auth/refresh`, {
+//     // const response = await axios.post('http://localhost:5000/login/refresh/', {
+//       refresh_token: refreshToken,
+//     },{
+//     headers: {
+//       'Content-type':'application/json', 
+//       'Accept':'application/json',
+//       'Access-Control-Allow-Origin':'*',
+//       'Authorization': `Bearer ${refreshToken}`,
+//     },
+//   }).then(response =>{
+//     if (response.data.token) {
+//       // Update the access token in cookies or localStorage
+//       Cookies.set('token', response.data.token, { expires: 1, path: '/' });
+//       console.log("REfresh ed")
+//     }else{console.log(response.data.error)}
+//   }).catch(err => console.log(err))
 
    
-  } catch (error) {
-    console.error('Error refreshing access token:', error);
-  }
-};
+//   } catch (error) {
+//     console.error('Error refreshing access token:', error);
+//   }
+// };
 
-// Call refreshAccessToken every 5 minutes (300,000 milliseconds)
-setInterval(refreshAccessToken, 300000);
+// // Call refreshAccessToken every 5 minutes (300,000 milliseconds)
+// setInterval(refreshAccessToken, 300000);
 
 
   const [isOpen, setIsOpen] = useState(false);
